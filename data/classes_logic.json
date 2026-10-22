@@ -20,100 +20,143 @@
           "name": "checkUsername",
           "static": true,
           "vis": "+",
-          "params": ["s: string"],
+          "params": [
+            "s: string"
+          ],
           "returns": "string",
           "summary": "3–20 ký tự, chỉ chữ không dấu, số, `_`, bắt đầu bằng chữ, không phải tên Windows cấm.",
           "role": "Username còn là tên file hồ sơ, nên quy tắc này bảo vệ cả việc tạo file.",
           "detail": "Tên Windows cấm (so chữ thường): `con`, `prn`, `aux`, `nul`, `com1`…`com9`, `lpt1`…`lpt9`. Vì chỉ cho chữ, số và `_`, các ký tự cấm trong tên file (`\\ / : * ? \" < > |`, dấu cách) tự bị loại.",
-          "pre": ["`s` đã được trim."],
-          "post": ["Trả `\"\"` thì `s` dùng được làm tên file."],
+          "pre": [
+            "`s` đã được trim."
+          ],
+          "post": [
+            "Trả `\"\"` thì `s` dùng được làm tên file."
+          ],
           "complexity": "O(n)",
           "example": "`nva`, `NVA01` → `\"\"`. `nv`, `1nva`, `nguyen van a` → `\"Username dai 3-20 ky tu, chi gom chu, so, _ va bat dau bang chu\"`. `con` → `\"Username trung ten danh rieng cua Windows\"`.",
-          "cpp": "Kiểm từng ký tự: `if (!isalnum((unsigned char)c) && c != '_') return \"...\";` (`#include <cctype>`). Tên cấm: `std::string t = Util::toLower(s); if (t == \"con\" || t == \"prn\" || t == \"aux\" || t == \"nul\" || (t.size() == 4 && (t.compare(0, 3, \"com\") == 0 || t.compare(0, 3, \"lpt\") == 0) && t[3] >= '1' && t[3] <= '9')) return \"...\";`"
+          "cpp": "Kiểm lần lượt: độ dài; ký tự đầu là chữ (`isalpha`); mọi ký tự là chữ, số hoặc `_` (`isalnum`). Cuối cùng đổi về chữ thường và so với danh sách tên Windows cấm."
         },
         {
           "name": "checkPassword",
           "static": true,
           "vis": "+",
-          "params": ["s: string"],
+          "params": [
+            "s: string"
+          ],
           "returns": "string",
           "summary": "6–20 ký tự có mã 33–126 (không dấu cách, không chữ có dấu).",
           "role": "Dấu cách bị cấm vì trong Employees.txt các cột cách nhau bằng dấu cách. Hai luật «khác 111111» và «khác mật khẩu cũ» nằm ở `HrSystem.checkNewPassword`.",
-          "pre": ["Không có."],
-          "post": ["Trả `\"\"` thì mật khẩu ghi được vào file mà không lệch cột."],
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "Trả `\"\"` thì mật khẩu ghi được vào file mà không lệch cột."
+          ],
           "complexity": "O(n)",
           "example": "`abc12345` → `\"\"`. `abc 1234`, `abc1` → `\"Mat khau dai 6-20 ky tu, khong co dau cach va chu co dau\"`.",
-          "cpp": "`if (s.size() < 6 || s.size() > 20) return MSG; for (size_t i = 0; i < s.size(); i++) if (s[i] < 33 || s[i] > 126) return MSG; return \"\";` (với `char` có dấu, chữ có dấu cho giá trị âm nên cũng bị bắt)."
+          "cpp": "Kiểm độ dài, rồi từng ký tự có mã trong khoảng 33–126."
         },
         {
           "name": "checkFullName",
           "static": true,
           "vis": "+",
-          "params": ["s: string"],
+          "params": [
+            "s: string"
+          ],
           "returns": "string",
           "summary": "Không rỗng, tối đa 50 ký tự, chỉ chữ cái không dấu và dấu cách.",
           "role": "Hàm duy nhất quyết định ký tự nào được phép trong họ tên.",
-          "pre": ["`s` đã được trim (nên không thể chỉ gồm dấu cách)."],
-          "post": ["Trả `\"\"` thì ghi được thành một dòng của file hồ sơ."],
+          "pre": [
+            "`s` đã được trim (nên không thể chỉ gồm dấu cách)."
+          ],
+          "post": [
+            "Trả `\"\"` thì ghi được thành một dòng của file hồ sơ."
+          ],
           "complexity": "O(n)",
           "example": "`Nguyen Van A` → `\"\"`. `Nguyen Van A2`, chuỗi rỗng → `\"Ho ten 1-50 ky tu, chi gom chu khong dau va dau cach\"`.",
-          "cpp": "`if (s.empty() || s.size() > 50) return MSG; for (...) if (!isalpha((unsigned char)s[i]) && s[i] != ' ') return MSG; return \"\";`"
+          "cpp": "Kiểm rỗng và độ dài, rồi từng ký tự là chữ cái (`isalpha`) hoặc dấu cách."
         },
         {
           "name": "checkAddress",
           "static": true,
           "vis": "+",
-          "params": ["s: string"],
+          "params": [
+            "s: string"
+          ],
           "returns": "string",
           "summary": "Không rỗng, tối đa 100 ký tự in được (chữ không dấu, số, dấu câu, dấu cách).",
           "role": "Địa chỉ nhập tự do nhất, nên chỉ chặn độ dài và ký tự lạ.",
-          "pre": ["`s` đã được trim."],
-          "post": ["Trả `\"\"` thì ghi được thành một dòng của file hồ sơ."],
+          "pre": [
+            "`s` đã được trim."
+          ],
+          "post": [
+            "Trả `\"\"` thì ghi được thành một dòng của file hồ sơ."
+          ],
           "complexity": "O(n)",
           "example": "`12/3 Le Loi, Q1` → `\"\"`. Chuỗi rỗng hoặc 120 ký tự → `\"Dia chi 1-100 ky tu, khong dung chu co dau\"`.",
-          "cpp": "`if (s.empty() || s.size() > 100) return MSG; for (...) if (s[i] < 32 || s[i] > 126) return MSG; return \"\";`"
+          "cpp": "Kiểm rỗng và độ dài, rồi từng ký tự có mã trong khoảng 32–126."
         },
         {
           "name": "checkPhone",
           "static": true,
           "vis": "+",
-          "params": ["s: string"],
+          "params": [
+            "s: string"
+          ],
           "returns": "string",
           "summary": "Đúng 10 chữ số, bắt đầu bằng 0.",
           "role": "Kiểm số di động Việt Nam ở dạng đơn giản nhất.",
-          "pre": ["`s` đã được trim."],
-          "post": ["Trả `\"\"` thì `s` gồm đúng 10 chữ số, bắt đầu bằng 0."],
+          "pre": [
+            "`s` đã được trim."
+          ],
+          "post": [
+            "Trả `\"\"` thì `s` gồm đúng 10 chữ số, bắt đầu bằng 0."
+          ],
           "complexity": "O(n)",
           "example": "`0912345678` → `\"\"`. `912345678`, `0912-345-678`, `+84912345678` → `\"So dien thoai gom dung 10 chu so va bat dau bang 0\"`.",
-          "cpp": "`if (s.size() != 10 || !Util::isAllDigits(s) || s[0] != '0') return MSG; return \"\";`"
+          "cpp": "Kiểm độ dài 10, toàn chữ số (`Util::isAllDigits`) và ký tự đầu là `'0'`."
         },
         {
           "name": "checkEmail",
           "static": true,
           "vis": "+",
-          "params": ["s: string"],
+          "params": [
+            "s: string"
+          ],
           "returns": "string",
           "summary": "Dạng `ten@ten-mien.duoi` ở mức đơn giản; tối đa 50 ký tự, không dấu cách.",
           "role": "Chặn các lỗi gõ thường gặp; không cố bắt mọi trường hợp của chuẩn email.",
           "detail": "Lỗi khi: rỗng hoặc dài hơn 50; có dấu cách; số `@` khác 1; trước `@` rỗng; sau `@` không có `.`, hoặc `.` nằm ngay sau `@` hay ở cuối.",
-          "pre": ["`s` đã được trim."],
-          "post": ["Trả `\"\"` thì có đúng một `@` và tên miền có dấu chấm."],
+          "pre": [
+            "`s` đã được trim."
+          ],
+          "post": [
+            "Trả `\"\"` thì có đúng một `@` và tên miền có dấu chấm."
+          ],
           "complexity": "O(n)",
           "example": "`nva@gmail.com` → `\"\"`. `nva@gmail`, `@gmail.com`, `nva@@gmail.com`, `nva@.com`, `nva@gmail.` → `\"Email khong hop le (vi du dung: ten@gmail.com)\"`.",
-          "cpp": "`size_t at = s.find('@'); if (s.empty() || s.size() > 50 || s.find(' ') != std::string::npos || at == 0 || at == std::string::npos || s.find('@', at + 1) != std::string::npos) return MSG; size_t dot = s.find('.', at + 1); if (dot == std::string::npos || dot == at + 1 || s[s.size() - 1] == '.') return MSG; return \"\";`"
+          "cpp": "Dùng `find` lấy vị trí `@`, kiểm không có `@` thứ hai và không có dấu cách; rồi tìm dấu `.` sau `@` và kiểm vị trí của nó theo các điều kiện ở phần mô tả."
         },
         {
           "name": "checkField",
           "static": true,
           "vis": "+",
-          "params": ["field: ProfileField", "value: string"],
+          "params": [
+            "field: ProfileField",
+            "value: string"
+          ],
           "returns": "string",
           "summary": "Kiểm một thông tin hồ sơ theo tên của nó.",
           "role": "Menu thêm nhân viên và menu cập nhật duyệt 4 thông tin bằng vòng lặp, nên cần một hàm kiểm chung.",
-          "pre": ["`value` đã được trim."],
-          "post": ["Bằng kết quả của hàm kiểm tương ứng."],
+          "pre": [
+            "`value` đã được trim."
+          ],
+          "post": [
+            "Bằng kết quả của hàm kiểm tương ứng."
+          ],
           "example": "`checkField(ProfileField::EMAIL, \"nva@gmail\")` → câu lỗi email.",
-          "cpp": "`switch (field) { case ProfileField::FULL_NAME: return checkFullName(value); case ProfileField::ADDRESS: return checkAddress(value); case ProfileField::PHONE: return checkPhone(value); default: return checkEmail(value); }`"
+          "cpp": "Một `switch` trên `field`, mỗi nhánh gọi hàm kiểm tương ứng."
         }
       ],
       "impl": {
@@ -126,7 +169,10 @@
       "read": 9,
       "stage": 4,
       "readWhy": "Các ràng buộc dữ liệu; HrSystem và menu admin đều gọi.",
-      "pos": [450, 950]
+      "pos": [
+        450,
+        950
+      ]
     },
     {
       "id": "HrSystem",
@@ -174,15 +220,21 @@
           "params": [],
           "summary": "Gắn hai danh sách với hai file; chưa đọc file.",
           "role": "`Application` có đúng một `HrSystem`.",
-          "pre": ["Không có."],
-          "post": ["Hai danh sách rỗng cho tới khi gọi `initialize`."],
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "Hai danh sách rỗng cho tới khi gọi `initialize`."
+          ],
           "example": "`HrSystem system;`",
-          "cpp": "`HrSystem::HrSystem() : m_admins(\"data/Administrators.txt\"), m_employees(\"data/Employees.txt\") {}`"
+          "cpp": "Truyền đường dẫn hai file cho hai danh sách trong danh sách khởi tạo."
         },
         {
           "name": "initialize",
           "vis": "+",
-          "params": ["messages: vector<string>&"],
+          "params": [
+            "messages: vector<string>&"
+          ],
           "returns": "bool",
           "summary": "Chuẩn bị lúc khởi động: tạo thư mục, đọc hai file, bỏ nhân viên trùng tên admin, tạo đủ 3 admin.",
           "role": "Gọi một lần, trước màn hình đăng nhập.",
@@ -192,173 +244,266 @@
             "Nhân viên trùng username với admin thì bỏ (duyệt từ cuối về đầu để chỉ số không lệch).",
             "Thử lần lượt `admin1`, `admin2`... (bỏ qua tên đã có) cho tới khi đủ 3 admin, mật khẩu `123456`; mỗi admin tạo thêm thì thêm câu «Da tao admin mac dinh: admin2 / 123456» vào `messages`. Có tạo thì `m_admins.save()`."
           ],
-          "pre": ["Gọi một lần."],
-          "post": ["Trả true: có ít nhất 3 admin; hai file danh sách tồn tại."],
+          "pre": [
+            "Gọi một lần."
+          ],
+          "post": [
+            "Trả true: có ít nhất 3 admin; hai file danh sách tồn tại."
+          ],
           "complexity": "O(n²)",
           "example": "Lần chạy đầu, thư mục trống: tạo `data`, `data/users`, Employees.txt rỗng, Administrators.txt có `admin1`, `admin2`, `admin3`; `messages` có 3 câu.",
-          "cpp": "`int k = 1; while (m_admins.size() < 3) { std::string name = \"admin\" + std::to_string(k++); if (isUsernameTaken(name)) continue; m_admins.add(Admin(name, \"123456\")); messages.push_back(\"Da tao admin mac dinh: \" + name + \" / 123456\"); }`"
+          "cpp": "Làm lần lượt các bước ở phần mô tả. Phần tạo admin là một vòng `while` thử tên `admin1`, `admin2`... (ghép số bằng `std::to_string`) cho tới khi đủ 3."
         },
         {
           "name": "login",
           "vis": "+",
-          "params": ["username: string", "password: string", "role: Role&", "accountName: string&"],
+          "params": [
+            "username: string",
+            "password: string",
+            "role: Role&",
+            "accountName: string&"
+          ],
           "returns": "bool",
           "summary": "Kiểm tra đăng nhập chung; đúng thì cho biết vai trò và username như trong file.",
           "role": "Màn hình đăng nhập trong `Application` gọi hàm này.",
           "detail": "Tìm trong admin trước, rồi nhân viên (không phân biệt hoa thường). Không có tài khoản hay sai mật khẩu đều trả false như nhau, để người lạ không dò được username nào có thật.",
-          "pre": ["Không có."],
-          "post": ["Trả true: `role` và `accountName` có giá trị.", "Trả false: hai tham số đó không đổi."],
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "Trả true: `role` và `accountName` có giá trị.",
+            "Trả false: hai tham số đó không đổi."
+          ],
           "complexity": "O(n)",
           "example": "File có `nva 111111 1`: `login(\"NVA\", \"111111\", role, name)` trả true, `role` = `Role::EMPLOYEE`, `name` = `\"nva\"`. Sai mật khẩu hay username lạ → false.",
-          "cpp": "`int i = m_admins.indexOf(username); if (i != -1 && m_admins.at(i).checkPassword(password)) { role = Role::ADMIN; accountName = m_admins.at(i).getUsername(); return true; }` rồi làm tương tự với `m_employees`; cuối hàm `return false;`."
+          "cpp": "Tìm vị trí trong danh sách admin bằng `indexOf`; có và đúng mật khẩu thì ghi kết quả vào hai tham số rồi trả true. Không thì làm tương tự với danh sách nhân viên."
         },
         {
           "name": "needsPasswordChange",
           "vis": "+",
-          "params": ["username: string"],
+          "params": [
+            "username: string"
+          ],
           "returns": "bool",
           "summary": "Nhân viên này có phải đổi mật khẩu ngay không (cờ đang bật).",
           "role": "Ngay sau khi nhân viên đăng nhập đúng, `Application` hỏi hàm này.",
-          "pre": ["Không có."],
-          "post": ["Admin hoặc username lạ: false."],
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "Admin hoặc username lạ: false."
+          ],
           "example": "Dòng `nva 111111 1` → true.",
-          "cpp": "`int i = m_employees.indexOf(username); return i != -1 && m_employees.at(i).needsPasswordChange();`"
+          "cpp": "Tìm vị trí bằng `indexOf`; không có thì false, có thì hỏi cờ của nhân viên đó."
         },
         {
           "name": "verifyPassword",
           "vis": "+",
-          "params": ["username: string", "password: string"],
+          "params": [
+            "username: string",
+            "password: string"
+          ],
           "returns": "bool",
           "summary": "Mật khẩu có đúng là mật khẩu hiện tại của nhân viên này không.",
           "role": "Bước «nhập mật khẩu để xác nhận chủ tài khoản» khi đổi mật khẩu tự nguyện.",
-          "pre": ["Không có."],
-          "post": ["Username không phải nhân viên: false."],
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "Username không phải nhân viên: false."
+          ],
           "example": "Dòng `lthb abc12345 0`: `verifyPassword(\"lthb\", \"abc12345\")` = true.",
-          "cpp": "`int i = m_employees.indexOf(username); return i != -1 && m_employees.at(i).checkPassword(password);`"
+          "cpp": "Tìm vị trí bằng `indexOf`; không có thì false, có thì gọi `checkPassword` của nhân viên đó."
         },
         {
           "name": "checkNewUsername",
           "vis": "+",
-          "params": ["username: string"],
+          "params": [
+            "username: string"
+          ],
           "returns": "string",
           "summary": "Username có dùng được cho nhân viên mới không: đúng quy tắc và chưa ai dùng.",
           "role": "Menu thêm nhân viên gọi ngay sau khi admin gõ username, để báo lỗi trước khi hỏi 4 thông tin còn lại.",
-          "pre": ["`username` đã được trim."],
-          "post": ["Trả `\"\"` thì tạo được nhân viên với username này."],
+          "pre": [
+            "`username` đã được trim."
+          ],
+          "post": [
+            "Trả `\"\"` thì tạo được nhân viên với username này."
+          ],
           "example": "Đã có `nva` và admin `admin1`: `\"NVA\"`, `\"admin1\"` → `\"Username da ton tai\"`; `\"ab\"` → câu lỗi định dạng; `\"ttc\"` → `\"\"`.",
-          "cpp": "`std::string error = Validator::checkUsername(username); if (!error.empty()) return error; if (isUsernameTaken(username)) return \"Username da ton tai\"; return \"\";`"
+          "cpp": "Gọi `Validator::checkUsername`, có lỗi thì trả luôn; sau đó kiểm trùng bằng `isUsernameTaken`."
         },
         {
           "name": "checkNewPassword",
           "vis": "+",
-          "params": ["username: string", "newPassword: string"],
+          "params": [
+            "username: string",
+            "newPassword: string"
+          ],
           "returns": "string",
           "summary": "Mật khẩu mới của nhân viên có hợp lệ không: đúng quy tắc, khác `111111`, khác mật khẩu hiện tại.",
           "role": "Menu nhân viên gọi ngay sau lần gõ mật khẩu mới thứ nhất.",
-          "pre": ["`username` là nhân viên."],
-          "post": ["Trả `\"\"` thì đặt được mật khẩu này."],
+          "pre": [
+            "`username` là nhân viên."
+          ],
+          "post": [
+            "Trả `\"\"` thì đặt được mật khẩu này."
+          ],
           "example": "Mật khẩu hiện tại `111111`: `\"abc\"` → câu lỗi quy tắc; `\"111111\"` → `\"Khong duoc dung mat khau mac dinh 111111\"`; `\"Moi12345\"` → `\"\"`. Mật khẩu hiện tại `Moi12345`: `\"Moi12345\"` → `\"Mat khau moi phai khac mat khau cu\"`.",
-          "cpp": "`std::string error = Validator::checkPassword(newPassword); if (!error.empty()) return error; if (newPassword == Employee::defaultPassword()) return \"...\"; if (m_employees.at(m_employees.indexOf(username)).checkPassword(newPassword)) return \"...\"; return \"\";`"
+          "cpp": "Lần lượt: `Validator::checkPassword`; so với `Employee::defaultPassword()`; so với mật khẩu hiện tại bằng `checkPassword`."
         },
         {
           "name": "addEmployee",
           "vis": "+",
-          "params": ["username: string", "profile: UserProfile"],
+          "params": [
+            "username: string",
+            "profile: UserProfile"
+          ],
           "returns": "string",
           "summary": "Thêm nhân viên: ghi file hồ sơ, thêm dòng `username 111111 1` vào Employees.txt.",
           "role": "Chức năng a của admin.",
           "detail": "Menu đã kiểm từng ô khi nhập, nên ở đây chỉ kiểm lại username (`checkNewUsername`). Ghi file hồ sơ trước (`Util.writeLines(profilePath(username), profile.toLines())`), rồi `add(Employee::createNew(username))` và `m_employees.save()`. Ghi lỗi thì trả `\"Khong ghi duoc file du lieu\"`.",
-          "pre": ["4 thông tin trong `profile` đã được kiểm."],
-          "post": ["Trả `\"\"`: Employees.txt có thêm dòng mới; có file `data/users/<username viết thường>.txt`."],
+          "pre": [
+            "4 thông tin trong `profile` đã được kiểm."
+          ],
+          "post": [
+            "Trả `\"\"`: Employees.txt có thêm dòng mới; có file `data/users/<username viết thường>.txt`."
+          ],
           "example": "`addEmployee(\"nva\", p)` → `\"\"`; Employees.txt thêm `nva 111111 1`; tạo `data/users/nva.txt` 4 dòng.",
-          "cpp": "`if (!Util::writeLines(profilePath(username), profile.toLines())) return FILE_ERROR; m_employees.add(Employee::createNew(username)); return m_employees.save() ? \"\" : FILE_ERROR;`"
+          "cpp": "Ghi file hồ sơ trước, rồi thêm `Employee::createNew(...)` vào danh sách và `save`. Câu lỗi ghi file dùng nhiều lần nên đặt thành một hằng trong file .cpp."
         },
         {
           "name": "removeEmployee",
           "vis": "+",
-          "params": ["username: string"],
+          "params": [
+            "username: string"
+          ],
           "returns": "string",
           "summary": "Xóa nhân viên: bỏ dòng khỏi Employees.txt và xóa file hồ sơ.",
           "role": "Chức năng b của admin. Hỏi xác nhận y/n do menu làm trước khi gọi.",
-          "pre": ["Không có."],
-          "post": ["Trả `\"\"`: không còn dòng của nhân viên; file hồ sơ đã bị xóa."],
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "Trả `\"\"`: không còn dòng của nhân viên; file hồ sơ đã bị xóa."
+          ],
           "example": "`removeEmployee(\"nva\")` → `\"\"`. `removeEmployee(\"admin1\")` → `\"Khong tim thay nhan vien\"` (admin không xóa được admin).",
-          "cpp": "`int i = m_employees.indexOf(username); if (i == -1) return \"Khong tim thay nhan vien\"; m_employees.removeAt(i); if (!m_employees.save()) return FILE_ERROR; Util::deleteFile(profilePath(username)); return \"\";`"
+          "cpp": "Tìm vị trí, `removeAt`, `save`, rồi xóa file hồ sơ bằng `Util::deleteFile`."
         },
         {
           "name": "findEmployee",
           "vis": "+",
-          "params": ["username: string", "profile: UserProfile&"],
+          "params": [
+            "username: string",
+            "profile: UserProfile&"
+          ],
           "returns": "string",
           "summary": "Đọc hồ sơ của một nhân viên.",
           "role": "Tìm (chức năng c), xem thông tin của nhân viên, bảng hiển thị toàn bộ, menu cập nhật.",
-          "pre": ["Không có."],
-          "post": ["Trả `\"\"`: `profile` là hồ sơ đọc được."],
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "Trả `\"\"`: `profile` là hồ sơ đọc được."
+          ],
           "example": "`findEmployee(\"NVA\", p)` → `\"\"`. `findEmployee(\"admin1\", p)` → `\"Khong tim thay nhan vien\"`. Thiếu file hồ sơ → `\"Khong doc duoc file ho so\"`.",
-          "cpp": "`if (m_employees.indexOf(username) == -1) return \"Khong tim thay nhan vien\"; std::vector<std::string> lines; if (!Util::readLines(profilePath(username), lines) || !UserProfile::fromLines(lines, profile)) return \"Khong doc duoc file ho so\"; return \"\";`"
+          "cpp": "Kiểm có trong danh sách nhân viên; rồi đọc file hồ sơ bằng `Util::readLines` và đổi sang hồ sơ bằng `UserProfile::fromLines`."
         },
         {
           "name": "updateField",
           "vis": "+",
-          "params": ["username: string", "field: ProfileField", "value: string"],
+          "params": [
+            "username: string",
+            "field: ProfileField",
+            "value: string"
+          ],
           "returns": "string",
           "summary": "Sửa một thông tin hồ sơ rồi ghi lại file hồ sơ ngay.",
           "role": "Chức năng d của admin; menu cập nhật gọi sau mỗi lần sửa một thông tin.",
-          "pre": ["`value` đã được trim."],
-          "post": ["Trả `\"\"`: file hồ sơ có giá trị mới."],
+          "pre": [
+            "`value` đã được trim."
+          ],
+          "post": [
+            "Trả `\"\"`: file hồ sơ có giá trị mới."
+          ],
           "example": "`updateField(\"nva\", ProfileField::PHONE, \"0987654321\")` → `\"\"`. Với `\"12345\"` → câu lỗi số điện thoại, file không đổi.",
-          "cpp": "`std::string error = Validator::checkField(field, value); if (!error.empty()) return error; UserProfile p; error = findEmployee(username, p); if (!error.empty()) return error; p.set(field, value); return Util::writeLines(profilePath(username), p.toLines()) ? \"\" : FILE_ERROR;`"
+          "cpp": "Kiểm giá trị bằng `Validator::checkField`, đọc hồ sơ bằng `findEmployee`, `set` một thông tin, rồi ghi lại file hồ sơ."
         },
         {
           "name": "listEmployees",
           "vis": "+",
-          "params": ["usernames: vector<string>&"],
+          "params": [
+            "usernames: vector<string>&"
+          ],
           "returns": "void",
           "summary": "Cho username của mọi nhân viên, đã sắp xếp tăng dần.",
           "role": "Chức năng e của admin.",
-          "pre": ["Không có."],
-          "post": ["`usernames` tăng dần theo chữ thường."],
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "`usernames` tăng dần theo chữ thường."
+          ],
           "complexity": "O(n log n)",
           "example": "`nva`, `lthb`, `Ttc` → `[\"lthb\", \"nva\", \"Ttc\"]`.",
-          "cpp": "`usernames.clear(); m_employees.sortByUsername(); for (int i = 0; i < m_employees.size(); i++) usernames.push_back(m_employees.at(i).getUsername());`"
+          "cpp": "Sắp xếp danh sách nhân viên, rồi chép username của từng người vào `usernames`."
         },
         {
           "name": "changePassword",
           "vis": "+",
-          "params": ["username: string", "newPassword: string"],
+          "params": [
+            "username: string",
+            "newPassword: string"
+          ],
           "returns": "string",
           "summary": "Đặt mật khẩu mới, tắt cờ «phải đổi mật khẩu», ghi Employees.txt.",
           "role": "Dùng chung cho đổi mật khẩu bắt buộc (lần đầu) và tự nguyện. Với đổi tự nguyện, menu đã kiểm mật khẩu cũ bằng `verifyPassword` trước khi gọi.",
           "detail": "Gọi lại `checkNewPassword` để chắc chắn; lỗi thì trả câu đó.",
-          "pre": ["`username` là nhân viên."],
-          "post": ["Trả `\"\"`: dòng của nhân viên có mật khẩu mới và cờ `0`."],
+          "pre": [
+            "`username` là nhân viên."
+          ],
+          "post": [
+            "Trả `\"\"`: dòng của nhân viên có mật khẩu mới và cờ `0`."
+          ],
           "example": "Dòng `nva 111111 1`: `changePassword(\"nva\", \"Moi12345\")` → `\"\"`; dòng thành `nva Moi12345 0`.",
-          "cpp": "`Employee& e = m_employees.at(m_employees.indexOf(username)); e.setPassword(newPassword); e.setNeedsPasswordChange(false); return m_employees.save() ? \"\" : FILE_ERROR;`"
+          "cpp": "Lấy tham chiếu tới nhân viên (`at` của `indexOf`), đặt mật khẩu mới, tắt cờ, rồi `save`."
         },
         {
           "name": "isUsernameTaken",
           "vis": "-",
-          "params": ["username: string"],
+          "params": [
+            "username: string"
+          ],
           "returns": "bool",
           "summary": "Username đã có ở admin hoặc nhân viên chưa (không phân biệt hoa thường).",
           "role": "Kiểm username mới và chọn tên admin mặc định.",
-          "pre": ["Không có."],
-          "post": ["Bằng `m_admins.indexOf(u) != -1 || m_employees.indexOf(u) != -1`."],
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "Bằng `m_admins.indexOf(u) != -1 || m_employees.indexOf(u) != -1`."
+          ],
           "example": "Có admin `admin1`: `isUsernameTaken(\"ADMIN1\")` = true.",
-          "cpp": "`return m_admins.indexOf(username) != -1 || m_employees.indexOf(username) != -1;`"
+          "cpp": "`indexOf` khác −1 ở một trong hai danh sách."
         },
         {
           "name": "profilePath",
           "static": true,
           "vis": "-",
-          "params": ["username: string"],
+          "params": [
+            "username: string"
+          ],
           "returns": "string",
           "summary": "Đường dẫn file hồ sơ: `data/users/<username viết thường>.txt`.",
           "role": "Mọi chỗ đọc, ghi, xóa file hồ sơ dùng hàm này. Thư mục con `users/` tránh việc username `Employees` đè lên `data/Employees.txt`.",
-          "pre": ["Không có."],
-          "post": ["Tên file luôn viết thường."],
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "Tên file luôn viết thường."
+          ],
           "example": "`profilePath(\"NVA\")` = `\"data/users/nva.txt\"`.",
-          "cpp": "`return \"data/users/\" + Util::toLower(username) + \".txt\";`"
+          "cpp": "Ghép `data/users/`, username đã đổi chữ thường, và `.txt`."
         }
       ],
       "impl": {
@@ -371,7 +516,10 @@
       "read": 10,
       "stage": 4,
       "readWhy": "Trung tâm của chương trình; đọc xong là hiểu mọi chức năng của đề.",
-      "pos": [1125, 950]
+      "pos": [
+        1125,
+        950
+      ]
     }
   ]
 }

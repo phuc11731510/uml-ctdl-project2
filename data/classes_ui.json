@@ -72,121 +72,176 @@
           "name": "setColor",
           "static": true,
           "vis": "+",
-          "params": ["color: int"],
+          "params": [
+            "color: int"
+          ],
           "returns": "void",
           "summary": "Đổi màu chữ cho những gì in ra sau đó.",
           "role": "Các hàm in bên dưới dùng.",
-          "pre": ["`color` là một trong 5 hằng màu."],
-          "post": ["Chữ in sau đó có màu `color`."],
+          "pre": [
+            "`color` là một trong 5 hằng màu."
+          ],
+          "post": [
+            "Chữ in sau đó có màu `color`."
+          ],
           "example": "`setColor(COLOR_ERROR);` rồi in thì chữ màu đỏ.",
-          "cpp": "`SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color);` (`#include <windows.h>`)."
+          "cpp": "`SetConsoleTextAttribute` với handle lấy từ `GetStdHandle(STD_OUTPUT_HANDLE)` (`<windows.h>`)."
         },
         {
           "name": "printLine",
           "static": true,
           "vis": "+",
-          "params": ["text: string", "color: int = COLOR_NORMAL"],
+          "params": [
+            "text: string",
+            "color: int = COLOR_NORMAL"
+          ],
           "returns": "void",
           "summary": "In một dòng với màu cho trước, rồi trả về màu thường.",
           "role": "Cách in chung cho mọi dòng chữ của chương trình.",
-          "pre": ["Không có."],
-          "post": ["Màu chữ trở về `COLOR_NORMAL`."],
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "Màu chữ trở về `COLOR_NORMAL`."
+          ],
           "example": "`printLine(\"Chua co nhan vien\", COLOR_TITLE)`.",
-          "cpp": "`setColor(color); std::cout << text << '\\n'; setColor(COLOR_NORMAL);`"
+          "cpp": "Đổi màu, in dòng, rồi trả màu về thường."
         },
         {
           "name": "printTitle",
           "static": true,
           "vis": "+",
-          "params": ["title: string"],
+          "params": [
+            "title: string"
+          ],
           "returns": "void",
           "summary": "In khung sao 3 dòng, tiêu đề ở giữa, màu vàng.",
           "role": "Dòng đầu của màn hình đăng nhập và các menu.",
           "detail": "Khung rộng 38 ký tự; dòng giữa là `*`, tiêu đề căn giữa trong 36 ô, rồi `*`.",
-          "pre": ["Tiêu đề ngắn hơn 36 ký tự."],
-          "post": ["In đúng 3 dòng."],
+          "pre": [
+            "Tiêu đề ngắn hơn 36 ký tự."
+          ],
+          "post": [
+            "In đúng 3 dòng."
+          ],
           "example": "`printTitle(\"DANG NHAP\")`:\n**************************************\n*             DANG NHAP              *\n**************************************",
-          "cpp": "`std::string stars(38, '*'); int left = (36 - (int)title.size()) / 2; printLine(stars, COLOR_TITLE); printLine(\"*\" + std::string(left, ' ') + title + std::string(36 - left - title.size(), ' ') + \"*\", COLOR_TITLE); printLine(stars, COLOR_TITLE);`"
+          "cpp": "Dòng sao dựng bằng `std::string(38, '*')`; dòng giữa tính số dấu cách hai bên rồi ghép tương tự."
         },
         {
           "name": "printSuccess",
           "static": true,
           "vis": "+",
-          "params": ["message: string"],
+          "params": [
+            "message: string"
+          ],
           "returns": "void",
           "summary": "In thông báo thành công, màu xanh ngọc.",
           "role": "Báo kết quả sau khi thêm, xóa, sửa, đổi mật khẩu.",
-          "pre": ["Không có."],
-          "post": ["Màu chữ trở về thường."],
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "Màu chữ trở về thường."
+          ],
           "example": "`printSuccess(\"Da them nhan vien nva. Mat khau mac dinh: 111111\")`.",
-          "cpp": "`printLine(message, COLOR_SUCCESS);`"
+          "cpp": "Gọi `printLine` với màu thành công."
         },
         {
           "name": "printError",
           "static": true,
           "vis": "+",
-          "params": ["message: string"],
+          "params": [
+            "message: string"
+          ],
           "returns": "void",
           "summary": "In câu thông báo lỗi, màu đỏ.",
           "role": "Mọi câu lỗi do `Validator` và `HrSystem` trả về đều in qua đây.",
-          "pre": ["`message` khác rỗng."],
-          "post": ["Màu chữ trở về thường."],
+          "pre": [
+            "`message` khác rỗng."
+          ],
+          "post": [
+            "Màu chữ trở về thường."
+          ],
           "example": "`printError(\"Username da ton tai\")`.",
-          "cpp": "`printLine(message, COLOR_ERROR);`"
+          "cpp": "Gọi `printLine` với màu lỗi."
         },
         {
           "name": "readLine",
           "static": true,
           "vis": "+",
-          "params": ["prompt: string"],
+          "params": [
+            "prompt: string"
+          ],
           "returns": "string",
           "summary": "In lời nhắc màu xanh lá, đọc một dòng, trả về chuỗi đã trim.",
           "role": "Mọi ô nhập thường (username, họ tên, lựa chọn menu...).",
           "detail": "Đọc cả dòng bằng `std::getline` nên địa chỉ có dấu cách vẫn đọc trọn. `std::cin` hỏng (Ctrl+Z) thì `clear()` và trả chuỗi rỗng để vòng lặp không chạy mãi.",
-          "pre": ["Không có."],
-          "post": ["Kết quả không có khoảng trắng ở đầu, cuối."],
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "Kết quả không có khoảng trắng ở đầu, cuối."
+          ],
           "example": "Gõ `  Nguyen Van A  `: `readLine(\"Ho ten: \")` trả `\"Nguyen Van A\"`.",
-          "cpp": "`setColor(COLOR_LABEL); std::cout << prompt; setColor(COLOR_NORMAL); std::string line; if (!std::getline(std::cin, line)) { std::cin.clear(); return \"\"; } return Util::trim(line);`"
+          "cpp": "In lời nhắc màu nhãn, đọc cả dòng bằng `std::getline(std::cin, ...)`, rồi bỏ khoảng trắng đầu cuối. Đọc thất bại thì `std::cin.clear()` và trả chuỗi rỗng."
         },
         {
           "name": "readPassword",
           "static": true,
           "vis": "+",
-          "params": ["prompt: string"],
+          "params": [
+            "prompt: string"
+          ],
           "returns": "string",
           "summary": "Đọc mật khẩu từng phím, mỗi ký tự hiện thành `*`.",
           "role": "Ô Pass khi đăng nhập và mọi ô mật khẩu khi đổi mật khẩu. Đúng yêu cầu «mã hóa pass thành dấu *».",
           "detail": "Enter (13): kết thúc. Backspace (8): xóa ký tự cuối và in `\\b \\b`. Mã 0 hoặc 224 (phím mũi tên, F1...): đọc bỏ thêm một mã. Ký tự mã 32–126: thêm vào và in `*` (tối đa 40 ký tự). Phím khác bỏ qua. Bản gọn không có Esc để hủy: muốn hủy thì gõ sai hoặc để trống.",
-          "pre": ["Không có."],
-          "post": ["Màn hình đã xuống dòng."],
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "Màn hình đã xuống dòng."
+          ],
           "example": "Gõ `a`, `b`, `c`, Backspace, `d`, Enter → màn hình `Pass: ***`, trả `\"abd\"`.",
-          "cpp": "`std::string s; while (true) { int c = _getch(); if (c == 13) break; if (c == 0 || c == 224) { _getch(); continue; } if (c == 8) { if (!s.empty()) { s.erase(s.size() - 1); std::cout << \"\\b \\b\"; } } else if (c >= 32 && c <= 126 && s.size() < 40) { s += (char)c; std::cout << '*'; } } std::cout << '\\n'; return s;` (`#include <conio.h>`)."
+          "cpp": "Vòng lặp đọc từng phím bằng `_getch()` (`<conio.h>`) và xử lý từng mã phím như phần mô tả; xóa một dấu `*` trên màn hình bằng cách in `\\b \\b`."
         },
         {
           "name": "readChoice",
           "static": true,
           "vis": "+",
-          "params": ["maxChoice: int"],
+          "params": [
+            "maxChoice: int"
+          ],
           "returns": "int",
           "summary": "Đọc lựa chọn menu; trả số trong 1..`maxChoice`, hoặc −1 nếu gõ sai.",
           "role": "`Menu.run` và menu cập nhật dùng.",
-          "pre": ["1 ≤ `maxChoice` ≤ 99."],
-          "post": ["Kết quả là −1 hoặc nằm trong 1..`maxChoice`."],
+          "pre": [
+            "1 ≤ `maxChoice` ≤ 99."
+          ],
+          "post": [
+            "Kết quả là −1 hoặc nằm trong 1..`maxChoice`."
+          ],
           "example": "`maxChoice` = 6: `3` → 3; `7`, `1abc`, để trống → −1.",
-          "cpp": "`std::string s = readLine(\"Chon: \"); if (!Util::isAllDigits(s) || s.size() > 2) return -1; int v = std::stoi(s); return (v >= 1 && v <= maxChoice) ? v : -1;` (đã kiểm toàn chữ số và tối đa 2 ký tự nên `stoi` không lỗi)."
+          "cpp": "Đọc bằng `readLine`; chỉ đổi sang số (`std::stoi`) sau khi đã chắc chuỗi toàn chữ số và tối đa 2 ký tự; ngoài khoảng thì trả −1."
         },
         {
           "name": "confirm",
           "static": true,
           "vis": "+",
-          "params": ["question: string"],
+          "params": [
+            "question: string"
+          ],
           "returns": "bool",
           "summary": "Hỏi có hoặc không; chỉ `y` hoặc `Y` là có.",
           "role": "Hỏi lại trước khi xóa nhân viên; nhấn Enter nhầm cũng không xóa.",
-          "pre": ["Không có."],
-          "post": ["Không thay đổi dữ liệu."],
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "Không thay đổi dữ liệu."
+          ],
           "example": "`confirm(\"Xoa nhan vien nva?\")` hiện `Xoa nhan vien nva? (y/n): `; `y` → true, `n` hay Enter → false.",
-          "cpp": "`std::string a = readLine(question + \" (y/n): \"); return a == \"y\" || a == \"Y\";`"
+          "cpp": "Đọc một dòng (lời nhắc có thêm `(y/n): `) và so với `y`, `Y`."
         },
         {
           "name": "pause",
@@ -196,10 +251,14 @@
           "returns": "void",
           "summary": "In «Nhan phim bat ky de tiep tuc...» rồi chờ một phím.",
           "role": "Sau mỗi chức năng, để người dùng kịp đọc kết quả.",
-          "pre": ["Không có."],
-          "post": ["Đã có một phím được nhấn."],
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "Đã có một phím được nhấn."
+          ],
           "example": "Sau khi in bảng nhân viên.",
-          "cpp": "`std::cout << \"Nhan phim bat ky de tiep tuc...\"; _getch(); std::cout << '\\n';`"
+          "cpp": "In lời nhắc rồi chờ một phím bằng `_getch()`."
         },
         {
           "name": "clearScreen",
@@ -209,10 +268,14 @@
           "returns": "void",
           "summary": "Xóa màn hình.",
           "role": "Đầu mỗi lần hiện menu hoặc màn hình đăng nhập.",
-          "pre": ["Không có."],
-          "post": ["Màn hình trống."],
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "Màn hình trống."
+          ],
           "example": "Mỗi vòng của `Menu.run` bắt đầu bằng `clearScreen()`.",
-          "cpp": "`system(\"cls\");` (`#include <cstdlib>`)."
+          "cpp": "`system(\"cls\")` (`<cstdlib>`)."
         }
       ],
       "impl": {
@@ -224,7 +287,10 @@
       "read": 11,
       "stage": 5,
       "readWhy": "Mọi màn hình đều in và đọc qua lớp này.",
-      "pos": [450, 0]
+      "pos": [
+        450,
+        0
+      ]
     },
     {
       "id": "Menu",
@@ -262,13 +328,20 @@
           "name": "Menu",
           "ctor": true,
           "vis": "#",
-          "params": ["title: string", "exitLabel: string"],
+          "params": [
+            "title: string",
+            "exitLabel: string"
+          ],
           "summary": "Gán tiêu đề và chữ mục thoát. Chỉ lớp con gọi.",
           "role": "Lớp con gọi trong danh sách khởi tạo.",
-          "pre": ["Không có."],
-          "post": ["Hai thuộc tính có giá trị."],
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "Hai thuộc tính có giá trị."
+          ],
           "example": "`AdminMenu(HrSystem& system, const std::string& username) : Menu(\"MENU ADMIN (\" + username + \")\", \"Thoat (dang xuat)\"), m_system(system) {}`",
-          "cpp": "`Menu(const std::string& title, const std::string& exitLabel) : m_title(title), m_exitLabel(exitLabel) {}`"
+          "cpp": "Gán hai thuộc tính trong danh sách khởi tạo."
         },
         {
           "name": "run",
@@ -278,10 +351,14 @@
           "summary": "Vòng lặp menu: hiện, đọc lựa chọn, xử lý, lặp lại cho tới khi chọn mục thoát.",
           "role": "Nơi duy nhất viết vòng lặp menu.",
           "detail": "Mỗi vòng: xóa màn hình, in tiêu đề, in các mục `1. ...` và mục thoát ở số cuối, đọc lựa chọn. −1 thì báo «Lua chon khong hop le» và chờ phím. Mục thoát thì kết thúc. Mục khác thì `handleChoice(choice)` rồi chờ phím.",
-          "pre": ["Không có."],
-          "post": ["Trả về khi người dùng chọn mục thoát."],
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "Trả về khi người dùng chọn mục thoát."
+          ],
           "example": "**************************************\n*        MENU ADMIN (admin1)         *\n**************************************\n1. Them Employee\n2. Xoa Employee\n3. Tim Employee\n4. Cap nhat Employee\n5. Hien thi thong tin Employee\n6. Thoat (dang xuat)\nChon: ",
-          "cpp": "`while (true) { Console::clearScreen(); Console::printTitle(m_title); std::vector<std::string> options = getOptions(); int n = (int)options.size(); for (int i = 0; i < n; i++) Console::printLine(std::to_string(i + 1) + \". \" + options[i]); Console::printLine(std::to_string(n + 1) + \". \" + m_exitLabel); int choice = Console::readChoice(n + 1); if (choice == n + 1) return; if (choice == -1) Console::printError(\"Lua chon khong hop le\"); else handleChoice(choice); Console::pause(); }`"
+          "cpp": "Một vòng `while (true)` làm đúng các bước ở phần mô tả; số thứ tự của mục ghép bằng `std::to_string`."
         },
         {
           "name": "getOptions",
@@ -291,36 +368,53 @@
           "returns": "vector<string>",
           "summary": "Danh sách mục, không gồm mục thoát.",
           "role": "Lớp con trả nội dung riêng.",
-          "pre": ["Không có."],
-          "post": ["Mục i (đếm từ 0) ứng với lựa chọn i + 1."],
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "Mục i (đếm từ 0) ứng với lựa chọn i + 1."
+          ],
           "example": "`EmployeeMenu` trả `[\"Xem thong tin tai khoan\", \"Doi password\"]`.",
-          "cpp": "`virtual std::vector<std::string> getOptions() = 0;`"
+          "cpp": "Khai báo thuần ảo (`= 0`), `protected`."
         },
         {
           "name": "handleChoice",
           "abstract": true,
           "vis": "#",
-          "params": ["choice: int"],
+          "params": [
+            "choice: int"
+          ],
           "returns": "void",
           "summary": "Làm việc của mục được chọn.",
           "role": "Lớp con viết bằng `switch`. Gặp lỗi thì in lỗi rồi `return`: đó là «hủy chức năng, cho chọn chức năng khác» của đề.",
-          "pre": ["1 ≤ `choice` ≤ số mục; không bao giờ là mục thoát."],
-          "post": ["Mọi thông báo đã được in."],
+          "pre": [
+            "1 ≤ `choice` ≤ số mục; không bao giờ là mục thoát."
+          ],
+          "post": [
+            "Mọi thông báo đã được in."
+          ],
           "example": "`AdminMenu`: `switch (choice) { case 1: addEmployee(); break; ... }`.",
-          "cpp": "`virtual void handleChoice(int choice) = 0;`"
+          "cpp": "Khai báo thuần ảo (`= 0`), `protected`."
         },
         {
           "name": "printProfile",
           "static": true,
           "vis": "#",
-          "params": ["username: string", "profile: UserProfile"],
+          "params": [
+            "username: string",
+            "profile: UserProfile"
+          ],
           "returns": "void",
           "summary": "In username và 4 thông tin, mỗi thông tin một dòng.",
           "role": "Dùng chung cho «Tìm Employee» của admin và «Xem thông tin tài khoản» của nhân viên.",
-          "pre": ["Không có."],
-          "post": ["In đúng 5 dòng."],
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "In đúng 5 dòng."
+          ],
           "example": "Username: nva\nHo ten: Nguyen Van A\nDia chi: 12 Le Loi, Q1\nSo dien thoai: 0912345678\nEmail: nva@gmail.com",
-          "cpp": "`Console::printLine(\"Username: \" + username); for (int i = 0; i < UserProfile::FIELD_COUNT; i++) { ProfileField f = static_cast<ProfileField>(i); Console::printLine(UserProfile::labelOf(f) + \": \" + profile.get(f)); }`"
+          "cpp": "In dòng username, rồi vòng `for` qua `FIELD_COUNT` thông tin, mỗi dòng ghép `labelOf` với `get` của thông tin đó."
         }
       ],
       "impl": {
@@ -330,7 +424,10 @@
       "read": 12,
       "stage": 5,
       "readWhy": "Lớp cha của hai menu.",
-      "pos": [900, 0]
+      "pos": [
+        900,
+        0
+      ]
     },
     {
       "id": "AdminMenu",
@@ -363,13 +460,20 @@
           "name": "AdminMenu",
           "ctor": true,
           "vis": "+",
-          "params": ["system: HrSystem&", "username: string"],
+          "params": [
+            "system: HrSystem&",
+            "username: string"
+          ],
           "summary": "Tạo menu admin; tiêu đề có tên admin đang đăng nhập.",
           "role": "`Application` tạo mỗi lần admin đăng nhập.",
-          "pre": ["`username` là admin vừa đăng nhập."],
-          "post": ["Tiêu đề `MENU ADMIN (<username>)`, mục thoát `Thoat (dang xuat)`."],
+          "pre": [
+            "`username` là admin vừa đăng nhập."
+          ],
+          "post": [
+            "Tiêu đề `MENU ADMIN (<username>)`, mục thoát `Thoat (dang xuat)`."
+          ],
           "example": "`AdminMenu menu(m_system, \"admin1\"); menu.run();`",
-          "cpp": "Xem ví dụ ở hàm dựng của `Menu`."
+          "cpp": "Truyền tiêu đề và chữ mục thoát cho hàm dựng của `Menu`; gán tham chiếu trong danh sách khởi tạo."
         },
         {
           "name": "getOptions",
@@ -379,23 +483,33 @@
           "returns": "vector<string>",
           "summary": "5 mục chức năng của admin.",
           "role": "Nội dung menu admin theo ảnh mẫu của đề.",
-          "pre": ["Không có."],
-          "post": ["Đúng 5 phần tử."],
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "Đúng 5 phần tử."
+          ],
           "example": "`[\"Them Employee\", \"Xoa Employee\", \"Tim Employee\", \"Cap nhat Employee\", \"Hien thi thong tin Employee\"]`.",
-          "cpp": "`const char* items[] = { \"Them Employee\", \"Xoa Employee\", \"Tim Employee\", \"Cap nhat Employee\", \"Hien thi thong tin Employee\" }; return std::vector<std::string>(items, items + 5);`"
+          "cpp": "Trả một vector gồm 5 chuỗi tên mục."
         },
         {
           "name": "handleChoice",
           "vis": "#",
           "override": true,
-          "params": ["choice: int"],
+          "params": [
+            "choice: int"
+          ],
           "returns": "void",
           "summary": "Gọi hàm ứng với mục đã chọn.",
           "role": "Nối số mục với chức năng.",
-          "pre": ["1 ≤ `choice` ≤ 5."],
-          "post": ["Đã chạy xong một chức năng."],
+          "pre": [
+            "1 ≤ `choice` ≤ 5."
+          ],
+          "post": [
+            "Đã chạy xong một chức năng."
+          ],
           "example": "`choice` = 4 → `updateEmployee()`.",
-          "cpp": "`switch (choice) { case 1: addEmployee(); break; case 2: removeEmployee(); break; case 3: findEmployee(); break; case 4: updateEmployee(); break; default: showAllEmployees(); }`"
+          "cpp": "Một `switch` gọi 5 hàm riêng."
         },
         {
           "name": "addEmployee",
@@ -405,10 +519,14 @@
           "summary": "Hỏi username và 4 thông tin, kiểm từng ô ngay, rồi thêm nhân viên.",
           "role": "Chức năng a của admin.",
           "detail": "Hỏi username, kiểm bằng `HrSystem.checkNewUsername`; lỗi thì in và dừng. Rồi một vòng `for` qua 4 thông tin: hỏi bằng lời nhắc `labelOf(f) + \": \"`, kiểm bằng `Validator.checkField`, lỗi thì in và dừng, đúng thì `set`. Cuối cùng gọi `HrSystem.addEmployee`. Admin không nhập mật khẩu: luôn là `111111`.",
-          "pre": ["Không có."],
-          "post": ["Thành công: có nhân viên mới. Lỗi: không có gì thay đổi."],
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "Thành công: có nhân viên mới. Lỗi: không có gì thay đổi."
+          ],
           "example": "Username: nva\nHo ten: Nguyen Van A\nDia chi: 12 Le Loi, Q1\nSo dien thoai: 0912345678\nEmail: nva@gmail.com\nDa them nhan vien nva. Mat khau mac dinh: 111111",
-          "cpp": "`for (int i = 0; i < UserProfile::FIELD_COUNT; i++) { ProfileField f = static_cast<ProfileField>(i); std::string v = Console::readLine(UserProfile::labelOf(f) + \": \"); std::string error = Validator::checkField(f, v); if (!error.empty()) { Console::printError(error); return; } profile.set(f, v); }`"
+          "cpp": "Đọc và kiểm username trước. Rồi vòng `for` qua 4 thông tin: hỏi, kiểm bằng `Validator::checkField`, lỗi thì in và `return`, đúng thì `set`. Cuối cùng gọi `HrSystem::addEmployee` và in kết quả."
         },
         {
           "name": "removeEmployee",
@@ -417,10 +535,14 @@
           "returns": "void",
           "summary": "Hỏi username, hỏi xác nhận y/n, rồi xóa.",
           "role": "Chức năng b của admin.",
-          "pre": ["Không có."],
-          "post": ["Chỉ xóa khi gõ `y` hoặc `Y`."],
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "Chỉ xóa khi gõ `y` hoặc `Y`."
+          ],
           "example": "Username can xoa: nva\nXoa nhan vien nva? (y/n): y\nDa xoa nhan vien nva",
-          "cpp": "`std::string u = Console::readLine(\"Username can xoa: \"); if (!Console::confirm(\"Xoa nhan vien \" + u + \"?\")) return; std::string error = m_system.removeEmployee(u); if (error.empty()) Console::printSuccess(\"Da xoa nhan vien \" + u); else Console::printError(error);`"
+          "cpp": "Đọc username, hỏi `Console::confirm`, rồi gọi `HrSystem::removeEmployee` và in kết quả."
         },
         {
           "name": "findEmployee",
@@ -429,10 +551,14 @@
           "returns": "void",
           "summary": "Hỏi username, in thông tin nhân viên đó.",
           "role": "Chức năng c của admin: tìm theo đúng username, không phân biệt hoa thường.",
-          "pre": ["Không có."],
-          "post": ["Không thay đổi dữ liệu."],
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "Không thay đổi dữ liệu."
+          ],
           "example": "Username can tim: nva\nUsername: nva\nHo ten: Nguyen Van A\n...",
-          "cpp": "`UserProfile p; std::string u = Console::readLine(\"Username can tim: \"); std::string error = m_system.findEmployee(u, p); if (error.empty()) printProfile(u, p); else Console::printError(error);`"
+          "cpp": "Đọc username, gọi `findEmployee` của hệ thống; thành công thì `printProfile`, lỗi thì in lỗi."
         },
         {
           "name": "updateEmployee",
@@ -442,10 +568,14 @@
           "summary": "Hỏi username rồi chạy vòng lặp con: hiện 4 thông tin kèm giá trị, chọn một mục để sửa, mục 5 «Xong» để về.",
           "role": "Chức năng d của admin: «cho người dùng tùy chọn muốn update bất kỳ thuộc tính nào».",
           "detail": "Mỗi vòng: đọc hồ sơ (`HrSystem.findEmployee`, lỗi thì in và dừng), xóa màn hình, in tiêu đề `CAP NHAT: nva`, in 4 mục `i. <tên>: <giá trị>` và `5. Xong`, đọc lựa chọn. 5 thì về menu admin. −1 thì báo lỗi. 1–4 thì hỏi giá trị mới và gọi `HrSystem.updateField` (file được ghi ngay); in kết quả rồi chờ phím.",
-          "pre": ["Không có."],
-          "post": ["Mọi thay đổi đã được ghi file ngay."],
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "Mọi thay đổi đã được ghi file ngay."
+          ],
           "example": "**************************************\n*           CAP NHAT: nva            *\n**************************************\n1. Ho ten: Nguyen Van A\n2. Dia chi: 12 Le Loi, Q1\n3. So dien thoai: 0912345678\n4. Email: nva@gmail.com\n5. Xong\nChon: 3\nGia tri moi: 0987654321\nDa cap nhat",
-          "cpp": "`ProfileField f = static_cast<ProfileField>(choice - 1); std::string error = m_system.updateField(u, f, Console::readLine(\"Gia tri moi: \")); if (error.empty()) Console::printSuccess(\"Da cap nhat\"); else Console::printError(error);`"
+          "cpp": "Một vòng `while (true)` nhỏ, giống `Menu::run`: mỗi vòng đọc lại hồ sơ, in 4 mục kèm giá trị và mục «Xong», đọc lựa chọn. Mục 1–4 đổi sang `ProfileField` bằng `static_cast` rồi gọi `HrSystem::updateField`."
         },
         {
           "name": "showAllEmployees",
@@ -454,10 +584,14 @@
           "returns": "void",
           "summary": "In mọi nhân viên, mỗi người một dòng, sắp theo username; các cột cách nhau bằng ` | `.",
           "role": "Chức năng e của admin. Không căn thẳng cột cho gọn.",
-          "pre": ["Không có."],
-          "post": ["Không thay đổi dữ liệu."],
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "Không thay đổi dữ liệu."
+          ],
           "example": "STT | Username | Ho ten | So dien thoai | Email | Dia chi\n1 | lthb | Le Thi B | 0912345678 | lthb@gmail.com | 12 Le Loi, Q1\n2 | nva | Nguyen Van A | 0987654321 | nva@gmail.com | 34 Tran Hung Dao, Q5",
-          "cpp": "`std::vector<std::string> names; m_system.listEmployees(names); if (names.empty()) { Console::printLine(\"Chua co nhan vien\"); return; }` rồi với mỗi người: `findEmployee` và ghép các cột bằng `\" | \"`."
+          "cpp": "Lấy danh sách tên đã sắp xếp; rỗng thì báo. Ngược lại in dòng tiêu đề, rồi với mỗi người đọc hồ sơ và nối các cột bằng `\" | \"`."
         }
       ],
       "impl": {
@@ -467,7 +601,10 @@
       "read": 13,
       "stage": 5,
       "readWhy": "Menu admin, gồm 5 chức năng a–e của đề.",
-      "pos": [675, 450]
+      "pos": [
+        675,
+        450
+      ]
     },
     {
       "id": "EmployeeMenu",
@@ -506,13 +643,20 @@
           "name": "EmployeeMenu",
           "ctor": true,
           "vis": "+",
-          "params": ["system: HrSystem&", "username: string"],
+          "params": [
+            "system: HrSystem&",
+            "username: string"
+          ],
           "summary": "Tạo menu cho nhân viên vừa đăng nhập.",
           "role": "`Application` tạo mỗi lần nhân viên đăng nhập.",
-          "pre": ["`username` là nhân viên vừa đăng nhập."],
-          "post": ["Tiêu đề `MENU EMPLOYEE (<username>)`, mục thoát `Thoat (dang xuat)`."],
+          "pre": [
+            "`username` là nhân viên vừa đăng nhập."
+          ],
+          "post": [
+            "Tiêu đề `MENU EMPLOYEE (<username>)`, mục thoát `Thoat (dang xuat)`."
+          ],
           "example": "`EmployeeMenu menu(m_system, \"nva\");`",
-          "cpp": "`EmployeeMenu(HrSystem& system, const std::string& username) : Menu(\"MENU EMPLOYEE (\" + username + \")\", \"Thoat (dang xuat)\"), m_system(system), m_username(username) {}`"
+          "cpp": "Giống hàm dựng của `AdminMenu`, chỉ khác tiêu đề và có thêm thuộc tính username."
         },
         {
           "name": "forcePasswordChange",
@@ -522,10 +666,14 @@
           "summary": "Buộc đổi mật khẩu ở lần đăng nhập đầu; hỏi lại cho tới khi đổi được.",
           "role": "`Application` gọi trước `run()` khi `HrSystem.needsPasswordChange` trả true.",
           "detail": "In «Day la lan dang nhap dau tien, ban phai doi mat khau.». Lặp: `askNewPassword`; sai thì hỏi lại. Có mật khẩu hợp lệ thì `HrSystem.changePassword`; thành công trả true; lỗi ghi file thì in lỗi và trả false (đăng xuất, lần sau vẫn bị buộc đổi).",
-          "pre": ["Nhân viên đang có cờ bật."],
-          "post": ["Trả true: mật khẩu đã đổi, cờ đã tắt trong file."],
+          "pre": [
+            "Nhân viên đang có cờ bật."
+          ],
+          "post": [
+            "Trả true: mật khẩu đã đổi, cờ đã tắt trong file."
+          ],
           "example": "Day la lan dang nhap dau tien, ban phai doi mat khau.\nMat khau moi: ******\nKhong duoc dung mat khau mac dinh 111111\nMat khau moi: ********\nNhap lai mat khau moi: ********\nDoi mat khau thanh cong",
-          "cpp": "`std::string p; while (!askNewPassword(p)) {} std::string error = m_system.changePassword(m_username, p); if (!error.empty()) { Console::printError(error); return false; } Console::printSuccess(\"Doi mat khau thanh cong\"); Console::pause(); return true;`"
+          "cpp": "In thông báo; lặp gọi `askNewPassword` cho tới khi true; rồi `HrSystem::changePassword` và in kết quả."
         },
         {
           "name": "getOptions",
@@ -535,23 +683,33 @@
           "returns": "vector<string>",
           "summary": "2 mục của nhân viên.",
           "role": "Nội dung menu nhân viên theo ảnh mẫu của đề.",
-          "pre": ["Không có."],
-          "post": ["Đúng 2 phần tử."],
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "Đúng 2 phần tử."
+          ],
           "example": "`[\"Xem thong tin tai khoan\", \"Doi password\"]`.",
-          "cpp": "`std::vector<std::string> v; v.push_back(\"Xem thong tin tai khoan\"); v.push_back(\"Doi password\"); return v;`"
+          "cpp": "Trả một vector gồm 2 chuỗi tên mục."
         },
         {
           "name": "handleChoice",
           "vis": "#",
           "override": true,
-          "params": ["choice: int"],
+          "params": [
+            "choice: int"
+          ],
           "returns": "void",
           "summary": "1 → xem thông tin; 2 → đổi mật khẩu.",
           "role": "Nối số mục với chức năng.",
-          "pre": ["1 ≤ `choice` ≤ 2."],
-          "post": ["Đã chạy xong một chức năng."],
+          "pre": [
+            "1 ≤ `choice` ≤ 2."
+          ],
+          "post": [
+            "Đã chạy xong một chức năng."
+          ],
           "example": "`choice` = 2 → `changePassword()`.",
-          "cpp": "`if (choice == 1) showMyInfo(); else changePassword();`"
+          "cpp": "Một `if` chọn giữa hai hàm riêng."
         },
         {
           "name": "showMyInfo",
@@ -560,10 +718,14 @@
           "returns": "void",
           "summary": "In thông tin tài khoản của chính mình.",
           "role": "Chức năng a của nhân viên: «Hiển thị thông tin của file [username].txt».",
-          "pre": ["Không có."],
-          "post": ["Không thay đổi dữ liệu."],
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "Không thay đổi dữ liệu."
+          ],
           "example": "Username: nva\nHo ten: Nguyen Van A\n...",
-          "cpp": "`UserProfile p; std::string error = m_system.findEmployee(m_username, p); if (error.empty()) printProfile(m_username, p); else Console::printError(error);`"
+          "cpp": "Gọi `findEmployee` cho chính `m_username`; thành công thì `printProfile`, lỗi thì in lỗi."
         },
         {
           "name": "changePassword",
@@ -573,23 +735,33 @@
           "summary": "Đổi mật khẩu tự nguyện: xác nhận mật khẩu hiện tại, rồi nhập mật khẩu mới hai lần.",
           "role": "Chức năng b của nhân viên.",
           "detail": "Hỏi mật khẩu hiện tại; sai (`HrSystem.verifyPassword` trả false) thì báo «Mat khau hien tai khong dung» và dừng. Rồi `askNewPassword`; false thì dừng. Cuối cùng `HrSystem.changePassword` và báo kết quả.",
-          "pre": ["Không có."],
-          "post": ["Thành công: Employees.txt có mật khẩu mới."],
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "Thành công: Employees.txt có mật khẩu mới."
+          ],
           "example": "Mat khau hien tai: ********\nMat khau moi: ********\nNhap lai mat khau moi: ********\nDoi mat khau thanh cong",
-          "cpp": "`if (!m_system.verifyPassword(m_username, Console::readPassword(\"Mat khau hien tai: \"))) { Console::printError(\"Mat khau hien tai khong dung\"); return; }` rồi tới mật khẩu mới."
+          "cpp": "Đọc mật khẩu hiện tại bằng `readPassword`, kiểm bằng `HrSystem::verifyPassword`; rồi `askNewPassword`; cuối cùng `HrSystem::changePassword` và in kết quả."
         },
         {
           "name": "askNewPassword",
           "vis": "-",
-          "params": ["newPassword: string&"],
+          "params": [
+            "newPassword: string&"
+          ],
           "returns": "bool",
           "summary": "Hỏi mật khẩu mới rồi hỏi gõ lại; kiểm cả hai, in lỗi nếu có.",
           "role": "Phần chung của đổi bắt buộc (gọi lặp cho tới khi true) và đổi tự nguyện (gọi một lần).",
           "detail": "Lần một kiểm bằng `HrSystem.checkNewPassword`. Lần hai so với lần một; khác thì lỗi «Hai lan nhap mat khau moi khong khop».",
-          "pre": ["Không có."],
-          "post": ["Trả true: `newPassword` hợp lệ và hai lần gõ khớp nhau."],
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "Trả true: `newPassword` hợp lệ và hai lần gõ khớp nhau."
+          ],
           "example": "Mat khau moi: ********\nNhap lai mat khau moi: *******\nHai lan nhap mat khau moi khong khop",
-          "cpp": "`std::string p = Console::readPassword(\"Mat khau moi: \"); std::string error = m_system.checkNewPassword(m_username, p); if (error.empty() && Console::readPassword(\"Nhap lai mat khau moi: \") != p) error = \"Hai lan nhap mat khau moi khong khop\"; if (!error.empty()) { Console::printError(error); return false; } newPassword = p; return true;`"
+          "cpp": "Đọc lần một và kiểm bằng `HrSystem::checkNewPassword`; nếu ổn thì đọc lần hai và so với lần một. Có lỗi thì in và trả false."
         }
       ],
       "impl": {
@@ -599,7 +771,10 @@
       "read": 14,
       "stage": 5,
       "readWhy": "Menu nhân viên và lần đổi mật khẩu bắt buộc.",
-      "pos": [1125, 450]
+      "pos": [
+        1125,
+        450
+      ]
     },
     {
       "id": "Application",
@@ -645,23 +820,35 @@
           "summary": "Chạy toàn bộ chương trình; trả 0 khi kết thúc bình thường, 1 khi không chuẩn bị được dữ liệu.",
           "role": "Toàn bộ luồng chương trình; `main` chỉ gọi hàm này.",
           "detail": "`m_system.initialize(messages)`, in từng câu (màu vàng), lỗi thì trả 1. Lặp: `login(name, role)` false thì thoát vòng lặp. Admin: `AdminMenu(m_system, name).run()`. Nhân viên: tạo `EmployeeMenu`; nếu cần thì `forcePasswordChange()`, false thì quay lại đăng nhập; xong `run()`. Ra khỏi vòng lặp in «Tam biet!» và trả 0.",
-          "pre": ["Gọi một lần."],
-          "post": ["Mọi thay đổi đã nằm trong file."],
+          "pre": [
+            "Gọi một lần."
+          ],
+          "post": [
+            "Mọi thay đổi đã nằm trong file."
+          ],
           "example": "Lần chạy đầu: in 3 câu «Da tao admin mac dinh: ...», chờ phím, rồi hiện màn hình đăng nhập.",
-          "cpp": "`if (role == Role::ADMIN) { AdminMenu menu(m_system, name); menu.run(); } else { EmployeeMenu menu(m_system, name); if (m_system.needsPasswordChange(name) && !menu.forcePasswordChange()) continue; menu.run(); }`"
+          "cpp": "Làm đúng các bước ở phần mô tả; menu là biến cục bộ trong vòng lặp, chọn loại menu bằng `if` trên `role`."
         },
         {
           "name": "login",
           "vis": "-",
-          "params": ["accountName: string&", "role: Role&"],
+          "params": [
+            "accountName: string&",
+            "role: Role&"
+          ],
           "returns": "bool",
           "summary": "Màn hình đăng nhập chung: hỏi User và Pass cho tới khi đúng, người dùng thoát, hoặc sai đủ 3 lần.",
           "role": "Mở đầu mỗi phiên làm việc; `run` gọi lại sau mỗi lần đăng xuất.",
           "detail": "Bộ đếm số lần sai là biến cục bộ, đếm các lần sai liên tiếp trong một lần ở màn hình đăng nhập. Mỗi vòng: xóa màn hình, in khung «DANG NHAP» và dòng nhắc «(De trong User de thoat)». User rỗng thì trả false. Đúng thì trả true. Sai thì tăng bộ đếm, báo «Sai tai khoan hoac mat khau. Con N lan thu.»; tới 3 thì báo «Sai 3 lan, chuong trinh ket thuc.» và trả false.",
-          "pre": ["Không có."],
-          "post": ["Trả true: `accountName` và `role` có giá trị.", "Trả false: cần kết thúc chương trình."],
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "Trả true: `accountName` và `role` có giá trị.",
+            "Trả false: cần kết thúc chương trình."
+          ],
           "example": "**************************************\n*             DANG NHAP              *\n**************************************\n(De trong User de thoat)\nUser: nva\nPass: ******\nSai tai khoan hoac mat khau. Con 2 lan thu.",
-          "cpp": "`for (int fails = 0; fails < MAX_FAILS; ) { ...; std::string user = Console::readLine(\"User: \"); if (user.empty()) return false; if (m_system.login(user, Console::readPassword(\"Pass: \"), role, accountName)) return true; fails++; ... } return false;`"
+          "cpp": "Vòng lặp với một biến đếm số lần sai; mỗi vòng đọc User bằng `readLine`, Pass bằng `readPassword`, rồi gọi `HrSystem::login`."
         }
       ],
       "impl": {
@@ -673,7 +860,10 @@
       "read": 15,
       "stage": 5,
       "readWhy": "Đọc cuối cùng: nối mọi lớp lại thành chương trình.",
-      "pos": [1575, 0]
+      "pos": [
+        1575,
+        0
+      ]
     }
   ]
 }

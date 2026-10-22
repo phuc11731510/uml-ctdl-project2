@@ -3,7 +3,9 @@
     {
       "id": "AccountList",
       "stereotype": "template",
-      "tparams": ["T"],
+      "tparams": [
+        "T"
+      ],
       "package": "storage",
       "status": "core",
       "summary": "Lớp template nhóm tự viết: danh sách tài khoản kiểu T trong bộ nhớ, gắn với một file txt. Dùng hai lần: `AccountList<Admin>` và `AccountList<Employee>`.",
@@ -41,13 +43,19 @@
           "name": "AccountList",
           "ctor": true,
           "vis": "+",
-          "params": ["filePath: string"],
+          "params": [
+            "filePath: string"
+          ],
           "summary": "Tạo danh sách rỗng gắn với một file; chưa đọc file.",
           "role": "`HrSystem` tạo hai danh sách trong danh sách khởi tạo của hàm dựng của mình.",
-          "pre": ["Không có."],
-          "post": ["`size()` = 0."],
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "`size()` = 0."
+          ],
           "example": "`AccountList<Employee> employees(\"data/Employees.txt\");`",
-          "cpp": "`AccountList(const std::string& filePath) : m_filePath(filePath) {}`"
+          "cpp": "Gán `m_filePath` trong danh sách khởi tạo."
         },
         {
           "name": "load",
@@ -57,11 +65,16 @@
           "summary": "Đọc file vào bộ nhớ; lặng lẽ bỏ qua dòng trống, dòng sai định dạng và dòng trùng username.",
           "role": "Gọi một lần lúc khởi động cho mỗi danh sách.",
           "detail": "Bản gọn không báo cảnh báo cho dòng hỏng (bản đầy đủ có). Nếu file do chương trình tự ghi thì không có dòng hỏng.",
-          "pre": ["Không có."],
-          "post": ["Trả false: chưa có file, danh sách rỗng.", "Trả true: danh sách gồm các dòng hợp lệ, theo thứ tự trong file."],
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "Trả false: chưa có file, danh sách rỗng.",
+            "Trả true: danh sách gồm các dòng hợp lệ, theo thứ tự trong file."
+          ],
           "complexity": "O(n²) do kiểm trùng tuần tự",
           "example": "File có `nva 111111 1`, một dòng trống, `NVA abc 0` → danh sách chỉ có `nva`.",
-          "cpp": "`std::vector<std::string> lines; m_items.clear(); if (!Util::readLines(m_filePath, lines)) return false; for (size_t i = 0; i < lines.size(); i++) { T item; if (!lines[i].empty() && T::fromLine(lines[i], item) && indexOf(item.getUsername()) == -1) m_items.push_back(item); } return true;`"
+          "cpp": "Xóa danh sách cũ, đọc file bằng `Util::readLines`. Với mỗi dòng không rỗng: tạo một `T` rỗng, gọi `T::fromLine`, chỉ thêm khi đọc được và `indexOf` trả −1."
         },
         {
           "name": "save",
@@ -70,11 +83,15 @@
           "returns": "bool",
           "summary": "Ghi lại toàn bộ file, mỗi tài khoản một dòng.",
           "role": "Gọi ngay sau mỗi thay đổi, nên khi chương trình còn chạy thì file đã cập nhật.",
-          "pre": ["Thư mục chứa file đã tồn tại."],
-          "post": ["Trả true: file có đúng `size()` dòng, dòng i + 1 là `at(i).toLine()`."],
+          "pre": [
+            "Thư mục chứa file đã tồn tại."
+          ],
+          "post": [
+            "Trả true: file có đúng `size()` dòng, dòng i + 1 là `at(i).toLine()`."
+          ],
           "complexity": "O(n)",
           "example": "`[nva (cờ bật), lthb (cờ tắt)]` → file:\nnva 111111 1\nlthb abc12345 0",
-          "cpp": "`std::vector<std::string> lines; for (size_t i = 0; i < m_items.size(); i++) lines.push_back(m_items[i].toLine()); return Util::writeLines(m_filePath, lines);`"
+          "cpp": "Gom `toLine()` của từng phần tử vào một vector rồi gọi `Util::writeLines`."
         },
         {
           "name": "size",
@@ -83,60 +100,88 @@
           "returns": "int",
           "summary": "Số tài khoản.",
           "role": "Kiểm đủ 3 admin chưa; duyệt danh sách.",
-          "pre": ["Không có."],
-          "post": ["≥ 0."],
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "≥ 0."
+          ],
           "example": "File admin có 3 dòng hợp lệ → 3.",
-          "cpp": "`int size() const { return (int)m_items.size(); }`"
+          "cpp": "Trả kích thước của vector, ép sang `int`."
         },
         {
           "name": "at",
           "vis": "+",
-          "params": ["index: int"],
+          "params": [
+            "index: int"
+          ],
           "returns": "T&",
           "summary": "Phần tử thứ `index` (đếm từ 0); trả tham chiếu nên sửa được.",
           "role": "Sau `indexOf`, lấy tài khoản để kiểm hoặc đổi mật khẩu.",
-          "pre": ["0 ≤ `index` < `size()`; hàm không kiểm."],
-          "post": ["Sửa qua tham chiếu là sửa luôn phần tử trong danh sách."],
+          "pre": [
+            "0 ≤ `index` < `size()`; hàm không kiểm."
+          ],
+          "post": [
+            "Sửa qua tham chiếu là sửa luôn phần tử trong danh sách."
+          ],
           "example": "`employees.at(employees.indexOf(\"nva\")).setPassword(\"Moi12345\");`",
-          "cpp": "`T& at(int index) { return m_items[index]; }`"
+          "cpp": "Trả tham chiếu tới phần tử của vector; không kiểm chỉ số."
         },
         {
           "name": "indexOf",
           "vis": "+",
-          "params": ["username: string"],
+          "params": [
+            "username: string"
+          ],
           "returns": "int",
           "summary": "Vị trí tài khoản có username khớp (không phân biệt hoa thường); −1 nếu không có.",
           "role": "Cách tìm duy nhất; kiểm trùng là `indexOf(u) != -1`.",
-          "pre": ["Không có."],
-          "post": ["Trả −1 thì không phần tử nào khớp."],
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "Trả −1 thì không phần tử nào khớp."
+          ],
           "complexity": "O(n) tìm tuần tự",
           "example": "`[nva, lthb]`: `indexOf(\"LTHB\")` = 1; `indexOf(\"ttc\")` = −1.",
-          "cpp": "`for (size_t i = 0; i < m_items.size(); i++) if (m_items[i].matchesUsername(username)) return (int)i; return -1;`"
+          "cpp": "Tìm tuần tự, so bằng `matchesUsername` của từng phần tử."
         },
         {
           "name": "add",
           "vis": "+",
-          "params": ["item: T"],
+          "params": [
+            "item: T"
+          ],
           "returns": "void",
           "summary": "Thêm vào cuối (chưa ghi file).",
           "role": "Thêm nhân viên mới; thêm admin mặc định.",
-          "pre": ["Username của `item` chưa có trong danh sách."],
-          "post": ["`size()` tăng 1."],
+          "pre": [
+            "Username của `item` chưa có trong danh sách."
+          ],
+          "post": [
+            "`size()` tăng 1."
+          ],
           "example": "`employees.add(Employee::createNew(\"ttc\")); employees.save();`",
-          "cpp": "`void add(const T& item) { m_items.push_back(item); }`"
+          "cpp": "Thêm vào cuối vector bằng `push_back`."
         },
         {
           "name": "removeAt",
           "vis": "+",
-          "params": ["index: int"],
+          "params": [
+            "index: int"
+          ],
           "returns": "void",
           "summary": "Xóa phần tử thứ `index` (chưa ghi file).",
           "role": "Xóa nhân viên; bỏ nhân viên trùng tên với admin lúc khởi động.",
-          "pre": ["0 ≤ `index` < `size()`."],
-          "post": ["`size()` giảm 1."],
+          "pre": [
+            "0 ≤ `index` < `size()`."
+          ],
+          "post": [
+            "`size()` giảm 1."
+          ],
           "complexity": "O(n)",
           "example": "`[nva, lthb, ttc]`: `removeAt(1)` còn `[nva, ttc]`.",
-          "cpp": "`void removeAt(int index) { m_items.erase(m_items.begin() + index); }`"
+          "cpp": "Xóa bằng `erase` tại vị trí `begin() + index`."
         },
         {
           "name": "sortByUsername",
@@ -145,24 +190,35 @@
           "returns": "void",
           "summary": "Sắp xếp theo username tăng dần, không phân biệt hoa thường.",
           "role": "Trước khi in bảng «Hiển thị thông tin toàn bộ employee».",
-          "pre": ["Không có."],
-          "post": ["Username tăng dần theo chữ thường."],
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "Username tăng dần theo chữ thường."
+          ],
           "complexity": "O(n log n)",
           "example": "`[nva, lthb, Ttc]` → `[lthb, nva, Ttc]`.",
-          "cpp": "`std::sort(m_items.begin(), m_items.end(), lessByUsername);` (`#include <algorithm>`)."
+          "cpp": "`std::sort` (`<algorithm>`) với hàm so sánh `lessByUsername`."
         },
         {
           "name": "lessByUsername",
           "static": true,
           "vis": "-",
-          "params": ["a: T", "b: T"],
+          "params": [
+            "a: T",
+            "b: T"
+          ],
           "returns": "bool",
           "summary": "Hàm so sánh cho `std::sort`: a đứng trước b khi username của a nhỏ hơn (theo chữ thường).",
           "role": "Chỉ `sortByUsername` dùng.",
-          "pre": ["Không có."],
-          "post": ["Bằng `Util.toLower(a.getUsername()) < Util.toLower(b.getUsername())`."],
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "Bằng `Util.toLower(a.getUsername()) < Util.toLower(b.getUsername())`."
+          ],
           "example": "`lessByUsername(lthb, nva)` = true.",
-          "cpp": "`static bool lessByUsername(const T& a, const T& b) { return Util::toLower(a.getUsername()) < Util::toLower(b.getUsername()); }`"
+          "cpp": "Hàm static: đổi hai username về chữ thường rồi so bằng `<`."
         }
       ],
       "impl": {
@@ -174,7 +230,10 @@
       "read": 8,
       "stage": 3,
       "readWhy": "Phần «template» của thang điểm; T chính là Admin và Employee vừa đọc.",
-      "pos": [900, 1450]
+      "pos": [
+        900,
+        1450
+      ]
     }
   ]
 }

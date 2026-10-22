@@ -1,0 +1,42 @@
+# Triển khai GitHub Pages: nhánh main ở địa chỉ gốc, nhánh ban-gon ở thư mục /ban-gon/.
+name: Deploy Pages
+
+on:
+  push:
+    branches: [main, ban-gon]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Lấy bản đầy đủ (main)
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: site
+      - name: Lấy bản gọn (ban-gon)
+        uses: actions/checkout@v4
+        with:
+          ref: ban-gon
+          path: site/ban-gon
+      - name: Bỏ các file không cần đăng
+        run: rm -rf site/.git site/.github site/ban-gon/.git site/ban-gon/.github
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - id: deployment
+        uses: actions/deploy-pages@v4

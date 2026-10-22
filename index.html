@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UML Quản lý nhân sự</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="style.css?v=20261023a">
+</head>
+<body>
+
+<header id="topbar">
+  <h1 id="app-title">UML Quản lý nhân sự</h1>
+  <div class="right">
+    <button id="btn-theme" title="Đổi giao diện sáng, tối, theo hệ thống">Giao diện: tự động</button>
+  </div>
+</header>
+
+<main id="main">
+  <section id="view-diagram" class="view active nopanel">
+    <aside id="side" aria-label="Bộ lọc">
+      <h4>Thứ tự đọc</h4>
+      <div class="lead" style="font-size:12px">Số trên mỗi thẻ là bước đọc. Lớp nào dùng lớp khác thì lớp được dùng được đọc trước.</div>
+      <details id="read-details" open>
+        <summary style="cursor:pointer;font-size:12px;margin-top:6px">Danh sách theo thứ tự đọc</summary>
+        <div id="read-list" class="read-list"></div>
+      </details>
+
+      <h4>Tìm</h4>
+      <input id="search" type="search" placeholder="Tên lớp, phương thức, thuộc tính..." autocomplete="off">
+      <div id="search-results"></div>
+
+      <h4>Mức chi tiết</h4>
+      <select id="lod-select" aria-label="Mức chi tiết">
+        <option value="auto">Tự động theo độ phóng</option>
+        <option value="0">Mức 0: tổng quan (tên và mục đích)</option>
+        <option value="1">Mức 1: thành viên (tên và kiểu)</option>
+        <option value="2">Mức 2: chữ ký đầy đủ, không mô tả</option>
+        <option value="3">Mức 3: chữ ký đầy đủ và mô tả</option>
+      </select>
+
+      <h4>Gói</h4>
+      <div id="pk-filter"></div>
+
+      <h4>Quan hệ</h4>
+      <label class="pk-line"><input type="checkbox" id="chk-deps"> <span>Hiện mọi quan hệ phụ thuộc (nét đứt, mũi tên hở)</span></label>
+      <div class="lead" style="font-size:12px">Mặc định chỉ vẽ các quan hệ cấu trúc cho gọn; khi bạn chọn một lớp, các quan hệ phụ thuộc của lớp đó vẫn hiện.</div>
+
+      <details id="legend-details" class="fold">
+        <summary>Chú giải</summary>
+        <div class="legend-box" id="legend"></div>
+      </details>
+
+    </aside>
+
+    <div id="canvas" aria-label="Sơ đồ lớp">
+      <div id="stage" class="lod-0">
+        <svg id="edges-under" xmlns="http://www.w3.org/2000/svg"></svg>
+        <svg id="edges-over" xmlns="http://www.w3.org/2000/svg"></svg>
+      </div>
+      <div class="canvas-hint" id="canvas-hint">Cuộn chuột để phóng to hoặc thu nhỏ, kéo để di chuyển. Số trên mỗi thẻ là thứ tự đọc (xem thanh bên trái). Rê chuột lên một lớp, một thành viên hoặc một đường nối để xem chú thích; bấm để xem đầy đủ ở khung bên phải.</div>
+      <div class="canvas-controls">
+        <button id="btn-side" title="Hiện hoặc ẩn thanh bên">☰</button>
+        <button id="btn-zoomout" title="Thu nhỏ">−</button>
+        <span class="zinfo" id="zinfo"></span>
+        <button id="btn-zoomin" title="Phóng to">+</button>
+        <button id="btn-fit" title="Vừa khung">Vừa khung</button>
+      </div>
+    </div>
+
+    <aside id="detail" aria-label="Chi tiết"></aside>
+  </section>
+</main>
+
+<div id="tooltip" role="tooltip"></div>
+
+<script src="common.js?v=20261023a"></script>
+<script src="diagram.js?v=20261023a"></script>
+<script src="main.js?v=20261023a"></script>
+</body>
+</html>

@@ -1,0 +1,440 @@
+/* UML ứng dụng quản lý nhân sự: giao diện xem thiết kế. Không dùng thư viện ngoài. */
+
+:root {
+  --bg: #f4f6f8;
+  --panel: #ffffff;
+  --panel2: #eef1f5;
+  --text: #1b2127;
+  --muted: #5a6572;
+  --border: #d3d9e0;
+  --accent: #2563eb;
+  --accent-soft: #dbe7ff;
+  --code-bg: #eef1f5;
+  --edge: #7a8694;
+  --shadow: 0 1px 3px rgba(20, 30, 40, 0.14);
+  --ok: #15803d;
+  --warn: #b45309;
+  --bad: #b91c1c;
+  --match: #f59e0b;
+  --mono: ui-monospace, "Cascadia Mono", "Segoe UI Mono", Consolas, "Courier New", monospace;
+  --sans: system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --node-start: #d9f2e1;
+  --node-end: #fbe0d6;
+  --node-decision: #fdf1c7;
+  --node-state: #e6dcfb;
+  --node-process: #ffffff;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12161b;
+    --panel: #1b2128;
+    --panel2: #242c35;
+    --text: #e6eaee;
+    --muted: #9aa6b2;
+    --border: #35404c;
+    --accent: #6ea0ff;
+    --accent-soft: #263a63;
+    --code-bg: #242c35;
+    --edge: #8b97a5;
+    --shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+    --ok: #4ade80;
+    --warn: #fbbf24;
+    --bad: #f87171;
+    --node-start: #1f3a2a;
+    --node-end: #44271f;
+    --node-decision: #3f3715;
+    --node-state: #342a55;
+    --node-process: #1b2128;
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #12161b;
+  --panel: #1b2128;
+  --panel2: #242c35;
+  --text: #e6eaee;
+  --muted: #9aa6b2;
+  --border: #35404c;
+  --accent: #6ea0ff;
+  --accent-soft: #263a63;
+  --code-bg: #242c35;
+  --edge: #8b97a5;
+  --shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+  --ok: #4ade80;
+  --warn: #fbbf24;
+  --bad: #f87171;
+  --node-start: #1f3a2a;
+  --node-end: #44271f;
+  --node-decision: #3f3715;
+  --node-state: #342a55;
+  --node-process: #1b2128;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+@supports (height: 100dvh) { html, body { height: 100dvh; } }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 14px;
+  line-height: 1.45;
+  display: flex;
+  flex-direction: column;
+}
+code, pre, .mono { font-family: var(--mono); }
+code {
+  background: var(--code-bg);
+  padding: 0 4px;
+  border-radius: 4px;
+  font-size: 0.92em;
+}
+button, input, select { font: inherit; color: inherit; }
+button {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 4px 10px;
+  cursor: pointer;
+}
+button:hover { border-color: var(--accent); }
+button:focus-visible, .member:focus-visible, .card-head:focus-visible, input:focus-visible, select:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+a { color: var(--accent); }
+
+/* ---------- thanh trên ---------- */
+#topbar {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 16px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+#topbar h1 { font-size: 16px; margin: 0; white-space: nowrap; }
+#topbar .right { display: flex; gap: 6px; margin-left: auto; }
+
+#main { flex: 1 1 auto; position: relative; min-height: 0; }
+.view { display: none; position: absolute; inset: 0; overflow: auto; }
+.view.active { display: block; }
+#view-diagram.active { display: grid; overflow: hidden; grid-template-columns: 270px minmax(0, 1fr) 420px; }
+#view-diagram.active.nopanel { grid-template-columns: 270px minmax(0, 1fr) 0; }
+#view-diagram.active.noside { grid-template-columns: 0 minmax(0, 1fr) 420px; }
+#view-diagram.active.noside.nopanel { grid-template-columns: 0 minmax(0, 1fr) 0; }
+.noside #side, .nopanel #detail { visibility: hidden; padding: 0; border: 0; overflow: hidden; }
+
+.lead { color: var(--muted); max-width: 80ch; }
+
+/* ---------- thanh bên của sơ đồ ---------- */
+#side {
+  overflow: auto;
+  padding: 10px 12px;
+  background: var(--panel);
+  border-right: 1px solid var(--border);
+  font-size: 13px;
+}
+#side h4 { margin: 14px 0 6px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); }
+#side .row { display: flex; gap: 6px; align-items: center; margin: 4px 0; flex-wrap: wrap; }
+#side input[type="search"] { width: 100%; padding: 5px 8px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); }
+#side select { width: 100%; padding: 4px 6px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); }
+#search-results { margin-top: 4px; max-height: 190px; overflow: auto; }
+#search-results button { display: block; width: 100%; text-align: left; border: 0; border-radius: 4px; padding: 3px 6px; background: transparent; font-family: var(--mono); font-size: 12px; }
+#search-results button:hover { background: var(--accent-soft); }
+.pk-line { display: flex; gap: 6px; align-items: center; margin: 3px 0; }
+.pk-dot { width: 12px; height: 12px; border-radius: 3px; flex: 0 0 auto; }
+.stage-h { margin: 12px 0 2px; font-weight: 700; font-size: 12.5px; }
+.stage-t { color: var(--muted); font-size: 11.5px; margin: 0 0 4px; }
+.read-list button { display: flex; gap: 6px; width: 100%; text-align: left; border: 0; background: transparent; padding: 2px 6px; border-left: 4px solid var(--pk); margin: 1px 0; border-radius: 0 4px 4px 0; font-family: var(--mono); font-size: 12px; }
+.read-list button .n { color: var(--muted); min-width: 1.7em; text-align: right; }
+.read-list button:hover, .read-list button.sel { background: var(--accent-soft); }
+/* mục gập: tiêu đề có tam giác bấm để sổ ra hoặc thu vào */
+.fold { margin: 14px 0 6px; }
+.fold > summary { cursor: pointer; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); font-weight: 700; padding: 2px 0; }
+.fold[open] > summary { margin-bottom: 6px; }
+.legend-box { background: var(--panel2); border-radius: 6px; padding: 8px; }
+.legend-box svg { display: block; }
+.status-dot { display: inline-block; padding: 0 6px; border-radius: 9px; font-size: 11px; border: 1px solid var(--border); }
+
+/* ---------- khung vẽ ---------- */
+#canvas {
+  position: relative;
+  overflow: hidden;
+  cursor: grab;
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  background-image: radial-gradient(var(--border) 1px, transparent 1px);
+  background-size: 24px 24px;
+  background-color: var(--bg);
+  min-width: 0;
+}
+#canvas.grabbing { cursor: grabbing; }
+#canvas, #canvas * { -webkit-user-select: none; user-select: none; }
+#canvas input { -webkit-user-select: text; user-select: text; }
+.detail-close { display: flex; justify-content: flex-end; margin: -4px 0 4px; }
+#stage, .stage { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
+#edges-under, #edges-over { position: absolute; left: 0; top: 0; overflow: visible; pointer-events: none; }
+#edges-under { z-index: 1; }
+#edges-over { z-index: 3; }
+#edges-under .edge-hit { pointer-events: stroke; }
+.canvas-controls {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  z-index: 10;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 4px;
+  box-shadow: var(--shadow);
+}
+.canvas-controls .zinfo { padding: 0 6px; color: var(--muted); font-size: 12px; min-width: 96px; text-align: center; }
+.canvas-hint {
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+  z-index: 10;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 4px 10px;
+  color: var(--muted);
+  font-size: 12px;
+  box-shadow: var(--shadow);
+  max-width: 60%;
+}
+
+/* ---------- thẻ lớp ---------- */
+.card {
+  position: absolute;
+  z-index: 2;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-left: 6px solid var(--pk, var(--accent));
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  font-size: 13px;
+  overflow: hidden;
+  cursor: default;
+}
+.card.dim { opacity: 0.25; }
+.card.sel { outline: 3px solid var(--accent); }
+.card.rel { outline: 2px dashed var(--accent); }
+.card.match { outline: 3px solid var(--match); }
+.card-head { padding: 8px 12px 6px; cursor: pointer; }
+.card-head:hover { background: var(--accent-soft); }
+.card .toprow { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 2px; }
+.rnum { display: inline-flex; align-items: center; justify-content: center; min-width: 22px; height: 22px; padding: 0 6px; border-radius: 11px; background: var(--pk, var(--accent)); color: #fff; font: 700 12px var(--sans); }
+.card .name { font-size: 17px; font-weight: 700; font-family: var(--mono); word-break: break-word; }
+.card.st-abstract .name, .card.st-interface .name { font-style: italic; }
+.badge { display: inline-block; font-size: 10px; border-radius: 9px; padding: 0 6px; vertical-align: middle; border: 1px solid var(--border); color: var(--muted); font-family: var(--sans); font-weight: 400; font-style: normal; }
+.badge.optional { border-color: #db2777; color: #db2777; }
+.badge.support { border-color: #0d9488; color: #0d9488; }
+.card-summary { padding: 0 12px 8px; color: var(--muted); }
+.card-role { padding: 0 12px 8px; }
+.card-counts { padding: 0 12px 10px; color: var(--muted); display: none; }
+.members { border-top: 1px solid var(--border); }
+.members .sect, .values .sect { font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); padding: 4px 12px 0; }
+.member { padding: 2px 12px; font-family: var(--mono); font-size: 12px; cursor: pointer; border-top: 1px solid transparent; }
+.member:hover { background: var(--accent-soft); }
+.member.sel { background: var(--accent-soft); box-shadow: inset 3px 0 0 var(--accent); }
+.member .vis { display: inline-block; width: 1.1em; color: var(--muted); }
+.member .mname { font-weight: 600; }
+.member.static .msig { text-decoration: underline; }
+.member.abstract .msig { font-style: italic; }
+.member .ret { color: var(--muted); }
+.member .msum { font-family: var(--sans); color: var(--muted); font-size: 12px; padding: 0 0 2px 1.1em; display: none; white-space: normal; }
+.member .sig-full { display: none; word-break: break-word; }
+.values { border-top: 1px solid var(--border); padding: 4px 0; }
+.vrow { padding: 1px 12px; font-family: var(--mono); font-size: 12px; }
+.vrow .vmean { display: none; font-family: var(--sans); color: var(--muted); padding-left: 1.1em; white-space: normal; }
+
+/* ---------- ba mức chi tiết ---------- */
+.lod-0 .members, .lod-0 .card-role, .lod-0 .values { display: none; }
+.lod-0 .card-counts { display: block; font-size: 20px; }
+.lod-0 .card .name { font-size: var(--l0name, 30px); }
+.lod-0 .card-summary { font-size: 24px; line-height: 1.3; }
+.lod-0 .badge { font-size: 16px; }
+.lod-0 .rnum { min-width: 40px; height: 40px; border-radius: 20px; font-size: 24px; }
+.lod-1 .card-role { display: none; }
+.lod-2 .sig-compact, .lod-3 .sig-compact { display: none; }
+.lod-2 .sig-full, .lod-3 .sig-full { display: inline; }
+.lod-3 .member .msum { display: block; }
+.lod-3 .vrow .vmean { display: block; }
+
+/* ---------- đường quan hệ ---------- */
+.edge { stroke: var(--edge); fill: none; stroke-width: 1.5; opacity: 0.5; }
+.edge.dash { stroke-dasharray: 6 4; }
+.edge.faint { opacity: 0.12; }
+.edge.hi { stroke: var(--accent); opacity: 1; stroke-width: 2.6; }
+.edge-hit { stroke: transparent; stroke-width: 16; fill: none; }
+.elabel { font: 12px var(--sans); fill: var(--text); paint-order: stroke; stroke: var(--panel); stroke-width: 5px; stroke-linejoin: round; }
+.emult { font: 700 12px var(--sans); fill: var(--accent); paint-order: stroke; stroke: var(--panel); stroke-width: 4px; }
+.mk-hollow { fill: var(--panel); stroke: var(--edge); stroke-width: 1.4; }
+.mk-filled { fill: var(--edge); stroke: var(--edge); stroke-width: 1.4; }
+.mk-open { fill: none; stroke: var(--edge); stroke-width: 1.6; }
+.mk-hi-hollow { fill: var(--panel); stroke: var(--accent); stroke-width: 1.6; }
+.mk-hi-filled { fill: var(--accent); stroke: var(--accent); stroke-width: 1.6; }
+.mk-hi-open { fill: none; stroke: var(--accent); stroke-width: 1.8; }
+
+/* ---------- chú thích nổi ---------- */
+#tooltip {
+  position: fixed;
+  z-index: 1000;
+  max-width: 440px;
+  background: var(--panel);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--accent);
+  border-radius: 8px;
+  padding: 8px 12px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  pointer-events: none;
+  display: none;
+  font-size: 13px;
+}
+#tooltip .tt-title { font-family: var(--mono); font-weight: 700; margin-bottom: 2px; word-break: break-word; }
+#tooltip .tt-sub { color: var(--muted); font-size: 12px; margin-top: 4px; }
+#tooltip ul { margin: 4px 0 0; padding-left: 18px; }
+
+/* ---------- khung chi tiết ---------- */
+#detail {
+  overflow: auto;
+  background: var(--panel);
+  border-left: 1px solid var(--border);
+  padding: 12px 16px 40px;
+  font-size: 13.5px;
+}
+#detail h2 { font-size: 20px; margin: 0 0 4px; font-family: var(--mono); word-break: break-word; }
+#detail h3 { font-size: 13px; margin: 16px 0 4px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); }
+#detail p { margin: 4px 0 8px; }
+#detail ul { margin: 4px 0 8px; padding-left: 20px; }
+#detail li { margin: 2px 0; }
+.callout { background: var(--accent-soft); border-left: 4px solid var(--accent); border-radius: 4px; padding: 6px 10px; margin: 8px 0; }
+.callout.warn { background: color-mix(in srgb, var(--warn) 14%, transparent); border-left-color: var(--warn); }
+.callout .ct { font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); }
+pre.example, .ex {
+  background: var(--code-bg);
+  border-radius: 6px;
+  padding: 6px 10px;
+  margin: 4px 0 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: var(--mono);
+  font-size: 12.5px;
+}
+.sig-big { font-family: var(--mono); font-size: 14px; background: var(--code-bg); padding: 6px 10px; border-radius: 6px; margin: 6px 0; word-break: break-word; }
+.linkish { color: var(--accent); cursor: pointer; text-decoration: underline; background: none; border: 0; padding: 0; font-family: var(--mono); font-size: inherit; }
+.mtable { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+.mtable td { padding: 3px 6px; border-top: 1px solid var(--border); vertical-align: top; }
+.mtable td:first-child { white-space: nowrap; font-family: var(--mono); }
+.twocol { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.twocol > div { background: var(--panel2); border-radius: 6px; padding: 6px 10px; }
+.twocol .lang { font-weight: 700; font-size: 12px; color: var(--muted); }
+.chip { display: inline-block; border: 1px solid var(--border); border-radius: 9px; padding: 0 8px; font-size: 12px; margin-right: 4px; }
+.crumbs { color: var(--muted); font-size: 12px; margin-bottom: 4px; }
+
+/* ---------- màn hình hẹp ---------- */
+@media (max-width: 1100px) {
+  #view-diagram.active { grid-template-columns: 0 minmax(0, 1fr) 360px; }
+  #view-diagram.active.noside { grid-template-columns: 0 minmax(0, 1fr) 360px; }
+  #view-diagram.active.nopanel { grid-template-columns: 0 minmax(0, 1fr) 0; }
+  #view-diagram.active #side { visibility: hidden; padding: 0; border: 0; overflow: hidden; }
+  #view-diagram.active.showside { grid-template-columns: 250px minmax(0, 1fr) 0; }
+  #view-diagram.active.showside #side { visibility: visible; padding: 10px 12px; border-right: 1px solid var(--border); overflow: auto; }
+  #view-diagram.active.showside #detail { visibility: hidden; padding: 0; border: 0; overflow: hidden; }
+}
+@media (max-width: 700px) {
+  #view-diagram.active, #view-diagram.active.nopanel, #view-diagram.active.showside, #view-diagram.active.noside { grid-template-columns: 0 minmax(0, 1fr) 0; }
+  #view-diagram.active #detail { position: absolute; left: 0; right: 0; bottom: 0; height: 50%; z-index: 20; visibility: visible; padding: 12px 16px 40px; border-left: 0; border-top: 2px solid var(--accent); overflow: auto; }
+  #view-diagram.active.nopanel #detail { visibility: hidden; padding: 0; border: 0; overflow: hidden; }
+  #view-diagram.active.showside #side { position: absolute; left: 0; top: 56px; bottom: 0; width: min(300px, 86vw); z-index: 30; box-shadow: var(--shadow); }
+  .twocol { grid-template-columns: 1fr; }
+  /* thanh bên và khung chi tiết là lớp phủ (rời khỏi lưới), nên khung vẽ phải được đặt rõ ở cột giữa */
+  #canvas { grid-column: 2; grid-row: 1; }
+  /* điện thoại: nhóm nút ở mép trên (nửa dưới có thể bị khung chi tiết phủ) */
+  .canvas-controls { top: 8px; right: 8px; bottom: auto; max-width: calc(100% - 16px); z-index: 40; flex-wrap: wrap; justify-content: flex-end; }
+  .canvas-controls button, .canvas-controls .zinfo { white-space: nowrap; }
+  .canvas-controls .zinfo { min-width: 0; padding: 0 4px; font-size: 11px; }
+  .canvas-hint { left: 8px; right: 8px; bottom: 8px; max-width: none; }
+  #topbar { padding: 4px 10px; gap: 8px; }
+  #view-diagram.active #detail { height: 52%; overscroll-behavior: contain; }
+  .detail-bar { position: sticky; top: -12px; z-index: 2; background: var(--panel); padding: 6px 0; margin: -12px 0 6px; }
+  .mtable td:first-child { white-space: normal; word-break: break-word; }
+  #detail code, #detail .ex, .sig-big { word-break: break-word; overflow-wrap: anywhere; }
+}
+@media (max-width: 1100px) {
+  #side, #detail { overscroll-behavior: contain; }
+}
+
+/* màn hình cảm ứng: vùng chạm lớn hơn, ô nhập đủ cỡ chữ để iPhone không tự phóng to khi gõ */
+@media (pointer: coarse) {
+  button { min-height: 36px; }
+  .canvas-controls button { min-width: 40px; min-height: 40px; font-size: 16px; }
+  #side input[type="search"], #side select { font-size: 16px; padding: 8px 10px; }
+  #search-results button { padding: 8px 6px; font-size: 13px; }
+  .read-list button { padding: 7px 6px; font-size: 13px; }
+  .pk-line { margin: 8px 0; min-height: 28px; }
+  .pk-line input { width: 20px; height: 20px; }
+  .mitem { padding: 9px 8px; }
+  .readnav .rn-btns button, .detail-bar button { min-height: 40px; }
+  .canvas-hint { font-size: 13px; }
+}
+/* điện thoại rất hẹp (320 đến 400 px): thu gọn nhóm nút để vẫn nằm trên một hàng */
+@media (max-width: 400px) {
+  .canvas-controls { gap: 2px; }
+  .canvas-controls button { min-width: 36px; padding: 0 6px; font-size: 14px; }
+  .canvas-controls .zinfo { font-size: 10px; padding: 0 2px; }
+  #topbar button { font-size: 13px; padding: 2px 8px; }
+}
+
+.errbox { margin: 40px auto; max-width: 760px; background: var(--panel); border: 1px solid var(--bad); border-left: 6px solid var(--bad); border-radius: 8px; padding: 14px 18px; }
+.errbox pre { background: var(--code-bg); padding: 8px 12px; border-radius: 6px; }
+
+
+/* thanh thứ tự đọc trong khung chi tiết */
+.readnav { background: var(--panel2); border-radius: 8px; padding: 8px 10px; margin: 6px 0 10px; }
+.readnav .rn-top { display: flex; align-items: center; gap: 8px; font-size: 12.5px; }
+.readnav .rn-why { margin-top: 4px; }
+.readnav .rn-btns { display: flex; justify-content: space-between; gap: 6px; margin-top: 8px; }
+.readnav .rn-btns button { font-family: var(--mono); font-size: 12px; max-width: 48%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.kindline { color: var(--muted); font-size: 12.5px; margin: 2px 0 6px; }
+
+/* tên kiểu và tên lớp có thể bấm để nhảy tới nơi định nghĩa */
+.tref { cursor: pointer; text-decoration: underline dotted; text-underline-offset: 2px; text-decoration-color: var(--muted); border-radius: 3px; }
+.tref:hover { background: var(--accent-soft); text-decoration-style: solid; }
+code.xref { cursor: pointer; color: var(--accent); text-decoration: underline dotted; text-underline-offset: 2px; }
+code.xref:hover { background: var(--accent-soft); text-decoration-style: solid; }
+.detail-bar { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin: -4px 0 6px; }
+.detail-bar button { max-width: 75%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.card.st-types { border-style: dashed; border-left-style: solid; }
+.card.st-types .name { font-family: var(--sans); }
+span.xref { cursor: pointer; color: var(--accent); text-decoration: underline dotted; text-underline-offset: 2px; }
+span.xref:hover { background: var(--accent-soft); text-decoration-style: solid; }
+
+/* danh sách thành viên trong khung chi tiết */
+.mlist { display: flex; flex-direction: column; gap: 2px; }
+.mitem { padding: 4px 8px; border-radius: 6px; cursor: pointer; border: 1px solid transparent; }
+.mitem:hover { background: var(--accent-soft); border-color: var(--border); }
+.mitem .sigline { font-family: var(--mono); font-size: 12.5px; font-weight: 600; word-break: break-word; }
+.mitem .msumline { color: var(--muted); font-size: 12.5px; }
+
+/* tham số của lớp template: ô nét đứt ở góc trên bên phải thẻ, như ký hiệu UML */
+.card .tr-right { display: inline-flex; align-items: center; gap: 6px; }
+.tparam { display: inline-block; border: 1px dashed var(--muted); border-radius: 3px; padding: 0 6px; background: var(--panel2); color: var(--text); font: 600 12px var(--mono); }
+.lod-0 .tparam { font-size: 20px; }
+
+/* phần cài đặt C++ trong khung chi tiết */
+.implbox { background: var(--panel2); border-radius: 6px; padding: 6px 10px; }
+.implbox .lang { font-weight: 700; font-size: 12px; color: var(--muted); }

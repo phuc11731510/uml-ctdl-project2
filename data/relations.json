@@ -1,0 +1,396 @@
+{
+  "relations": [
+    {
+      "id": "r01",
+      "from": "Admin",
+      "to": "Account",
+      "kind": "inheritance",
+      "label": "",
+      "explain": "Admin là một Account: thừa kế username, mật khẩu và các hàm chung; tự viết `toLine` (2 cột) và `getRole`."
+    },
+    {
+      "id": "r02",
+      "from": "Employee",
+      "to": "Account",
+      "kind": "inheritance",
+      "label": "",
+      "explain": "Employee là một Account, thêm cờ «phải đổi mật khẩu»; tự viết `toLine` (3 cột) và `getRole`."
+    },
+    {
+      "id": "r03",
+      "from": "Account",
+      "to": "Role",
+      "kind": "dependency",
+      "label": "getRole()",
+      "explain": "Mỗi tài khoản trả vai trò của mình qua `getRole()`."
+    },
+    {
+      "id": "r04",
+      "from": "Account",
+      "to": "StringUtil",
+      "kind": "dependency",
+      "label": "equalsIgnoreCase",
+      "explain": "`matchesUsername` so username không phân biệt hoa thường bằng `StringUtil.equalsIgnoreCase`."
+    },
+    {
+      "id": "r05",
+      "from": "UserProfile",
+      "to": "ProfileField",
+      "kind": "dependency",
+      "label": "get, set",
+      "explain": "`get` và `set` nhận tên thông tin kiểu `ProfileField`."
+    },
+    {
+      "id": "r06",
+      "from": "AccountList",
+      "to": "Account",
+      "kind": "dependency",
+      "label": "T = Admin hoặc Employee",
+      "explain": "Tham số `T` của template được thay bằng `Admin` hoặc `Employee`, hai lớp con của Account. `AccountList` gọi `T::fromLine`, `toLine`, `getUsername`, `matchesUsername` của T."
+    },
+    {
+      "id": "r07",
+      "from": "AccountList",
+      "to": "FileUtil",
+      "kind": "dependency",
+      "label": "readLines, writeLines",
+      "explain": "`load` đọc file bằng `FileUtil.readLines`; `save` ghi lại cả file bằng `FileUtil.writeLines`."
+    },
+    {
+      "id": "r08",
+      "from": "AccountList",
+      "to": "StringUtil",
+      "kind": "dependency",
+      "label": "trim, toLower",
+      "explain": "`load` bỏ khoảng trắng mỗi dòng; `lessByUsername` so sánh username theo chữ thường."
+    },
+    {
+      "id": "r09",
+      "from": "ProfileStore",
+      "to": "UserProfile",
+      "kind": "dependency",
+      "label": "đọc, ghi",
+      "explain": "Đổi qua lại giữa 4 dòng của file hồ sơ và một `UserProfile` (`toLines`, `fromLines`)."
+    },
+    {
+      "id": "r10",
+      "from": "ProfileStore",
+      "to": "FileUtil",
+      "kind": "dependency",
+      "label": "đọc, ghi, xóa file",
+      "explain": "Mọi thao tác trên file hồ sơ đi qua `FileUtil`."
+    },
+    {
+      "id": "r11",
+      "from": "ProfileStore",
+      "to": "StringUtil",
+      "kind": "dependency",
+      "label": "toLower",
+      "explain": "Tên file hồ sơ luôn viết thường: `pathOf` dùng `StringUtil.toLower`."
+    },
+    {
+      "id": "r12",
+      "from": "Validator",
+      "to": "ErrorCode",
+      "kind": "dependency",
+      "label": "trả về",
+      "explain": "Mọi hàm kiểm tra trả `ErrorCode::OK` hoặc một mã lỗi."
+    },
+    {
+      "id": "r13",
+      "from": "Validator",
+      "to": "ProfileField",
+      "kind": "dependency",
+      "label": "checkField",
+      "explain": "`checkField` chọn hàm kiểm theo tên thông tin."
+    },
+    {
+      "id": "r14",
+      "from": "Validator",
+      "to": "StringUtil",
+      "kind": "dependency",
+      "label": "textLength, isAllDigits",
+      "explain": "Đo độ dài bằng `textLength`, kiểm số điện thoại bằng `isAllDigits`, so tên cấm bằng `toLower`."
+    },
+    {
+      "id": "r15",
+      "from": "HrSystem",
+      "to": "AccountList",
+      "kind": "composition",
+      "label": "m_admins, m_employees",
+      "fromMult": "1",
+      "toMult": "2",
+      "explain": "HrSystem sở hữu hai danh sách: `AccountList<Admin>` cho Administrators.txt và `AccountList<Employee>` cho Employees.txt. Hai danh sách được tạo cùng HrSystem và mất cùng HrSystem."
+    },
+    {
+      "id": "r16",
+      "from": "HrSystem",
+      "to": "ProfileStore",
+      "kind": "composition",
+      "label": "m_profiles",
+      "fromMult": "1",
+      "toMult": "1",
+      "explain": "HrSystem sở hữu kho file hồ sơ."
+    },
+    {
+      "id": "r17",
+      "from": "HrSystem",
+      "to": "Admin",
+      "kind": "dependency",
+      "label": "tạo admin mặc định",
+      "explain": "`ensureMinimumAdmins` tạo `Admin(tên, \"123456\")` khi chưa đủ 3 admin."
+    },
+    {
+      "id": "r18",
+      "from": "HrSystem",
+      "to": "Employee",
+      "kind": "dependency",
+      "label": "createNew, đổi mật khẩu",
+      "explain": "Thêm nhân viên bằng `Employee::createNew`; đổi mật khẩu bằng `setPassword` và `setNeedsPasswordChange`."
+    },
+    {
+      "id": "r19",
+      "from": "HrSystem",
+      "to": "Validator",
+      "kind": "dependency",
+      "label": "kiểm dữ liệu",
+      "explain": "Kiểm lại username, mật khẩu và 4 thông tin hồ sơ trước khi ghi."
+    },
+    {
+      "id": "r20",
+      "from": "HrSystem",
+      "to": "ErrorCode",
+      "kind": "dependency",
+      "label": "trả về",
+      "explain": "Mọi chức năng trả `ErrorCode` để giao diện báo cho người dùng."
+    },
+    {
+      "id": "r21",
+      "from": "HrSystem",
+      "to": "UserProfile",
+      "kind": "dependency",
+      "label": "tham số, kết quả",
+      "explain": "`addEmployee` nhận hồ sơ; `findEmployee` trả hồ sơ; `updateProfileField` sửa một thông tin của hồ sơ."
+    },
+    {
+      "id": "r22",
+      "from": "HrSystem",
+      "to": "Role",
+      "kind": "dependency",
+      "label": "login()",
+      "explain": "`login` ghi vai trò của tài khoản vào tham số `role`."
+    },
+    {
+      "id": "r23",
+      "from": "HrSystem",
+      "to": "FileUtil",
+      "kind": "dependency",
+      "label": "ensureFolder",
+      "explain": "`initialize` tạo thư mục `data` và `data/users` nếu chưa có."
+    },
+    {
+      "id": "r24",
+      "from": "Console",
+      "to": "ConsoleColor",
+      "kind": "dependency",
+      "label": "setColor",
+      "explain": "Các hàm in đổi màu chữ theo `ConsoleColor`."
+    },
+    {
+      "id": "r25",
+      "from": "Console",
+      "to": "ErrorCode",
+      "kind": "dependency",
+      "label": "messageOf",
+      "explain": "`printError` và `messageOf` đổi mã lỗi thành câu thông báo."
+    },
+    {
+      "id": "r26",
+      "from": "Console",
+      "to": "StringUtil",
+      "kind": "dependency",
+      "label": "trim, tryParseInt",
+      "explain": "`readLine` bỏ khoảng trắng; `readMenuChoice` đổi chuỗi thành số mà không lỗi khi gõ chữ."
+    },
+    {
+      "id": "r27",
+      "from": "Menu",
+      "to": "Console",
+      "kind": "dependency",
+      "label": "in, đọc",
+      "explain": "`run` in tiêu đề, các mục và đọc lựa chọn qua `Console`. Các lớp con cũng in và đọc qua `Console`."
+    },
+    {
+      "id": "r28",
+      "from": "Menu",
+      "to": "UserProfile",
+      "kind": "dependency",
+      "label": "printProfile",
+      "explain": "`printProfile` in 5 dòng thông tin từ một `UserProfile`."
+    },
+    {
+      "id": "r29",
+      "from": "ProfileEditMenu",
+      "to": "Menu",
+      "kind": "inheritance",
+      "label": "",
+      "explain": "Menu con cập nhật là một Menu: dùng lại vòng lặp `run`, chỉ viết `getOptions` và `handleChoice`."
+    },
+    {
+      "id": "r30",
+      "from": "AdminMenu",
+      "to": "Menu",
+      "kind": "inheritance",
+      "label": "",
+      "explain": "Menu admin là một Menu."
+    },
+    {
+      "id": "r31",
+      "from": "EmployeeMenu",
+      "to": "Menu",
+      "kind": "inheritance",
+      "label": "",
+      "explain": "Menu nhân viên là một Menu."
+    },
+    {
+      "id": "r32",
+      "from": "ProfileEditMenu",
+      "to": "HrSystem",
+      "kind": "association",
+      "label": "m_system",
+      "fromMult": "*",
+      "toMult": "1",
+      "explain": "Giữ tham chiếu tới hệ thống dùng chung để đọc hồ sơ và ghi thay đổi. Không sở hữu."
+    },
+    {
+      "id": "r33",
+      "from": "AdminMenu",
+      "to": "HrSystem",
+      "kind": "association",
+      "label": "m_system",
+      "fromMult": "*",
+      "toMult": "1",
+      "explain": "Giữ tham chiếu tới hệ thống dùng chung; mọi chức năng của admin gọi qua đây."
+    },
+    {
+      "id": "r34",
+      "from": "EmployeeMenu",
+      "to": "HrSystem",
+      "kind": "association",
+      "label": "m_system",
+      "fromMult": "*",
+      "toMult": "1",
+      "explain": "Giữ tham chiếu tới hệ thống dùng chung; xem thông tin và đổi mật khẩu gọi qua đây."
+    },
+    {
+      "id": "r35",
+      "from": "LoginScreen",
+      "to": "HrSystem",
+      "kind": "association",
+      "label": "m_system",
+      "fromMult": "1",
+      "toMult": "1",
+      "explain": "Giữ tham chiếu tới hệ thống để kiểm tra đăng nhập."
+    },
+    {
+      "id": "r36",
+      "from": "ProfileEditMenu",
+      "to": "ProfileField",
+      "kind": "dependency",
+      "label": "số mục → thông tin",
+      "explain": "Đổi số mục 1–4 thành `ProfileField` bằng `static_cast<ProfileField>(choice - 1)`."
+    },
+    {
+      "id": "r37",
+      "from": "AdminMenu",
+      "to": "ProfileEditMenu",
+      "kind": "dependency",
+      "label": "tạo khi chọn 4",
+      "explain": "`updateEmployee` tạo một `ProfileEditMenu` rồi gọi `run()`."
+    },
+    {
+      "id": "r38",
+      "from": "AdminMenu",
+      "to": "Validator",
+      "kind": "dependency",
+      "label": "kiểm từng ô",
+      "explain": "`addEmployee` kiểm mỗi thông tin ngay khi nhập bằng `Validator.checkField`, để báo lỗi sớm."
+    },
+    {
+      "id": "r39",
+      "from": "AdminMenu",
+      "to": "UserProfile",
+      "kind": "dependency",
+      "label": "tạo hồ sơ",
+      "explain": "`addEmployee` điền 4 thông tin vào một `UserProfile` rồi chuyển cho `HrSystem.addEmployee`."
+    },
+    {
+      "id": "r40",
+      "from": "LoginScreen",
+      "to": "Console",
+      "kind": "dependency",
+      "label": "readLine, readPassword",
+      "explain": "Đọc User bằng `readLine` và Pass bằng `readPassword` (che `*`)."
+    },
+    {
+      "id": "r41",
+      "from": "LoginScreen",
+      "to": "Role",
+      "kind": "dependency",
+      "label": "tham số của run()",
+      "explain": "`run` trả vai trò của người vừa đăng nhập qua tham số `role`."
+    },
+    {
+      "id": "r42",
+      "from": "Application",
+      "to": "HrSystem",
+      "kind": "composition",
+      "label": "m_system",
+      "fromMult": "1",
+      "toMult": "1",
+      "explain": "Application sở hữu hệ thống duy nhất của chương trình; các màn hình chỉ mượn tham chiếu."
+    },
+    {
+      "id": "r43",
+      "from": "Application",
+      "to": "LoginScreen",
+      "kind": "composition",
+      "label": "m_loginScreen",
+      "fromMult": "1",
+      "toMult": "1",
+      "explain": "Application sở hữu màn hình đăng nhập; nó sống suốt chương trình để giữ bộ đếm số lần sai."
+    },
+    {
+      "id": "r44",
+      "from": "Application",
+      "to": "AdminMenu",
+      "kind": "dependency",
+      "label": "tạo khi admin đăng nhập",
+      "explain": "Mỗi lần admin đăng nhập, `run` tạo một `AdminMenu` cục bộ rồi gọi `run()`."
+    },
+    {
+      "id": "r45",
+      "from": "Application",
+      "to": "EmployeeMenu",
+      "kind": "dependency",
+      "label": "tạo khi nhân viên đăng nhập",
+      "explain": "Mỗi lần nhân viên đăng nhập, `run` tạo một `EmployeeMenu` cục bộ, gọi `forcePasswordChange()` nếu cần, rồi `run()`."
+    },
+    {
+      "id": "r46",
+      "from": "Application",
+      "to": "Console",
+      "kind": "dependency",
+      "label": "initialize, cảnh báo",
+      "explain": "Chuẩn bị console và in các cảnh báo lúc khởi động."
+    },
+    {
+      "id": "r47",
+      "from": "Application",
+      "to": "Role",
+      "kind": "dependency",
+      "label": "chọn menu",
+      "explain": "Dựa vào `Role` để mở menu admin hay menu nhân viên."
+    }
+  ]
+}

@@ -1,0 +1,946 @@
+{
+  "classes": [
+    {
+      "id": "ConsoleColor",
+      "stereotype": "enum",
+      "package": "ui",
+      "status": "support",
+      "summary": "Các màu chữ, đặt tên theo mục đích dùng (tiêu đề, nhãn, lỗi...) chứ không theo tên màu.",
+      "role": "Muốn đổi màu cả chương trình chỉ cần sửa giá trị ở đây. Tên theo mục đích giúp mã gọi đọc ra ý, ví dụ `Console.printLine(msg, ConsoleColor::DANGER)`.",
+      "spec": "«Dùng màu để thiết kế giao diện dễ nhìn.» Màu tiêu đề và màu nhãn lấy theo ảnh mẫu trong đề (sao vàng, chữ `User:` xanh lá).",
+      "uses": [],
+      "invariants": [],
+      "attributes": [],
+      "methods": [],
+      "values": [
+        { "name": "NORMAL", "meaning": "7: xám nhạt. Chữ thường." },
+        { "name": "TITLE", "meaning": "14: vàng. Khung sao và tiêu đề màn hình." },
+        { "name": "LABEL", "meaning": "10: xanh lá. Nhãn ô nhập như `User:`, `Pass:`, `Chon:`." },
+        { "name": "SUCCESS", "meaning": "11: xanh ngọc. Báo thành công." },
+        { "name": "WARNING", "meaning": "6: vàng đậm. Cảnh báo lúc khởi động, thông báo «Da huy»." },
+        { "name": "DANGER", "meaning": "12: đỏ. Báo lỗi." }
+      ],
+      "impl": {
+        "cpp": "`enum class ConsoleColor { NORMAL = 7, TITLE = 14, LABEL = 10, SUCCESS = 11, WARNING = 6, DANGER = 12 };` Số là thuộc tính màu của `SetConsoleTextAttribute`: 4 bit thấp là màu chữ, 4 bit cao là màu nền (ở đây nền đen, bằng 0)."
+      },
+      "notes": [
+        "Không đặt tên `ERROR`: `<windows.h>` đã định nghĩa macro `ERROR`, mã sẽ không biên dịch được."
+      ],
+      "read": 14,
+      "stage": 5,
+      "readWhy": "Kiểu nhỏ mở đầu phần giao diện; Console dùng để đổi màu chữ.",
+      "pos": [450, 0]
+    },
+    {
+      "id": "Console",
+      "stereotype": "utility",
+      "package": "ui",
+      "status": "core",
+      "summary": "Lớp duy nhất đọc bàn phím và in ra màn hình: in có màu, khung tiêu đề, đọc dòng, đọc mật khẩu che `*`, đọc lựa chọn menu, hỏi có hay không.",
+      "role": "Gom mọi thứ phụ thuộc console của Windows (`SetConsoleTextAttribute`, `_getch`, `cls`) vào một lớp. Không lớp nào khác dùng `std::cin` hay `_getch`. Khi chuyển sang tiếng Việt có dấu, cách đọc dòng chỉ phải sửa ở `readLine` và `initialize`.",
+      "spec": "«Mã hóa pass thành dấu * khi đăng nhập»; «Dùng màu để thiết kế giao diện dễ nhìn»; «hệ thống sẽ thông báo thông tin lỗi đến user».",
+      "uses": [
+        "`ConsoleColor`: các màu `NORMAL`, `TITLE`, `LABEL`, `SUCCESS`, `WARNING`, `DANGER`; mỗi giá trị là số màu của Windows.",
+        "`ErrorCode`: danh sách mã lỗi; `messageOf` cần một câu cho mỗi mã (câu gợi ý có ở thẻ ErrorCode).",
+        "`StringUtil.trim(s)`: bỏ khoảng trắng đầu cuối.",
+        "`StringUtil.tryParseInt(s, value)`: đổi chuỗi toàn chữ số thành số, trả false nếu không phải số."
+      ],
+      "invariants": [
+        "K1. Mỗi hàm in xong đều trả màu chữ về `NORMAL`."
+      ],
+      "attributes": [
+        {
+          "name": "PASSWORD_INPUT_LIMIT",
+          "type": "int = 40",
+          "vis": "-",
+          "static": true,
+          "readonly": true,
+          "summary": "Số ký tự tối đa nhận khi gõ mật khẩu.",
+          "role": "Chặn việc dán một chuỗi rất dài vào ô mật khẩu. Quy tắc 6–20 ký tự vẫn do `Validator.checkPassword` kiểm, nên gõ 25 ký tự thì vẫn nhận rồi báo lỗi rõ ràng.",
+          "example": "Gõ tới ký tự thứ 41 thì phím bị bỏ qua, không hiện thêm `*`."
+        }
+      ],
+      "methods": [
+        {
+          "name": "initialize",
+          "static": true,
+          "vis": "+",
+          "params": [],
+          "returns": "void",
+          "summary": "Chuẩn bị cửa sổ console lúc khởi động: đặt tiêu đề cửa sổ, đặt màu chữ mặc định.",
+          "role": "`Application.run` gọi đúng một lần ở đầu chương trình.",
+          "detail": "Khi chuyển sang tiếng Việt có dấu, thêm `SetConsoleOutputCP(65001)` và `SetConsoleCP(65001)` ở đây (65001 là mã của UTF-8).",
+          "pre": ["Không có."],
+          "post": ["Màu chữ là `NORMAL`."],
+          "example": "Thanh tiêu đề cửa sổ hiện «Quan ly nhan su».",
+          "cpp": "`SetConsoleTitleA(\"Quan ly nhan su\"); setColor(ConsoleColor::NORMAL);`"
+        },
+        {
+          "name": "setColor",
+          "static": true,
+          "vis": "+",
+          "params": ["color: ConsoleColor"],
+          "returns": "void",
+          "summary": "Đổi màu chữ cho những gì in ra sau đó.",
+          "role": "Các hàm in bên dưới dùng; lớp khác hiếm khi cần gọi trực tiếp.",
+          "pre": ["Không có."],
+          "post": ["Chữ in ra sau đó có màu `color` cho tới lần đổi tiếp theo."],
+          "example": "`setColor(ConsoleColor::DANGER); std::cout << \"Loi\"; setColor(ConsoleColor::NORMAL);` in chữ «Loi» màu đỏ.",
+          "cpp": "`SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), static_cast<WORD>(color));` (`#include <windows.h>`)."
+        },
+        {
+          "name": "printLine",
+          "static": true,
+          "vis": "+",
+          "params": ["text: string", "color: ConsoleColor = ConsoleColor::NORMAL"],
+          "returns": "void",
+          "summary": "In một dòng với màu cho trước, xuống dòng, rồi trả về màu thường.",
+          "role": "Cách in chung cho mọi dòng chữ của chương trình.",
+          "pre": ["Không có."],
+          "post": ["Màu chữ trở về `NORMAL`."],
+          "example": "`printLine(\"1. Them Employee\")` in chữ thường; `printLine(\"Chua co nhan vien\", ConsoleColor::WARNING)` in chữ vàng đậm.",
+          "cpp": "`setColor(color); std::cout << text << '\\n'; setColor(ConsoleColor::NORMAL);`"
+        },
+        {
+          "name": "printTitle",
+          "static": true,
+          "vis": "+",
+          "params": ["title: string"],
+          "returns": "void",
+          "summary": "In khung sao có tiêu đề ở giữa, màu vàng, giống ảnh mẫu của đề.",
+          "role": "Dòng đầu của mỗi màn hình: đăng nhập và các menu.",
+          "detail": "Khung rộng cố định 38 ký tự (dòng trên và dòng dưới là 38 dấu `*`). Dòng giữa gồm `*`, tiêu đề căn giữa trong 36 ô, rồi `*`: số dấu cách bên trái là (36 − độ dài tiêu đề) / 2, phần còn lại ở bên phải.",
+          "pre": ["Tiêu đề ngắn hơn 36 ký tự."],
+          "post": ["In đúng 3 dòng; màu chữ trở về `NORMAL`."],
+          "example": "`printTitle(\"DANG NHAP\")` in:\n**************************************\n*             DANG NHAP              *\n**************************************",
+          "cpp": "`int left = (36 - (int)title.size()) / 2; int right = 36 - (int)title.size() - left; std::string middle = \"*\" + std::string(left, ' ') + title + std::string(right, ' ') + \"*\";` rồi in ba dòng bằng `printLine(..., ConsoleColor::TITLE)`."
+        },
+        {
+          "name": "printSuccess",
+          "static": true,
+          "vis": "+",
+          "params": ["message: string"],
+          "returns": "void",
+          "summary": "In thông báo thành công, màu xanh ngọc.",
+          "role": "Báo kết quả sau khi thêm, xóa, sửa, đổi mật khẩu thành công.",
+          "pre": ["Không có."],
+          "post": ["Màu chữ trở về `NORMAL`."],
+          "example": "`printSuccess(\"Da them nhan vien nva. Mat khau mac dinh: 111111\")`.",
+          "cpp": "`printLine(message, ConsoleColor::SUCCESS);`"
+        },
+        {
+          "name": "printWarning",
+          "static": true,
+          "vis": "+",
+          "params": ["message: string"],
+          "returns": "void",
+          "summary": "In cảnh báo, màu vàng đậm.",
+          "role": "In các cảnh báo lúc khởi động (dòng hỏng trong file, admin mặc định vừa tạo) và thông báo «Da huy».",
+          "pre": ["Không có."],
+          "post": ["Màu chữ trở về `NORMAL`."],
+          "example": "`printWarning(\"Da tao admin mac dinh: admin2 / 123456\")`.",
+          "cpp": "`printLine(message, ConsoleColor::WARNING);`"
+        },
+        {
+          "name": "printError",
+          "static": true,
+          "vis": "+",
+          "params": ["code: ErrorCode"],
+          "returns": "void",
+          "summary": "In câu thông báo của một mã lỗi, màu đỏ.",
+          "role": "Mọi chỗ báo lỗi cho người dùng đều qua đây, đúng yêu cầu «hệ thống sẽ thông báo thông tin lỗi đến user».",
+          "pre": ["`code` khác `ErrorCode::OK`."],
+          "post": ["Màu chữ trở về `NORMAL`."],
+          "example": "`printError(ErrorCode::USERNAME_TAKEN)` in «Username da ton tai» màu đỏ.",
+          "cpp": "`printLine(messageOf(code), ConsoleColor::DANGER);`"
+        },
+        {
+          "name": "messageOf",
+          "static": true,
+          "vis": "+",
+          "params": ["code: ErrorCode"],
+          "returns": "string",
+          "summary": "Câu thông báo (tiếng Việt không dấu) của mỗi mã lỗi.",
+          "role": "Chỗ duy nhất chứa câu chữ của thông báo lỗi; sửa câu chữ, hay sau này viết lại có dấu, chỉ sửa ở đây.",
+          "detail": "Một `switch` có một nhánh cho mỗi giá trị của `ErrorCode`. Câu gợi ý cho từng mã có ở thẻ ErrorCode.",
+          "pre": ["Không có."],
+          "post": ["Không trả chuỗi rỗng."],
+          "example": "`messageOf(ErrorCode::PHONE_INVALID)` = `\"So dien thoai gom dung 10 chu so va bat dau bang 0\"`.",
+          "cpp": "`switch (code) { case ErrorCode::OK: return \"Thanh cong\"; case ErrorCode::LOGIN_FAILED: return \"Sai tai khoan hoac mat khau\"; ... } return \"Loi khong xac dinh\";`"
+        },
+        {
+          "name": "readLine",
+          "static": true,
+          "vis": "+",
+          "params": ["prompt: string"],
+          "returns": "string",
+          "summary": "In lời nhắc màu xanh lá, đọc một dòng người dùng gõ, trả về chuỗi đã bỏ khoảng trắng đầu cuối.",
+          "role": "Mọi ô nhập thường (username, họ tên, lựa chọn menu...) đều qua đây. Là một trong ba chỗ phải sửa khi chuyển sang tiếng Việt có dấu: lúc đó thay `std::getline` bằng hàm đọc chữ Unicode của Windows (`ReadConsoleW`) rồi đổi sang UTF-8.",
+          "detail": "Đọc cả dòng bằng `std::getline`, nên địa chỉ có dấu cách như `12 Le Loi, Q1` vẫn đọc trọn. Nếu `std::cin` bị hỏng (người dùng nhấn Ctrl+Z rồi Enter) thì gọi `std::cin.clear()` và trả chuỗi rỗng, để vòng lặp menu không chạy mãi.",
+          "pre": ["Không có."],
+          "post": ["Kết quả không có ký tự xuống dòng và không có khoảng trắng ở đầu, cuối."],
+          "example": "Người dùng gõ `  Nguyen Van A  ` rồi Enter: `readLine(\"Ho ten: \")` trả `\"Nguyen Van A\"`.",
+          "cpp": "`setColor(ConsoleColor::LABEL); std::cout << prompt; setColor(ConsoleColor::NORMAL); std::string line; if (!std::getline(std::cin, line)) { std::cin.clear(); return \"\"; } return StringUtil::trim(line);`"
+        },
+        {
+          "name": "readPassword",
+          "static": true,
+          "vis": "+",
+          "params": ["prompt: string", "allowCancel: bool", "password: string&"],
+          "returns": "bool",
+          "summary": "Đọc mật khẩu từng phím, mỗi ký tự hiện thành `*`; trả false nếu người dùng nhấn Esc để hủy.",
+          "role": "Ô «Pass» của màn hình đăng nhập và mọi ô nhập mật khẩu khi đổi mật khẩu. Đúng yêu cầu «mã hóa pass thành dấu * khi đăng nhập».",
+          "detail": [
+            "Đọc từng phím bằng `_getch()` (phím gõ không tự hiện ra màn hình) rồi tự in `*`. Xử lý từng phím:",
+            "Enter (mã 13): kết thúc, xuống dòng, trả true. Backspace (mã 8): nếu đã gõ ít nhất một ký tự thì bỏ ký tự cuối và xóa một dấu `*` trên màn hình bằng cách in `\\b \\b`. Esc (mã 27): nếu `allowCancel` đúng thì trả false; nếu không thì bỏ qua phím.",
+            "Mã 0 hoặc 224: phím đặc biệt (mũi tên, F1...) gửi thêm một mã nữa; gọi `_getch()` thêm một lần để bỏ mã đó. Ký tự có mã 32 tới 126: thêm vào mật khẩu và in `*`, nếu mật khẩu chưa dài tới `PASSWORD_INPUT_LIMIT`. Phím khác: bỏ qua.",
+            "Dấu cách vẫn được nhận để `Validator` báo lỗi rõ ràng («khong co dau cach»), thay vì lặng lẽ bỏ đi."
+          ],
+          "pre": ["Không có."],
+          "post": ["Trả true: `password` là chuỗi đã gõ (không trim).", "Trả false: `password` rỗng."],
+          "example": "Gõ `a`, `b`, `c`, Backspace, `d`, Enter: màn hình hiện `Pass: ***` rồi xuống dòng; hàm trả true và `password` = `\"abd\"`.",
+          "cpp": "`password.clear(); /* in prompt màu LABEL */ while (true) { int c = _getch(); if (c == 13) { std::cout << '\\n'; return true; } if (c == 8) { if (!password.empty()) { password.erase(password.size() - 1); std::cout << \"\\b \\b\"; } continue; } if (c == 27) { if (allowCancel) { password.clear(); std::cout << '\\n'; return false; } continue; } if (c == 0 || c == 224) { _getch(); continue; } if (c >= 32 && c <= 126 && (int)password.size() < PASSWORD_INPUT_LIMIT) { password += (char)c; std::cout << '*'; } }` (`#include <conio.h>`)."
+        },
+        {
+          "name": "readMenuChoice",
+          "static": true,
+          "vis": "+",
+          "params": ["maxChoice: int"],
+          "returns": "int",
+          "summary": "Đọc lựa chọn menu; trả số đã chọn, hoặc −1 nếu gõ sai.",
+          "role": "`Menu.run` gọi cho mọi menu, nên mọi menu xử lý gõ sai giống nhau.",
+          "detail": "Đọc một dòng bằng `readLine(\"Chon: \")`, đổi sang số bằng `StringUtil.tryParseInt`. Trả số đó nếu nằm trong khoảng 1 tới `maxChoice`; mọi trường hợp khác (chữ, số âm, số ngoài khoảng, để trống) trả −1.",
+          "pre": ["`maxChoice` ≥ 1."],
+          "post": ["Kết quả là −1 hoặc nằm trong 1..`maxChoice`."],
+          "example": "Với `maxChoice` = 6: gõ `3` → 3; gõ `7` → −1; gõ `1abc` → −1; để trống → −1.",
+          "cpp": "`int value = 0; if (!StringUtil::tryParseInt(readLine(\"Chon: \"), value)) return -1; if (value < 1 || value > maxChoice) return -1; return value;`"
+        },
+        {
+          "name": "confirm",
+          "static": true,
+          "vis": "+",
+          "params": ["question: string"],
+          "returns": "bool",
+          "summary": "Hỏi có hoặc không; chỉ `y` hoặc `Y` được tính là có.",
+          "role": "Hỏi lại trước khi xóa nhân viên.",
+          "detail": "In câu hỏi kèm `(y/n): ` rồi đọc một dòng. Mọi câu trả lời khác `y`, `Y` (kể cả để trống) đều là không, để lỡ tay nhấn Enter cũng không xóa nhầm.",
+          "pre": ["Không có."],
+          "post": ["Không thay đổi dữ liệu."],
+          "example": "`confirm(\"Xoa nhan vien nva (Nguyen Van A)?\")` hiện `Xoa nhan vien nva (Nguyen Van A)? (y/n): `; gõ `y` → true; gõ `n` hoặc chỉ nhấn Enter → false.",
+          "cpp": "`std::string answer = readLine(question + \" (y/n): \"); return answer == \"y\" || answer == \"Y\";`"
+        },
+        {
+          "name": "pause",
+          "static": true,
+          "vis": "+",
+          "params": [],
+          "returns": "void",
+          "summary": "In «Nhan phim bat ky de tiep tuc...» rồi chờ một phím.",
+          "role": "Sau mỗi chức năng, để người dùng kịp đọc kết quả trước khi màn hình bị xóa và menu hiện lại.",
+          "pre": ["Không có."],
+          "post": ["Đã có một phím được nhấn."],
+          "example": "Sau khi in bảng nhân viên, `pause()` giữ bảng trên màn hình cho tới khi nhấn phím.",
+          "cpp": "`std::cout << \"Nhan phim bat ky de tiep tuc...\"; _getch(); std::cout << '\\n';`"
+        },
+        {
+          "name": "clearScreen",
+          "static": true,
+          "vis": "+",
+          "params": [],
+          "returns": "void",
+          "summary": "Xóa màn hình.",
+          "role": "Đầu mỗi lần hiện menu hoặc màn hình đăng nhập, để màn hình gọn.",
+          "pre": ["Không có."],
+          "post": ["Màn hình trống, con trỏ ở góc trên trái."],
+          "example": "Mỗi vòng của `Menu.run` bắt đầu bằng `clearScreen()`.",
+          "cpp": "`system(\"cls\");` (`#include <cstdlib>`)."
+        }
+      ],
+      "impl": {
+        "cpp": "Hàm `static`. `Console.cpp` cần `<windows.h>`, `<conio.h>`, `<iostream>`, `<cstdlib>`. Chỉ include `<windows.h>` trong file .cpp, không include trong `Console.h`, để các macro của Windows không lan ra cả chương trình."
+      },
+      "notes": [
+        "Các câu in ra màn hình viết không dấu (theo quyết định của nhóm); mô tả trong sơ đồ vẫn viết có dấu."
+      ],
+      "read": 15,
+      "stage": 5,
+      "readWhy": "Mọi màn hình đều in và đọc qua lớp này; đọc trước các menu.",
+      "pos": [900, 0]
+    },
+    {
+      "id": "Menu",
+      "stereotype": "abstract",
+      "package": "ui",
+      "status": "support",
+      "summary": "Khung chung của mọi menu: in tiêu đề và các mục, đọc lựa chọn, báo lỗi khi chọn sai, giao cho lớp con xử lý, lặp tới khi chọn mục thoát.",
+      "role": "`run()` chỉ viết một lần (mẫu thiết kế Template Method). Lớp con chỉ khai báo danh sách mục (`getOptions`) và việc làm cho từng mục (`handleChoice`). Mục thoát luôn là mục cuối và do `Menu` tự thêm, nên ba menu cư xử giống nhau.",
+      "spec": "«Người dùng có thể lựa chọn thực hiện chức năng khác hoặc kết thúc chương trình sau khi hoàn thành mỗi thao tác/chức năng»; các màn hình MENU trong đề.",
+      "uses": [
+        "`Console`: `clearScreen()`; `printTitle(title)` in khung sao; `printLine(text)`; `readMenuChoice(max)` trả số đã chọn hoặc −1; `printError(code)`; `pause()` chờ một phím.",
+        "`ErrorCode::INVALID_CHOICE`.",
+        "`UserProfile.get(field)` lấy một thông tin; `ProfileField` có 4 giá trị `FULL_NAME`, `ADDRESS`, `PHONE`, `EMAIL` (cho `printProfile`)."
+      ],
+      "invariants": [],
+      "attributes": [
+        {
+          "name": "m_title",
+          "type": "string",
+          "vis": "#",
+          "summary": "Tiêu đề in trong khung sao.",
+          "role": "Cho người dùng biết mình đang ở menu nào và đăng nhập bằng tài khoản nào.",
+          "example": "`\"MENU ADMIN (admin1)\"`, `\"MENU EMPLOYEE (nva)\"`, `\"CAP NHAT: nva\"`."
+        },
+        {
+          "name": "m_exitLabel",
+          "type": "string",
+          "vis": "#",
+          "summary": "Chữ của mục thoát, luôn là mục cuối.",
+          "role": "Mỗi menu thoát về một nơi khác nhau nên chữ khác nhau.",
+          "example": "`\"Thoat (dang xuat)\"` ở menu admin và menu nhân viên; `\"Xong (ve menu admin)\"` ở menu cập nhật."
+        }
+      ],
+      "methods": [
+        {
+          "name": "Menu",
+          "ctor": true,
+          "vis": "#",
+          "params": ["title: string", "exitLabel: string"],
+          "summary": "Gán tiêu đề và chữ của mục thoát. Chỉ lớp con gọi.",
+          "role": "Lớp con gọi trong danh sách khởi tạo của hàm dựng của mình.",
+          "pre": ["Không có."],
+          "post": ["`m_title` = `title`, `m_exitLabel` = `exitLabel`."],
+          "example": "`AdminMenu::AdminMenu(HrSystem& system, const std::string& username) : Menu(\"MENU ADMIN (\" + username + \")\", \"Thoat (dang xuat)\"), m_system(system), m_username(username) {}`",
+          "cpp": "`Menu::Menu(const std::string& title, const std::string& exitLabel) : m_title(title), m_exitLabel(exitLabel) {}`"
+        },
+        {
+          "name": "run",
+          "vis": "+",
+          "params": [],
+          "returns": "void",
+          "summary": "Vòng lặp của menu: hiện, đọc lựa chọn, xử lý, lặp lại cho tới khi chọn mục thoát.",
+          "role": "Nơi duy nhất viết vòng lặp menu; ba menu dùng chung.",
+          "detail": [
+            "Mỗi vòng: xóa màn hình; in khung tiêu đề; lấy danh sách mục (`getOptions`) và in `1. ...`, `2. ...`; in mục thoát với số kế tiếp; đọc lựa chọn (`Console.readMenuChoice`).",
+            "Chọn sai (−1): báo `INVALID_CHOICE`, chờ phím, hiện lại menu. Chọn mục thoát: kết thúc `run`. Chọn mục khác: gọi `handleChoice(choice)` rồi chờ phím để người dùng đọc kết quả.",
+            "Vì `getOptions` được gọi lại ở mỗi vòng, menu cập nhật luôn hiện giá trị mới nhất sau mỗi lần sửa."
+          ],
+          "pre": ["Không có."],
+          "post": ["Trả về khi người dùng chọn mục thoát."],
+          "example": "Menu admin hiện:\n**************************************\n*        MENU ADMIN (admin1)         *\n**************************************\n1. Them Employee\n2. Xoa Employee\n3. Tim Employee\n4. Cap nhat Employee\n5. Hien thi thong tin Employee\n6. Thoat (dang xuat)\nChon: ",
+          "cpp": "`while (true) { Console::clearScreen(); Console::printTitle(m_title); std::vector<std::string> options = getOptions(); int count = (int)options.size(); for (int i = 0; i < count; i++) Console::printLine(std::to_string(i + 1) + \". \" + options[i]); Console::printLine(std::to_string(count + 1) + \". \" + m_exitLabel); int choice = Console::readMenuChoice(count + 1); if (choice == -1) { Console::printError(ErrorCode::INVALID_CHOICE); Console::pause(); continue; } if (choice == count + 1) return; handleChoice(choice); Console::pause(); }`"
+        },
+        {
+          "name": "getOptions",
+          "abstract": true,
+          "vis": "#",
+          "params": [],
+          "returns": "vector<string>",
+          "summary": "Danh sách mục của menu, không gồm mục thoát.",
+          "role": "Lớp con trả nội dung riêng của menu mình.",
+          "pre": ["Không có."],
+          "post": ["Mục thứ i (đếm từ 0) ứng với lựa chọn i + 1."],
+          "example": "`AdminMenu` trả `[\"Them Employee\", \"Xoa Employee\", \"Tim Employee\", \"Cap nhat Employee\", \"Hien thi thong tin Employee\"]`.",
+          "cpp": "`virtual std::vector<std::string> getOptions() = 0;`"
+        },
+        {
+          "name": "handleChoice",
+          "abstract": true,
+          "vis": "#",
+          "params": ["choice: int"],
+          "returns": "void",
+          "summary": "Làm việc của mục được chọn.",
+          "role": "Lớp con viết bằng một `switch` gọi các hàm riêng của mình.",
+          "detail": "Gặp lỗi thì in lỗi (`Console.printError`) rồi `return`; `run` sẽ chờ phím rồi hiện lại menu. Đó chính là «hủy chức năng đang thực hiện, cho phép user chọn chức năng khác» trong đề.",
+          "pre": ["1 ≤ `choice` ≤ số mục của `getOptions()`; không bao giờ là mục thoát."],
+          "post": ["Không yêu cầu gì; mọi thông báo đã được in."],
+          "example": "`AdminMenu`: `switch (choice) { case 1: addEmployee(); break; case 2: removeEmployee(); break; ... }`.",
+          "cpp": "`virtual void handleChoice(int choice) = 0;`"
+        },
+        {
+          "name": "printProfile",
+          "static": true,
+          "vis": "#",
+          "params": ["username: string", "profile: UserProfile"],
+          "returns": "void",
+          "summary": "In 5 dòng thông tin của một nhân viên.",
+          "role": "Dùng chung cho «Tìm Employee» của admin và «Xem thông tin tài khoản» của nhân viên, nên đặt ở lớp cha.",
+          "pre": ["Không có."],
+          "post": ["In đúng 5 dòng."],
+          "example": "Username      : nva\nHo ten        : Nguyen Van A\nDia chi       : 12 Le Loi, Q1\nSo dien thoai : 0912345678\nEmail         : nva@gmail.com",
+          "cpp": "`Console::printLine(\"Username      : \" + username); Console::printLine(\"Ho ten        : \" + profile.get(ProfileField::FULL_NAME));` và tương tự cho 3 dòng còn lại."
+        }
+      ],
+      "impl": {
+        "cpp": "Lớp trừu tượng: `virtual ~Menu() {}`; hai hàm thuần ảo để `protected`. `run()` không ảo, lớp con không viết lại."
+      },
+      "notes": [
+        "Thêm một menu mới (ví dụ menu cài đặt) chỉ cần một lớp con với `getOptions` và `handleChoice`."
+      ],
+      "read": 16,
+      "stage": 5,
+      "readWhy": "Lớp cha của ba menu; đọc trước các menu cụ thể.",
+      "pos": [1350, 0]
+    },
+    {
+      "id": "ProfileEditMenu",
+      "stereotype": "class",
+      "package": "ui",
+      "status": "core",
+      "summary": "Menu con của chức năng Cập nhật: liệt kê 4 thông tin của một nhân viên kèm giá trị hiện tại; chọn một mục để nhập giá trị mới; mục cuối «Xong» về menu admin.",
+      "role": "Là một `Menu` nên dùng lại vòng lặp chung. Mỗi lần sửa một mục là file hồ sơ được ghi ngay. Nhập sai thì báo lỗi, bỏ lần sửa đó và quay lại menu con, không văng ra menu admin.",
+      "spec": "«Cập nhật lại thông tin của employee (họ tên, địa chỉ, số điện thoại và địa chỉ email). Cho người dùng tùy chọn muốn update bất kỳ thuộc tính nào. Ghi cập nhật lại thông tin file [username].txt.»",
+      "uses": [
+        "`Menu`: lớp cha. Hàm dựng `Menu(title, exitLabel)`; lớp con viết `getOptions()` (danh sách mục, gọi lại mỗi vòng) và `handleChoice(choice)` (choice từ 1 tới số mục).",
+        "`HrSystem.findEmployee(username, profile)`: đọc hồ sơ, trả `ErrorCode::OK` hoặc mã lỗi.",
+        "`HrSystem.updateProfileField(username, field, value)`: kiểm giá trị, sửa một thông tin và ghi file ngay; trả `OK` hoặc mã lỗi (ví dụ `PHONE_INVALID`).",
+        "`Console.readLine(prompt)`, `Console.printSuccess(msg)`, `Console.printError(code)`.",
+        "`ProfileField`: 4 giá trị theo thứ tự `FULL_NAME`, `ADDRESS`, `PHONE`, `EMAIL`; `UserProfile.get(field)`."
+      ],
+      "invariants": [],
+      "attributes": [
+        {
+          "name": "m_system",
+          "type": "HrSystem&",
+          "vis": "-",
+          "summary": "Tham chiếu tới hệ thống dùng chung.",
+          "role": "Đọc hồ sơ và ghi thay đổi. Menu không sở hữu hệ thống, chỉ mượn.",
+          "example": "Truyền từ `AdminMenu`: `ProfileEditMenu menu(m_system, username);`."
+        },
+        {
+          "name": "m_username",
+          "type": "string",
+          "vis": "-",
+          "summary": "Nhân viên đang được sửa.",
+          "role": "Truyền cho mọi lời gọi tới `HrSystem`.",
+          "example": "`\"nva\"`"
+        }
+      ],
+      "methods": [
+        {
+          "name": "ProfileEditMenu",
+          "ctor": true,
+          "vis": "+",
+          "params": ["system: HrSystem&", "username: string"],
+          "summary": "Tạo menu con cho một nhân viên.",
+          "role": "`AdminMenu.updateEmployee` tạo sau khi đã biết nhân viên tồn tại.",
+          "pre": ["`username` là nhân viên đang tồn tại."],
+          "post": ["Tiêu đề là `CAP NHAT: <username>`, mục thoát là `Xong (ve menu admin)`."],
+          "example": "`ProfileEditMenu menu(m_system, \"nva\"); menu.run();`",
+          "cpp": "`ProfileEditMenu::ProfileEditMenu(HrSystem& system, const std::string& username) : Menu(\"CAP NHAT: \" + username, \"Xong (ve menu admin)\"), m_system(system), m_username(username) {}`"
+        },
+        {
+          "name": "getOptions",
+          "vis": "#",
+          "override": true,
+          "params": [],
+          "returns": "vector<string>",
+          "summary": "4 mục, mỗi mục là tên thông tin kèm giá trị hiện tại.",
+          "role": "Cho admin thấy giá trị đang có trước khi sửa.",
+          "detail": "Đọc hồ sơ mới nhất bằng `HrSystem.findEmployee` ở mỗi lần gọi. Không đọc được hồ sơ thì giá trị hiện là `(khong doc duoc)`.",
+          "pre": ["Không có."],
+          "post": ["Đúng 4 phần tử theo thứ tự họ tên, địa chỉ, số điện thoại, email."],
+          "example": "**************************************\n*           CAP NHAT: nva            *\n**************************************\n1. Ho ten        : Nguyen Van A\n2. Dia chi       : 12 Le Loi, Q1\n3. So dien thoai : 0912345678\n4. Email         : nva@gmail.com\n5. Xong (ve menu admin)",
+          "cpp": "`UserProfile p; bool ok = m_system.findEmployee(m_username, p) == ErrorCode::OK; std::vector<std::string> options; options.push_back(\"Ho ten        : \" + (ok ? p.get(ProfileField::FULL_NAME) : std::string(\"(khong doc duoc)\")));` và tương tự cho 3 mục còn lại."
+        },
+        {
+          "name": "handleChoice",
+          "vis": "#",
+          "override": true,
+          "params": ["choice: int"],
+          "returns": "void",
+          "summary": "Hỏi giá trị mới cho mục đã chọn rồi ghi ngay.",
+          "role": "Sửa đúng một thông tin mỗi lần.",
+          "detail": "Đổi số mục thành thông tin: `static_cast<ProfileField>(choice - 1)`. Hỏi `Gia tri moi: ` bằng `Console.readLine`. Gọi `HrSystem.updateProfileField`. `OK` thì báo «Da cap nhat»; lỗi thì báo lỗi, giá trị cũ giữ nguyên.",
+          "pre": ["1 ≤ `choice` ≤ 4."],
+          "post": ["`OK`: file hồ sơ đã có giá trị mới; vòng tiếp theo của menu hiện giá trị mới."],
+          "example": "Chọn 3, gõ `0987654321` → «Da cap nhat», mục 3 thành `So dien thoai : 0987654321`. Chọn 3, gõ `12345` → «So dien thoai gom dung 10 chu so va bat dau bang 0», mục 3 không đổi.",
+          "cpp": "`ProfileField field = static_cast<ProfileField>(choice - 1); std::string value = Console::readLine(\"Gia tri moi: \"); ErrorCode code = m_system.updateProfileField(m_username, field, value); if (code == ErrorCode::OK) Console::printSuccess(\"Da cap nhat\"); else Console::printError(code);`"
+        }
+      ],
+      "impl": {
+        "cpp": "`class ProfileEditMenu : public Menu { ... };`. Thuộc tính tham chiếu `HrSystem& m_system;` phải được gán trong danh sách khởi tạo của hàm dựng."
+      },
+      "notes": [],
+      "read": 17,
+      "stage": 5,
+      "readWhy": "Menu cụ thể đơn giản nhất (2 hàm); xem cách một lớp con của Menu được viết.",
+      "pos": [900, 450]
+    },
+    {
+      "id": "AdminMenu",
+      "stereotype": "class",
+      "package": "ui",
+      "status": "core",
+      "summary": "Menu chính của admin: 1 Thêm, 2 Xóa, 3 Tìm, 4 Cập nhật, 5 Hiển thị tất cả, 6 Thoát (đăng xuất).",
+      "role": "Hỏi người dùng từng thông tin, kiểm tra ngay sau mỗi lần nhập để báo lỗi sớm, rồi gọi `HrSystem`. Không tự đọc ghi file.",
+      "spec": "«Các chức năng chính của Admin» a–e và màn hình MENU trong đề: thêm, xóa, tìm, cập nhật, hiển thị toàn bộ employee.",
+      "uses": [
+        "`Menu`: lớp cha. Hàm dựng `Menu(title, exitLabel)`; lớp con viết `getOptions()` và `handleChoice(choice)`; có sẵn `printProfile(username, profile)` in 5 dòng thông tin.",
+        "`HrSystem`: `checkNewUsername(u)`, `addEmployee(u, profile)`, `removeEmployee(u)`, `findEmployee(u, profile)`, `listEmployees(usernames)`; các hàm trả `ErrorCode` (trừ `listEmployees` trả danh sách username đã sắp xếp).",
+        "`Validator.checkField(field, value)`: kiểm một thông tin hồ sơ, trả `OK` hoặc mã lỗi.",
+        "`Console`: `readLine(prompt)`, `confirm(question)` (true chỉ khi gõ y), `printSuccess`, `printWarning`, `printError(code)`, `printLine`.",
+        "`UserProfile` (hồ sơ rỗng rồi `set(field, value)`, `get(field)`), `ProfileField`, `ProfileEditMenu(system, username).run()`."
+      ],
+      "invariants": [],
+      "attributes": [
+        {
+          "name": "m_system",
+          "type": "HrSystem&",
+          "vis": "-",
+          "summary": "Tham chiếu tới hệ thống dùng chung.",
+          "role": "Mọi chức năng của menu đều gọi qua đây.",
+          "example": "Truyền từ `Application`: `AdminMenu menu(m_system, name);`."
+        },
+        {
+          "name": "m_username",
+          "type": "string",
+          "vis": "-",
+          "summary": "Admin đang đăng nhập.",
+          "role": "Hiện trên tiêu đề menu.",
+          "example": "`\"admin1\"`"
+        }
+      ],
+      "methods": [
+        {
+          "name": "AdminMenu",
+          "ctor": true,
+          "vis": "+",
+          "params": ["system: HrSystem&", "username: string"],
+          "summary": "Tạo menu admin cho admin vừa đăng nhập.",
+          "role": "`Application` tạo mỗi lần một admin đăng nhập thành công.",
+          "pre": ["`username` là admin vừa đăng nhập đúng."],
+          "post": ["Tiêu đề `MENU ADMIN (<username>)`, mục thoát `Thoat (dang xuat)`."],
+          "example": "`AdminMenu menu(m_system, \"admin1\"); menu.run();`",
+          "cpp": "Xem ví dụ ở hàm dựng của `Menu`."
+        },
+        {
+          "name": "getOptions",
+          "vis": "#",
+          "override": true,
+          "params": [],
+          "returns": "vector<string>",
+          "summary": "5 mục chức năng của admin.",
+          "role": "Nội dung menu admin, theo đúng ảnh mẫu của đề.",
+          "pre": ["Không có."],
+          "post": ["Đúng 5 phần tử."],
+          "example": "`[\"Them Employee\", \"Xoa Employee\", \"Tim Employee\", \"Cap nhat Employee\", \"Hien thi thong tin Employee\"]`; `Menu` tự thêm mục 6 «Thoat (dang xuat)».",
+          "cpp": "Năm lần `options.push_back(...)` rồi `return options;`."
+        },
+        {
+          "name": "handleChoice",
+          "vis": "#",
+          "override": true,
+          "params": ["choice: int"],
+          "returns": "void",
+          "summary": "Gọi hàm tương ứng với mục đã chọn.",
+          "role": "Nối số mục với chức năng.",
+          "pre": ["1 ≤ `choice` ≤ 5."],
+          "post": ["Đã chạy xong đúng một chức năng."],
+          "example": "`choice` = 4 → `updateEmployee()`.",
+          "cpp": "`switch (choice) { case 1: addEmployee(); break; case 2: removeEmployee(); break; case 3: findEmployee(); break; case 4: updateEmployee(); break; case 5: showAllEmployees(); break; }`"
+        },
+        {
+          "name": "addEmployee",
+          "vis": "-",
+          "params": [],
+          "returns": "void",
+          "summary": "Chức năng 1: hỏi username và 4 thông tin, kiểm từng ô ngay khi nhập, rồi thêm nhân viên.",
+          "role": "Chức năng a của admin: «Thêm vào user mới bao gồm username, password, họ tên, địa chỉ, số điện thoại và địa chỉ email».",
+          "detail": [
+            "Hỏi username (`Console.readLine`) rồi kiểm ngay bằng `HrSystem.checkNewUsername`: sai quy tắc hoặc trùng thì báo lỗi và dừng (hủy chức năng), không hỏi tiếp.",
+            "Hỏi lần lượt họ tên, địa chỉ, số điện thoại, email. Mỗi ô kiểm ngay bằng `Validator.checkField`; sai thì báo lỗi và dừng.",
+            "Đủ cả thì gọi `HrSystem.addEmployee(username, profile)`. `OK` thì báo «Da them nhan vien nva. Mat khau mac dinh: 111111»; lỗi thì báo lỗi.",
+            "Admin không nhập mật khẩu: nhân viên mới luôn có mật khẩu `111111` và phải đổi ở lần đăng nhập đầu."
+          ],
+          "pre": ["Không có."],
+          "post": ["Thành công: nhân viên mới có trong Employees.txt và có file hồ sơ.", "Thất bại: không có gì thay đổi."],
+          "example": "Username: nva\nHo ten: Nguyen Van A\nDia chi: 12 Le Loi, Q1\nSo dien thoai: 0912345678\nEmail: nva@gmail.com\nDa them nhan vien nva. Mat khau mac dinh: 111111\n\nKhi username đã có:\nUsername: NVA\nUsername da ton tai",
+          "cpp": "Một ô điển hình: `std::string phone = Console::readLine(\"So dien thoai: \"); ErrorCode code = Validator::checkField(ProfileField::PHONE, phone); if (code != ErrorCode::OK) { Console::printError(code); return; } profile.set(ProfileField::PHONE, phone);`"
+        },
+        {
+          "name": "removeEmployee",
+          "vis": "-",
+          "params": [],
+          "returns": "void",
+          "summary": "Chức năng 2: hỏi username, hỏi xác nhận, rồi xóa nhân viên.",
+          "role": "Chức năng b của admin: «Xóa một user ra khỏi danh sách employee», kèm xóa file hồ sơ.",
+          "detail": [
+            "Hỏi username. Đọc hồ sơ (`HrSystem.findEmployee`) để biết người đó có tồn tại không và để hiện họ tên: `NOT_FOUND` thì báo lỗi và dừng. Nếu chỉ thiếu file hồ sơ (`PROFILE_MISSING`) thì vẫn cho xóa, chỉ hiện username.",
+            "Hỏi lại bằng `Console.confirm`. Không đồng ý thì báo «Da huy».",
+            "Đồng ý thì gọi `HrSystem.removeEmployee(username)` và báo kết quả."
+          ],
+          "pre": ["Không có."],
+          "post": ["Chỉ xóa khi người dùng gõ `y` hoặc `Y`."],
+          "example": "Username can xoa: nva\nXoa nhan vien nva (Nguyen Van A)? (y/n): y\nDa xoa nhan vien nva",
+          "cpp": "`if (!Console::confirm(\"Xoa nhan vien \" + username + \" (\" + name + \")?\")) { Console::printWarning(\"Da huy\"); return; }`"
+        },
+        {
+          "name": "findEmployee",
+          "vis": "-",
+          "params": [],
+          "returns": "void",
+          "summary": "Chức năng 3: hỏi username, in thông tin của nhân viên đó.",
+          "role": "Chức năng c của admin: «Tìm và hiển thị thông tin employee theo username».",
+          "detail": "Hỏi username, gọi `HrSystem.findEmployee`. `OK` thì in bằng `printProfile`; lỗi (`NOT_FOUND`, `PROFILE_MISSING`) thì báo lỗi. Tìm theo đúng cả username (không tìm một phần), không phân biệt hoa thường.",
+          "pre": ["Không có."],
+          "post": ["Không thay đổi dữ liệu."],
+          "example": "Username can tim: nva\nUsername      : nva\nHo ten        : Nguyen Van A\nDia chi       : 12 Le Loi, Q1\nSo dien thoai : 0912345678\nEmail         : nva@gmail.com",
+          "cpp": "`UserProfile p; ErrorCode code = m_system.findEmployee(username, p); if (code != ErrorCode::OK) { Console::printError(code); return; } printProfile(username, p);`"
+        },
+        {
+          "name": "updateEmployee",
+          "vis": "-",
+          "params": [],
+          "returns": "void",
+          "summary": "Chức năng 4: hỏi username rồi mở menu con cập nhật.",
+          "role": "Chức năng d của admin: «Cập nhật lại thông tin của employee».",
+          "detail": "Hỏi username; kiểm bằng `HrSystem.findEmployee`: khác `OK` thì báo lỗi và dừng (không có nhân viên, hoặc hồ sơ hỏng nên không sửa được). `OK` thì mở menu con: `ProfileEditMenu menu(m_system, username); menu.run();`. Khi người dùng chọn «Xong», menu con kết thúc và quay về menu admin.",
+          "pre": ["Không có."],
+          "post": ["Mọi thay đổi đã được ghi file ngay trong menu con."],
+          "example": "Username can cap nhat: nva\n(màn hình chuyển sang menu «CAP NHAT: nva»)",
+          "cpp": "`ProfileEditMenu menu(m_system, username); menu.run();`"
+        },
+        {
+          "name": "showAllEmployees",
+          "vis": "-",
+          "params": [],
+          "returns": "void",
+          "summary": "Chức năng 5: in bảng mọi nhân viên, sắp xếp theo username.",
+          "role": "Chức năng e của admin: «Hiển thị thông tin toàn bộ employee».",
+          "detail": [
+            "Lấy danh sách username đã sắp xếp (`HrSystem.listEmployees`). Rỗng thì báo «Chua co nhan vien».",
+            "In dòng tiêu đề, rồi mỗi nhân viên một dòng: đọc hồ sơ bằng `HrSystem.findEmployee`; đọc lỗi thì in `(khong doc duoc ho so)` thay cho 4 cột thông tin.",
+            "Bản đơn giản không căn cột: các cột cách nhau bằng ` | `. Muốn thẳng cột thì xem phần Cài đặt."
+          ],
+          "pre": ["Không có."],
+          "post": ["Không thay đổi dữ liệu (chỉ đổi thứ tự trong bộ nhớ)."],
+          "example": "STT | Username | Ho ten | So dien thoai | Email | Dia chi\n1 | lthb | Le Thi B | 0912345678 | lthb@gmail.com | 12 Le Loi, Q1\n2 | nva | Nguyen Van A | 0987654321 | nva@gmail.com | 34 Tran Hung Dao, Q5",
+          "cpp": "Bản đơn giản: `Console::printLine(std::to_string(i + 1) + \" | \" + usernames[i] + \" | \" + p.get(ProfileField::FULL_NAME) + ...);`. Bản thẳng cột: `#include <iomanip>` rồi `std::cout << std::left << std::setw(12) << usernames[i];` cho từng cột; chuỗi dài hơn độ rộng cột sẽ đẩy lệch hàng, khi đó cắt bớt bằng `StringUtil::fitWidth`."
+        }
+      ],
+      "impl": {
+        "cpp": "`class AdminMenu : public Menu { ... };`. Năm hàm chức năng để `private`; mỗi hàm tự hỏi, tự báo, và `return` ngay khi gặp lỗi."
+      },
+      "notes": [
+        "Câu hỏi username ở mỗi chức năng nên ghi rõ việc đang làm (`Username can xoa:`, `Username can tim:`) để người dùng không nhầm."
+      ],
+      "read": 18,
+      "stage": 5,
+      "readWhy": "Menu chính của admin, gồm 5 chức năng a–e của đề.",
+      "pos": [1350, 450]
+    },
+    {
+      "id": "EmployeeMenu",
+      "stereotype": "class",
+      "package": "ui",
+      "status": "core",
+      "summary": "Menu của nhân viên: 1 Xem thông tin tài khoản, 2 Đổi mật khẩu, 3 Thoát (đăng xuất). Kèm màn hình buộc đổi mật khẩu ở lần đăng nhập đầu.",
+      "role": "Hai chức năng của nhân viên và lần đổi mật khẩu bắt buộc. Phần «hỏi mật khẩu mới hai lần» dùng chung cho cả đổi bắt buộc và đổi tự nguyện.",
+      "spec": "«Chức năng của employee»: hiển thị thông tin file [username].txt; đổi password (nhập mật khẩu để xác nhận chủ tài khoản, nhập 2 lần mật khẩu mới, ghi cập nhật Employees.txt); bắt buộc đổi mật khẩu ở lần đăng nhập đầu.",
+      "uses": [
+        "`Menu`: lớp cha. Hàm dựng `Menu(title, exitLabel)`; lớp con viết `getOptions()` và `handleChoice(choice)`; có sẵn `printProfile(username, profile)`.",
+        "`HrSystem`: `findEmployee(u, profile)`; `verifyPassword(u, p)` (true nếu đúng mật khẩu hiện tại); `checkNewPassword(u, p)` (kiểm mật khẩu mới, trả `OK` hoặc mã lỗi); `changePassword(u, current, new)`; `forceChangePassword(u, new)`.",
+        "`Console.readPassword(prompt, allowCancel, password)`: đọc mật khẩu che `*`, trả false khi nhấn Esc (chỉ khi `allowCancel` đúng). Thêm `printSuccess`, `printWarning`, `printError(code)`.",
+        "`ErrorCode::PASSWORD_MISMATCH`, `ErrorCode::WRONG_PASSWORD`, `ErrorCode::FILE_ERROR`."
+      ],
+      "invariants": [],
+      "attributes": [
+        {
+          "name": "m_system",
+          "type": "HrSystem&",
+          "vis": "-",
+          "summary": "Tham chiếu tới hệ thống dùng chung.",
+          "role": "Mọi chức năng của menu đều gọi qua đây.",
+          "example": "Truyền từ `Application`: `EmployeeMenu menu(m_system, name);`."
+        },
+        {
+          "name": "m_username",
+          "type": "string",
+          "vis": "-",
+          "summary": "Nhân viên đang đăng nhập.",
+          "role": "Nhân viên chỉ xem và đổi được tài khoản của chính mình.",
+          "example": "`\"nva\"`"
+        }
+      ],
+      "methods": [
+        {
+          "name": "EmployeeMenu",
+          "ctor": true,
+          "vis": "+",
+          "params": ["system: HrSystem&", "username: string"],
+          "summary": "Tạo menu cho nhân viên vừa đăng nhập.",
+          "role": "`Application` tạo mỗi lần một nhân viên đăng nhập thành công.",
+          "pre": ["`username` là nhân viên vừa đăng nhập đúng."],
+          "post": ["Tiêu đề `MENU EMPLOYEE (<username>)`, mục thoát `Thoat (dang xuat)`."],
+          "example": "`EmployeeMenu menu(m_system, \"nva\");`",
+          "cpp": "Giống hàm dựng của `AdminMenu`, chỉ khác tiêu đề."
+        },
+        {
+          "name": "forcePasswordChange",
+          "vis": "+",
+          "params": [],
+          "returns": "bool",
+          "summary": "Màn hình buộc đổi mật khẩu ở lần đăng nhập đầu; không cho hủy.",
+          "role": "`Application` gọi trước `run()` khi `HrSystem.needsPasswordChange` trả true.",
+          "detail": [
+            "In cảnh báo «Day la lan dang nhap dau tien. Ban phai doi mat khau truoc khi tiep tuc.».",
+            "Gọi `readNewPassword(false, newPassword)`: không cho hủy, chỉ trả về khi đã có mật khẩu hợp lệ và hai lần gõ khớp nhau. Rồi gọi `HrSystem.forceChangePassword(m_username, newPassword)`.",
+            "`OK`: báo «Doi mat khau thanh cong», trả true. `FILE_ERROR`: báo lỗi, trả false (đăng xuất; lần sau vẫn bị buộc đổi vì cờ chưa tắt)."
+          ],
+          "pre": ["Nhân viên đang có cờ «phải đổi mật khẩu»."],
+          "post": ["Trả true: mật khẩu đã đổi và cờ đã tắt trong Employees.txt."],
+          "example": "Day la lan dang nhap dau tien. Ban phai doi mat khau truoc khi tiep tuc.\nMat khau moi: ******\nKhong duoc dung mat khau mac dinh 111111\nMat khau moi: ********\nNhap lai mat khau moi: ********\nDoi mat khau thanh cong",
+          "cpp": "`std::string newPassword; readNewPassword(false, newPassword); ErrorCode code = m_system.forceChangePassword(m_username, newPassword); if (code != ErrorCode::OK) { Console::printError(code); Console::pause(); return false; } Console::printSuccess(\"Doi mat khau thanh cong\"); Console::pause(); return true;`"
+        },
+        {
+          "name": "getOptions",
+          "vis": "#",
+          "override": true,
+          "params": [],
+          "returns": "vector<string>",
+          "summary": "2 mục chức năng của nhân viên.",
+          "role": "Nội dung menu nhân viên, theo ảnh mẫu của đề.",
+          "pre": ["Không có."],
+          "post": ["Đúng 2 phần tử."],
+          "example": "`[\"Xem thong tin tai khoan\", \"Doi password\"]`; `Menu` tự thêm mục 3 «Thoat (dang xuat)».",
+          "cpp": "Hai lần `options.push_back(...)` rồi `return options;`."
+        },
+        {
+          "name": "handleChoice",
+          "vis": "#",
+          "override": true,
+          "params": ["choice: int"],
+          "returns": "void",
+          "summary": "1 → xem thông tin; 2 → đổi mật khẩu.",
+          "role": "Nối số mục với chức năng.",
+          "pre": ["1 ≤ `choice` ≤ 2."],
+          "post": ["Đã chạy xong đúng một chức năng."],
+          "example": "`choice` = 2 → `changePassword()`.",
+          "cpp": "`if (choice == 1) showMyInfo(); else changePassword();`"
+        },
+        {
+          "name": "showMyInfo",
+          "vis": "-",
+          "params": [],
+          "returns": "void",
+          "summary": "In thông tin tài khoản của chính nhân viên đang đăng nhập.",
+          "role": "Chức năng a của nhân viên: «Hiển thị thông tin của file [username].txt tương ứng».",
+          "pre": ["Không có."],
+          "post": ["Không thay đổi dữ liệu."],
+          "example": "Username      : nva\nHo ten        : Nguyen Van A\nDia chi       : 12 Le Loi, Q1\nSo dien thoai : 0912345678\nEmail         : nva@gmail.com",
+          "cpp": "`UserProfile p; ErrorCode code = m_system.findEmployee(m_username, p); if (code != ErrorCode::OK) { Console::printError(code); return; } printProfile(m_username, p);`"
+        },
+        {
+          "name": "changePassword",
+          "vis": "-",
+          "params": [],
+          "returns": "void",
+          "summary": "Đổi mật khẩu tự nguyện: xác nhận mật khẩu hiện tại, nhập mật khẩu mới hai lần.",
+          "role": "Chức năng b của nhân viên: «Đổi pass nếu người dùng có nhu cầu từ lần đăng nhập thứ 2».",
+          "detail": [
+            "Hỏi `Mat khau hien tai: ` (`Console.readPassword`, cho hủy bằng Esc). Nhấn Esc thì báo «Da huy» và dừng.",
+            "Kiểm ngay bằng `HrSystem.verifyPassword`; sai thì báo `WRONG_PASSWORD` và dừng.",
+            "Hỏi mật khẩu mới hai lần bằng `readNewPassword(true, newPassword)`; trả false (lỗi hoặc Esc) thì dừng.",
+            "Gọi `HrSystem.changePassword(m_username, current, newPassword)` và báo kết quả."
+          ],
+          "pre": ["Không có."],
+          "post": ["Thành công: Employees.txt có mật khẩu mới."],
+          "example": "Mat khau hien tai: ********\nMat khau moi: ********\nNhap lai mat khau moi: *******\nHai lan nhap mat khau moi khong khop",
+          "cpp": "`std::string current; if (!Console::readPassword(\"Mat khau hien tai: \", true, current)) { Console::printWarning(\"Da huy\"); return; } if (!m_system.verifyPassword(m_username, current)) { Console::printError(ErrorCode::WRONG_PASSWORD); return; }` rồi tới mật khẩu mới."
+        },
+        {
+          "name": "readNewPassword",
+          "vis": "-",
+          "params": ["allowCancel: bool", "newPassword: string&"],
+          "returns": "bool",
+          "summary": "Hỏi mật khẩu mới rồi hỏi gõ lại; kiểm cả hai.",
+          "role": "Phần chung của đổi mật khẩu bắt buộc và đổi mật khẩu tự nguyện.",
+          "detail": [
+            "Hỏi `Mat khau moi: ` bằng `Console.readPassword`, kiểm bằng `HrSystem.checkNewPassword(m_username, ...)`. Rồi hỏi `Nhap lai mat khau moi: ` và so với lần đầu; khác nhau thì lỗi `PASSWORD_MISMATCH`.",
+            "Khi `allowCancel` đúng: nhấn Esc thì báo «Da huy» và trả false; gặp lỗi thì báo lỗi và trả false (hủy chức năng).",
+            "Khi `allowCancel` sai: Esc bị bỏ qua (do `readPassword` lo); gặp lỗi thì báo lỗi rồi hỏi lại từ đầu; chỉ trả về khi đã có mật khẩu hợp lệ."
+          ],
+          "pre": ["Không có."],
+          "post": ["Trả true: `newPassword` đúng quy tắc, khác `111111`, khác mật khẩu cũ, và hai lần gõ khớp nhau."],
+          "example": "Mat khau moi: ****\nMat khau dai 6-20 ky tu, khong co dau cach va chu co dau",
+          "cpp": "`while (true) { std::string first, second; if (!Console::readPassword(\"Mat khau moi: \", allowCancel, first)) { Console::printWarning(\"Da huy\"); return false; } ErrorCode code = m_system.checkNewPassword(m_username, first); if (code == ErrorCode::OK) { ... đọc second, so sánh ... } if (code == ErrorCode::OK) { newPassword = first; return true; } Console::printError(code); if (allowCancel) return false; }`"
+        }
+      ],
+      "impl": {
+        "cpp": "`class EmployeeMenu : public Menu { ... };`."
+      },
+      "notes": [],
+      "read": 19,
+      "stage": 5,
+      "readWhy": "Menu của nhân viên và lần đổi mật khẩu bắt buộc.",
+      "pos": [1800, 450]
+    },
+    {
+      "id": "LoginScreen",
+      "stereotype": "class",
+      "package": "ui",
+      "status": "core",
+      "summary": "Màn hình đăng nhập chung cho admin và nhân viên. Sai 3 lần liên tiếp thì kết thúc chương trình; để trống User rồi Enter để thoát.",
+      "role": "Một màn hình duy nhất cho cả hai vai trò (quyết định của nhóm thay cho hai màn hình riêng trong đề). Đếm số lần sai liên tiếp; vai trò được nhận ra từ tài khoản, không phải người dùng tự chọn.",
+      "spec": "«User phải đăng nhập vào hệ thống... hệ thống có thể nhận ra đối tượng đăng nhập là admin hay employee»; «Nếu đăng nhập sai 3 lần thì thoát» (áp dụng cho cả admin); «Mã hóa pass thành dấu * khi đăng nhập».",
+      "uses": [
+        "`HrSystem.login(username, password, role, accountName)`: trả `ErrorCode::OK` và ghi vai trò, username đúng như trong file vào hai tham số cuối; sai thì trả `LOGIN_FAILED`.",
+        "`Console`: `clearScreen()`, `printTitle(title)`, `printLine(text)`, `readLine(prompt)`, `readPassword(prompt, allowCancel, password)` (trả false khi Esc), `printError(code)`, `pause()`.",
+        "`Role`: `ADMIN` hoặc `EMPLOYEE`."
+      ],
+      "invariants": [
+        "D1. 0 ≤ `m_failCount` < `MAX_FAILS` trong khi chương trình còn chạy."
+      ],
+      "attributes": [
+        {
+          "name": "MAX_FAILS",
+          "type": "int = 3",
+          "vis": "-",
+          "static": true,
+          "readonly": true,
+          "summary": "Số lần sai liên tiếp tối đa.",
+          "role": "Đề: «Nếu đăng nhập sai 3 lần thì thoát».",
+          "example": "3"
+        },
+        {
+          "name": "m_system",
+          "type": "HrSystem&",
+          "vis": "-",
+          "summary": "Tham chiếu tới hệ thống dùng chung.",
+          "role": "Kiểm tra đăng nhập.",
+          "example": "Truyền từ `Application` lúc tạo."
+        },
+        {
+          "name": "m_failCount",
+          "type": "int",
+          "vis": "-",
+          "summary": "Số lần đăng nhập sai liên tiếp.",
+          "role": "Về 0 khi đăng nhập đúng. Vì là thuộc tính của đối tượng sống suốt chương trình, đăng xuất rồi đăng nhập sai tiếp vẫn bị đếm tiếp.",
+          "example": "Sai 2 lần rồi đúng → về 0. Sai 3 lần liên tiếp → chương trình kết thúc."
+        }
+      ],
+      "methods": [
+        {
+          "name": "LoginScreen",
+          "ctor": true,
+          "vis": "+",
+          "params": ["system: HrSystem&"],
+          "summary": "Tạo màn hình đăng nhập; bộ đếm bằng 0.",
+          "role": "`Application` tạo một lần, trong danh sách khởi tạo của hàm dựng.",
+          "pre": ["Không có."],
+          "post": ["`m_failCount` = 0."],
+          "example": "`Application::Application() : m_loginScreen(m_system) {}`",
+          "cpp": "`LoginScreen::LoginScreen(HrSystem& system) : m_system(system), m_failCount(0) {}`"
+        },
+        {
+          "name": "run",
+          "vis": "+",
+          "params": ["accountName: string&", "role: Role&"],
+          "returns": "bool",
+          "summary": "Hỏi User và Pass cho tới khi đăng nhập đúng, người dùng thoát, hoặc sai đủ 3 lần.",
+          "role": "Mở đầu mỗi phiên làm việc; `Application` gọi lại sau mỗi lần đăng xuất.",
+          "detail": [
+            "Mỗi vòng: xóa màn hình, in khung «DANG NHAP» và dòng nhắc «(De trong User roi nhan Enter de thoat chuong trinh)».",
+            "Đọc `User: ` bằng `Console.readLine`. Để trống thì trả false (người dùng muốn thoát).",
+            "Đọc `Pass: ` bằng `Console.readPassword` (cho hủy). Nhấn Esc thì quay lại hỏi User từ đầu, không tính là một lần sai.",
+            "Gọi `HrSystem.login`. `OK`: đặt `m_failCount = 0`, trả true.",
+            "Sai: tăng `m_failCount`. Chưa tới 3 thì báo «Sai tai khoan hoac mat khau. Con N lan thu.» (N = 3 − `m_failCount`) và chờ phím. Tới 3 thì báo «Ban da nhap sai 3 lan. Chuong trinh ket thuc.», chờ phím và trả false."
+          ],
+          "pre": ["Không có."],
+          "post": ["Trả true: đăng nhập thành công; `accountName` và `role` đã có giá trị; bộ đếm bằng 0.", "Trả false: người dùng chọn thoát, hoặc đã sai đủ 3 lần (thông báo đã được in)."],
+          "example": "**************************************\n*             DANG NHAP              *\n**************************************\n(De trong User roi nhan Enter de thoat chuong trinh)\nUser: nva\nPass: ******\nSai tai khoan hoac mat khau. Con 2 lan thu.",
+          "cpp": "`while (true) { ... std::string user = Console::readLine(\"User: \"); if (user.empty()) return false; std::string pass; if (!Console::readPassword(\"Pass: \", true, pass)) continue; if (m_system.login(user, pass, role, accountName) == ErrorCode::OK) { m_failCount = 0; return true; } m_failCount++; ... }`"
+        }
+      ],
+      "impl": {
+        "cpp": "Lớp thường. Thuộc tính tham chiếu `HrSystem& m_system;` gán trong danh sách khởi tạo."
+      },
+      "notes": [
+        "Thông báo chung «Sai tai khoan hoac mat khau» cho cả hai trường hợp (không có username, sai mật khẩu) để người lạ không dò được username nào có thật."
+      ],
+      "read": 20,
+      "stage": 5,
+      "readWhy": "Màn hình đầu tiên người dùng thấy; dùng HrSystem.login.",
+      "pos": [2250, 450]
+    },
+    {
+      "id": "Application",
+      "stereotype": "class",
+      "package": "ui",
+      "status": "core",
+      "summary": "Điểm bắt đầu: khởi tạo hệ thống, rồi lặp: đăng nhập → mở menu theo vai trò → đăng xuất về màn hình đăng nhập. Kết thúc khi người dùng thoát hoặc sai 3 lần.",
+      "role": "Nối mọi phần lại với nhau. Sở hữu `HrSystem` duy nhất và màn hình đăng nhập; tạo menu mới cho mỗi lần đăng nhập. Hàm `main` chỉ tạo một `Application` và gọi `run()`.",
+      "spec": "Luồng chung của đề: đăng nhập, nhận ra vai trò, tới menu tương ứng; «người dùng có thể lựa chọn thực hiện chức năng khác hoặc kết thúc chương trình».",
+      "uses": [
+        "`HrSystem`: `initialize(messages)` (trả false nếu không chuẩn bị được dữ liệu; `messages` chứa cảnh báo cần in); `needsPasswordChange(username)`.",
+        "`LoginScreen.run(accountName, role)`: trả true khi đăng nhập đúng, false khi cần kết thúc chương trình.",
+        "`AdminMenu(system, username).run()`; `EmployeeMenu(system, username)` với `forcePasswordChange()` (trả false nếu không đổi được) và `run()`.",
+        "`Console`: `initialize()`, `printWarning(msg)`, `printLine(text)`, `pause()`.",
+        "`Role`: `ADMIN` hoặc `EMPLOYEE`."
+      ],
+      "invariants": [],
+      "attributes": [
+        {
+          "name": "m_system",
+          "type": "HrSystem",
+          "vis": "-",
+          "summary": "Hệ thống duy nhất của chương trình.",
+          "role": "Mọi màn hình mượn tham chiếu tới đối tượng này.",
+          "detail": "Phải khai báo **trước** `m_loginScreen` trong lớp: C++ khởi tạo thuộc tính theo thứ tự khai báo, mà `m_loginScreen` cần tham chiếu tới `m_system`.",
+          "example": "`HrSystem m_system;`"
+        },
+        {
+          "name": "m_loginScreen",
+          "type": "LoginScreen",
+          "vis": "-",
+          "summary": "Màn hình đăng nhập, sống suốt chương trình.",
+          "role": "Giữ bộ đếm số lần sai qua các lần đăng xuất.",
+          "example": "`LoginScreen m_loginScreen;`"
+        }
+      ],
+      "methods": [
+        {
+          "name": "Application",
+          "ctor": true,
+          "vis": "+",
+          "params": [],
+          "summary": "Tạo hệ thống và màn hình đăng nhập; chưa đọc file.",
+          "role": "`main` tạo đúng một đối tượng.",
+          "pre": ["Không có."],
+          "post": ["Chưa có gì được đọc hay in."],
+          "example": "`int main() { Application app; return app.run(); }`",
+          "cpp": "`Application::Application() : m_loginScreen(m_system) {}`"
+        },
+        {
+          "name": "run",
+          "vis": "+",
+          "params": [],
+          "returns": "int",
+          "summary": "Chạy toàn bộ chương trình; trả mã kết thúc (0 bình thường, 1 khi không chuẩn bị được dữ liệu).",
+          "role": "Toàn bộ luồng của chương trình nằm ở đây.",
+          "detail": [
+            "`Console.initialize()`.",
+            "`m_system.initialize(messages)`; in từng câu trong `messages` bằng `Console.printWarning`. Trả false thì chờ phím rồi trả 1. Có cảnh báo thì chờ phím để người dùng kịp đọc.",
+            "Lặp: gọi `m_loginScreen.run(name, role)`; trả false thì ra khỏi vòng lặp.",
+            "`role` là `Role::ADMIN`: tạo `AdminMenu menu(m_system, name)` rồi `menu.run()`.",
+            "`role` là `Role::EMPLOYEE`: tạo `EmployeeMenu menu(m_system, name)`; nếu `m_system.needsPasswordChange(name)` thì gọi `menu.forcePasswordChange()`, trả false thì quay lại màn hình đăng nhập; xong thì `menu.run()`.",
+            "Menu kết thúc (chọn Thoát) thì vòng lặp quay lại màn hình đăng nhập.",
+            "Ra khỏi vòng lặp: in «Tam biet!» và trả 0."
+          ],
+          "pre": ["Gọi một lần."],
+          "post": ["Mọi thay đổi đã nằm trong file (đã được ghi ngay sau từng thao tác)."],
+          "example": "Lần chạy đầu: in 3 cảnh báo «Da tao admin mac dinh: ...», chờ phím, rồi hiện màn hình đăng nhập.",
+          "cpp": "`if (role == Role::ADMIN) { AdminMenu menu(m_system, name); menu.run(); } else { EmployeeMenu menu(m_system, name); if (m_system.needsPasswordChange(name) && !menu.forcePasswordChange()) continue; menu.run(); }`"
+        }
+      ],
+      "impl": {
+        "cpp": "`main.cpp`: `int main() { Application app; return app.run(); }`. Menu là biến cục bộ trong vòng lặp nên mỗi lần đăng nhập có một menu mới, không còn dữ liệu của người đăng nhập trước."
+      },
+      "notes": [],
+      "read": 21,
+      "stage": 5,
+      "readWhy": "Đọc cuối cùng: nối mọi lớp lại thành chương trình hoàn chỉnh.",
+      "pos": [2250, 0]
+    }
+  ]
+}

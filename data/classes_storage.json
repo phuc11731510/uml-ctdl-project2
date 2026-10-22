@@ -1,0 +1,323 @@
+{
+  "classes": [
+    {
+      "id": "AccountList",
+      "stereotype": "template",
+      "tparams": ["T"],
+      "package": "storage",
+      "status": "core",
+      "summary": "Lớp template nhóm tự viết: danh sách tài khoản kiểu T trong bộ nhớ, gắn với một file txt. Dùng hai lần: `AccountList<Admin>` và `AccountList<Employee>`.",
+      "role": "Viết một lần, dùng cho cả hai file tài khoản. Bên trong là một `vector<T>`. Lớp lo các việc: đọc file lúc khởi động, tìm theo username, thêm, xóa, sắp xếp, và ghi lại toàn bộ file sau mỗi thay đổi. Lớp không biết gì về admin hay nhân viên; nó chỉ cần kiểu T có đủ 5 thứ được liệt kê ở mục «Cần biết từ lớp khác». `Admin` và `Employee` đều có đủ.",
+      "spec": "Yêu cầu chấm điểm «Project phải được cài đặt theo hướng đối tượng và template (2đ)»; lưu danh sách admin và employee trong Administrators.txt và Employees.txt.",
+      "uses": [
+        "`FileUtil.readLines(path, lines)`: đọc mọi dòng của file vào `lines`; trả false nếu không mở được file (thường là chưa có file).",
+        "`FileUtil.writeLines(path, lines)`: ghi đè file bằng các dòng trong `lines`; trả false nếu lỗi, khi đó file cũ còn nguyên.",
+        "`StringUtil.trim(s)` bỏ khoảng trắng đầu cuối; `StringUtil.toLower(s)` đổi chữ thường.",
+        "Kiểu `T` phải có: (1) hàm dựng không tham số; (2) `static bool fromLine(const std::string& line, T& out)` đọc một dòng, trả false nếu sai định dạng; (3) `std::string toLine() const` cho một dòng để ghi; (4) `std::string getUsername() const`; (5) `bool matchesUsername(const std::string& name) const` so username không phân biệt hoa thường."
+      ],
+      "invariants": [
+        "L1. Không có hai phần tử trùng username (không phân biệt hoa thường): `load` bỏ dòng trùng, còn nơi gọi `add` phải kiểm trước.",
+        "L2. Sau khi `save()` trả true, file có đúng `size()` dòng, và dòng thứ i + 1 là `at(i).toLine()`."
+      ],
+      "attributes": [
+        {
+          "name": "m_items",
+          "type": "vector<T>",
+          "vis": "-",
+          "summary": "Mọi tài khoản của một file, nạp vào bộ nhớ lúc khởi động.",
+          "role": "Mọi thao tác tìm, thêm, xóa, sắp xếp làm trên vector này; xong thì ghi lại file từ vector.",
+          "example": "Với `AccountList<Employee>`: hai phần tử `nva` (mật khẩu 111111, cờ bật) và `lthb` (mật khẩu abc12345, cờ tắt)."
+        },
+        {
+          "name": "m_filePath",
+          "type": "string",
+          "vis": "-",
+          "summary": "Đường dẫn file mà danh sách đọc và ghi.",
+          "role": "Truyền vào lúc tạo, không đổi về sau.",
+          "example": "`\"data/Employees.txt\"`, `\"data/Administrators.txt\"`."
+        }
+      ],
+      "methods": [
+        {
+          "name": "AccountList",
+          "ctor": true,
+          "vis": "+",
+          "params": ["filePath: string"],
+          "summary": "Tạo danh sách rỗng gắn với một file; chưa đọc file.",
+          "role": "`HrSystem` tạo hai danh sách trong hàm dựng của mình, rồi gọi `load` lúc khởi động.",
+          "pre": ["Không có."],
+          "post": ["`size()` = 0."],
+          "example": "`AccountList<Employee> employees(\"data/Employees.txt\");`",
+          "cpp": "`AccountList(const std::string& filePath) : m_filePath(filePath) {}`"
+        },
+        {
+          "name": "load",
+          "vis": "+",
+          "params": ["warnings: vector<string>&"],
+          "returns": "bool",
+          "summary": "Đọc file vào bộ nhớ; bỏ qua dòng trống, dòng sai định dạng và dòng trùng username.",
+          "role": "Gọi một lần lúc khởi động cho mỗi danh sách.",
+          "detail": [
+            "Xóa danh sách cũ, đọc mọi dòng bằng `FileUtil.readLines`. Không mở được file thì trả false (danh sách rỗng).",
+            "Với mỗi dòng: bỏ khoảng trắng đầu cuối; dòng trống thì bỏ qua lặng lẽ. Gọi `T::fromLine`; trả false thì bỏ dòng và thêm cảnh báo. Username đã có ở dòng trước (không phân biệt hoa thường) thì bỏ dòng và thêm cảnh báo. Còn lại thì thêm vào cuối danh sách.",
+            "Cảnh báo được thêm vào cuối `warnings` (không xóa nội dung cũ), để một vector gom được cảnh báo của cả hai file."
+          ],
+          "pre": ["Không có."],
+          "post": ["Trả false: file chưa tồn tại, danh sách rỗng.", "Trả true: danh sách gồm các dòng hợp lệ, theo thứ tự trong file."],
+          "complexity": "O(n²): mỗi dòng tìm trùng tuần tự trong các dòng đã đọc. Với vài trăm tài khoản thì không đáng kể.",
+          "example": "Employees.txt có 4 dòng: `nva 111111 1`, một dòng trống, `NVA abc12345 0`, `ttc 123 456 7`. Kết quả: danh sách chỉ có `nva`; `warnings` thêm 2 câu: «Employees.txt dong 3: trung username NVA, da bo qua» và «Employees.txt dong 4: sai dinh dang, da bo qua».",
+          "cpp": "`std::vector<std::string> lines; m_items.clear(); if (!FileUtil::readLines(m_filePath, lines)) return false; for (int i = 0; i < (int)lines.size(); i++) { std::string line = StringUtil::trim(lines[i]); if (line.empty()) continue; T item; if (!T::fromLine(line, item)) { warnings.push_back(m_filePath + \" dong \" + std::to_string(i + 1) + \": sai dinh dang, da bo qua\"); continue; } if (contains(item.getUsername())) { ...; continue; } m_items.push_back(item); } return true;`"
+        },
+        {
+          "name": "save",
+          "vis": "+",
+          "params": [],
+          "returns": "bool",
+          "summary": "Ghi lại toàn bộ file, mỗi tài khoản một dòng.",
+          "role": "Gọi ngay sau mỗi thay đổi (thêm, xóa, đổi mật khẩu), nên khi chương trình còn chạy thì file đã được cập nhật.",
+          "pre": ["Thư mục chứa file đã tồn tại."],
+          "post": ["Trả true: file có đúng `size()` dòng, dòng i + 1 là `at(i).toLine()`.", "Trả false: file cũ không đổi; danh sách trong bộ nhớ cũng không đổi (nơi gọi tự quyết định hoàn tác)."],
+          "complexity": "O(n)",
+          "example": "Danh sách `[nva (cờ bật), lthb (cờ tắt)]` → file Employees.txt:\nnva 111111 1\nlthb abc12345 0",
+          "cpp": "`std::vector<std::string> lines; for (int i = 0; i < (int)m_items.size(); i++) lines.push_back(m_items[i].toLine()); return FileUtil::writeLines(m_filePath, lines);`"
+        },
+        {
+          "name": "size",
+          "vis": "+",
+          "params": [],
+          "returns": "int",
+          "summary": "Số tài khoản trong danh sách.",
+          "role": "Kiểm còn thiếu admin không (phải có ít nhất 3), duyệt danh sách, kiểm danh sách rỗng.",
+          "pre": ["Không có."],
+          "post": ["Lớn hơn hoặc bằng 0."],
+          "complexity": "O(1)",
+          "example": "Sau khi đọc file admin có 3 dòng hợp lệ: `size()` = 3.",
+          "cpp": "`int size() const { return (int)m_items.size(); }`"
+        },
+        {
+          "name": "at",
+          "vis": "+",
+          "params": ["index: int"],
+          "returns": "T&",
+          "summary": "Phần tử thứ `index` (đếm từ 0), trả tham chiếu nên sửa được.",
+          "role": "Sau khi có vị trí từ `indexOf`, lấy tài khoản để kiểm mật khẩu hoặc đổi mật khẩu.",
+          "pre": ["0 ≤ `index` < `size()`. Hàm không kiểm tra; nơi gọi lấy `index` từ `indexOf` và đã loại trường hợp −1."],
+          "post": ["Sửa qua tham chiếu trả về là sửa luôn phần tử trong danh sách."],
+          "complexity": "O(1)",
+          "example": "`int i = employees.indexOf(\"nva\"); employees.at(i).setPassword(\"Moi12345\");` đổi mật khẩu của nva trong bộ nhớ.",
+          "cpp": "`T& at(int index) { return m_items[index]; }`"
+        },
+        {
+          "name": "indexOf",
+          "vis": "+",
+          "params": ["username: string"],
+          "returns": "int",
+          "summary": "Vị trí của tài khoản có username khớp (không phân biệt hoa thường); −1 nếu không có.",
+          "role": "Cách tìm duy nhất của danh sách; `contains` và mọi chức năng tìm, xóa, đổi mật khẩu đều dựa vào nó.",
+          "detail": "Tìm tuần tự từ đầu tới cuối, so bằng `matchesUsername` của từng phần tử.",
+          "pre": ["Không có."],
+          "post": ["Trả i ≥ 0 thì `at(i).matchesUsername(username)` đúng.", "Trả −1 thì không phần tử nào khớp."],
+          "complexity": "O(n)",
+          "example": "Danh sách `[nva, lthb]`: `indexOf(\"LTHB\")` = 1; `indexOf(\"ttc\")` = −1.",
+          "cpp": "`for (int i = 0; i < (int)m_items.size(); i++) if (m_items[i].matchesUsername(username)) return i; return -1;`"
+        },
+        {
+          "name": "contains",
+          "vis": "+",
+          "params": ["username: string"],
+          "returns": "bool",
+          "summary": "Danh sách có tài khoản với username này không (không phân biệt hoa thường).",
+          "role": "Kiểm trùng username khi đọc file và khi thêm nhân viên mới.",
+          "pre": ["Không có."],
+          "post": ["Bằng `indexOf(username) != -1`."],
+          "complexity": "O(n)",
+          "example": "Danh sách `[nva]`: `contains(\"NVA\")` = true.",
+          "cpp": "`return indexOf(username) != -1;`"
+        },
+        {
+          "name": "add",
+          "vis": "+",
+          "params": ["item: T"],
+          "returns": "void",
+          "summary": "Thêm tài khoản vào cuối danh sách (chưa ghi file).",
+          "role": "Thêm nhân viên mới, thêm admin mặc định, hoặc đưa tài khoản trở lại khi hoàn tác.",
+          "pre": ["`contains(item.getUsername())` là false (nơi gọi đã kiểm)."],
+          "post": ["`size()` tăng 1; `at(size() - 1)` là `item`."],
+          "complexity": "O(1) trung bình",
+          "example": "`employees.add(Employee::createNew(\"ttc\"));` rồi `employees.save();`.",
+          "cpp": "`void add(const T& item) { m_items.push_back(item); }`"
+        },
+        {
+          "name": "removeAt",
+          "vis": "+",
+          "params": ["index: int"],
+          "returns": "void",
+          "summary": "Xóa phần tử thứ `index` (chưa ghi file).",
+          "role": "Xóa nhân viên; bỏ nhân viên trùng tên với admin lúc khởi động; hoàn tác lần thêm bị lỗi ghi file.",
+          "pre": ["0 ≤ `index` < `size()`."],
+          "post": ["`size()` giảm 1; các phần tử sau `index` dời lên một vị trí."],
+          "complexity": "O(n)",
+          "example": "Danh sách `[nva, lthb, ttc]`: `removeAt(1)` còn `[nva, ttc]`.",
+          "cpp": "`m_items.erase(m_items.begin() + index);`"
+        },
+        {
+          "name": "sortByUsername",
+          "vis": "+",
+          "params": [],
+          "returns": "void",
+          "summary": "Sắp xếp danh sách theo username tăng dần, không phân biệt hoa thường.",
+          "role": "Trước khi in bảng «Hiển thị thông tin toàn bộ employee».",
+          "pre": ["Không có."],
+          "post": ["Với mọi i: `toLower(at(i).getUsername())` ≤ `toLower(at(i + 1).getUsername())`."],
+          "complexity": "O(n log n)",
+          "example": "`[nva, lthb, Ttc]` → `[lthb, nva, Ttc]`.",
+          "cpp": "`std::sort(m_items.begin(), m_items.end(), lessByUsername);` (`#include <algorithm>`)."
+        },
+        {
+          "name": "lessByUsername",
+          "static": true,
+          "vis": "-",
+          "params": ["a: T", "b: T"],
+          "returns": "bool",
+          "summary": "Hàm so sánh cho `std::sort`: a đứng trước b khi username của a nhỏ hơn (theo chữ thường).",
+          "role": "Chỉ `sortByUsername` dùng.",
+          "pre": ["Không có."],
+          "post": ["Bằng `StringUtil.toLower(a.getUsername()) < StringUtil.toLower(b.getUsername())`."],
+          "complexity": "O(độ dài username)",
+          "example": "`lessByUsername(lthb, nva)` = true; `lessByUsername(Ttc, nva)` = false.",
+          "cpp": "`static bool lessByUsername(const T& a, const T& b) { return StringUtil::toLower(a.getUsername()) < StringUtil::toLower(b.getUsername()); }`"
+        }
+      ],
+      "impl": {
+        "cpp": "Toàn bộ mã (khai báo và thân hàm) phải nằm trong `AccountList.h`, không có `AccountList.cpp`: trình biên dịch cần thấy thân hàm template ở nơi dùng `AccountList<Admin>`. Tách ra file .cpp sẽ gặp lỗi liên kết «undefined reference». Khai báo: `template <typename T> class AccountList { ... };`."
+      },
+      "notes": [
+        "Vì sao không dùng một `std::vector<Account*>` chung cho cả hai loại? Khi đó phải `new` và `delete` từng đối tượng, và lúc đọc file phải tự phân biệt dòng nào là admin dòng nào là nhân viên. Template giữ đối tượng theo giá trị, mỗi danh sách biết đúng kiểu của mình, và `T::fromLine` được chọn lúc biên dịch.",
+        "Tìm kiếm là tuần tự, O(n). Muốn thể hiện thêm kiến thức CTDL có thể giữ danh sách luôn sắp xếp và tìm nhị phân O(log n); với vài trăm tài khoản thì không cần."
+      ],
+      "read": 9,
+      "stage": 3,
+      "readWhy": "Phần «template» của thang điểm. Đọc sau Admin và Employee vì T chính là hai lớp đó.",
+      "pos": [1125, 1450]
+    },
+    {
+      "id": "ProfileStore",
+      "stereotype": "class",
+      "package": "storage",
+      "status": "core",
+      "summary": "Đọc, ghi, xóa file hồ sơ `data/users/<username>.txt`.",
+      "role": "Biết hồ sơ của ai nằm ở file nào, và chuyển qua lại giữa 4 dòng trong file với một `UserProfile`. Tên file luôn viết thường (`NVA` → `nva.txt`) để mỗi username chỉ ứng với đúng một file.",
+      "spec": "«[username].txt: lưu trữ thông tin của từng user»; «tạo file [username].txt»; «xóa file [username].txt»; «ghi cập nhật lại thông tin file [username].txt».",
+      "uses": [
+        "`FileUtil.readLines(path, lines)`: đọc mọi dòng; trả false nếu không mở được file.",
+        "`FileUtil.writeLines(path, lines)`: ghi đè cả file; trả false nếu lỗi.",
+        "`FileUtil.fileExists(path)`, `FileUtil.deleteFile(path)`: kiểm tra và xóa file; đều trả bool.",
+        "`StringUtil.toLower(s)`: đổi chữ thường.",
+        "`UserProfile.toLines()` cho 4 dòng để ghi; `UserProfile.fromLines(lines, out)` đổi các dòng đọc được thành hồ sơ, trả false nếu ít hơn 4 dòng."
+      ],
+      "invariants": [
+        "S1. Mỗi file hồ sơ do lớp này ghi có đúng 4 dòng."
+      ],
+      "attributes": [
+        {
+          "name": "m_folder",
+          "type": "string",
+          "vis": "-",
+          "summary": "Thư mục chứa các file hồ sơ, không có dấu `/` ở cuối.",
+          "role": "Ghép với username để ra đường dẫn file.",
+          "example": "`\"data/users\"`"
+        }
+      ],
+      "methods": [
+        {
+          "name": "ProfileStore",
+          "ctor": true,
+          "vis": "+",
+          "params": ["folder: string"],
+          "summary": "Gắn kho với một thư mục.",
+          "role": "`HrSystem` tạo một kho trong hàm dựng của mình.",
+          "pre": ["Không có (thư mục được tạo lúc khởi động, không phải ở đây)."],
+          "post": ["`pathOf(u)` bắt đầu bằng `folder + \"/\"`."],
+          "example": "`ProfileStore profiles(\"data/users\");`",
+          "cpp": "`ProfileStore(const std::string& folder) : m_folder(folder) {}`"
+        },
+        {
+          "name": "pathOf",
+          "vis": "+",
+          "params": ["username: string"],
+          "returns": "string",
+          "summary": "Đường dẫn file hồ sơ của một username (tên file viết thường).",
+          "role": "Mọi hàm còn lại của lớp dùng để tìm đúng file.",
+          "detail": "Đề gọi file này là «[username].txt». Vì thư mục `data/users` chỉ chứa hồ sơ, username như `Employees` cũng không đè lên file `data/Employees.txt`.",
+          "pre": ["Không có."],
+          "post": ["Bằng `m_folder + \"/\" + StringUtil.toLower(username) + \".txt\"`."],
+          "complexity": "O(độ dài username)",
+          "example": "`pathOf(\"NVA\")` = `\"data/users/nva.txt\"`; `pathOf(\"nva\")` cũng vậy.",
+          "cpp": "`return m_folder + \"/\" + StringUtil::toLower(username) + \".txt\";`"
+        },
+        {
+          "name": "exists",
+          "vis": "+",
+          "params": ["username: string"],
+          "returns": "bool",
+          "summary": "Nhân viên có file hồ sơ không.",
+          "role": "Kiểm tra nhanh khi cần, không đọc nội dung.",
+          "pre": ["Không có."],
+          "post": ["Bằng `FileUtil.fileExists(pathOf(username))`."],
+          "complexity": "O(1)",
+          "example": "Sau khi thêm `nva`: `exists(\"nva\")` = true.",
+          "cpp": "`return FileUtil::fileExists(pathOf(username));`"
+        },
+        {
+          "name": "load",
+          "vis": "+",
+          "params": ["username: string", "out: UserProfile&"],
+          "returns": "bool",
+          "summary": "Đọc hồ sơ; trả false nếu thiếu file hoặc file ít hơn 4 dòng.",
+          "role": "Hiển thị thông tin khi tìm, khi nhân viên xem tài khoản, khi in bảng, và trước khi sửa một thông tin.",
+          "pre": ["Không có."],
+          "post": ["Trả true: `out` là hồ sơ đọc được.", "Trả false: `out` không đổi."],
+          "complexity": "O(kích thước file)",
+          "example": "File `data/users/nva.txt` có 4 dòng: `load(\"nva\", p)` trả true và `p.get(ProfileField::FULL_NAME)` = `\"Nguyen Van A\"`.",
+          "cpp": "`std::vector<std::string> lines; if (!FileUtil::readLines(pathOf(username), lines)) return false; return UserProfile::fromLines(lines, out);`"
+        },
+        {
+          "name": "save",
+          "vis": "+",
+          "params": ["username: string", "profile: UserProfile"],
+          "returns": "bool",
+          "summary": "Ghi lại cả file hồ sơ 4 dòng (tạo mới nếu chưa có).",
+          "role": "Tạo file khi thêm nhân viên; ghi lại file sau mỗi lần sửa một thông tin.",
+          "pre": ["Thư mục `m_folder` đã tồn tại."],
+          "post": ["Trả true: file có đúng 4 dòng của `profile.toLines()`.", "Trả false: file cũ (nếu có) không đổi."],
+          "complexity": "O(1)",
+          "example": "`save(\"nva\", p)` tạo hoặc ghi đè `data/users/nva.txt`:\nNguyen Van A\n12 Le Loi, Q1\n0912345678\nnva@gmail.com",
+          "cpp": "`return FileUtil::writeLines(pathOf(username), profile.toLines());`"
+        },
+        {
+          "name": "remove",
+          "vis": "+",
+          "params": ["username: string"],
+          "returns": "bool",
+          "summary": "Xóa file hồ sơ; trả true nếu xóa được.",
+          "role": "Khi admin xóa nhân viên; và khi hoàn tác một lần thêm nhân viên bị lỗi.",
+          "pre": ["Không có."],
+          "post": ["Trả true: file không còn."],
+          "complexity": "O(1)",
+          "example": "`remove(\"nva\")` xóa `data/users/nva.txt`.",
+          "cpp": "`return FileUtil::deleteFile(pathOf(username));`"
+        }
+      ],
+      "impl": {
+        "cpp": "Lớp thường, một thuộc tính. Mọi hàm đều ngắn, mỗi hàm một hoặc hai dòng."
+      },
+      "notes": [
+        "Admin không có file hồ sơ (quyết định của nhóm), nên lớp này chỉ dùng cho nhân viên."
+      ],
+      "read": 10,
+      "stage": 3,
+      "readWhy": "Kho file hồ sơ; dùng UserProfile và FileUtil đã đọc.",
+      "pos": [1950, 1450]
+    }
+  ]
+}

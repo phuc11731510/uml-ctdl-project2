@@ -80,7 +80,10 @@
         "Tham số kiểu string chỉ để đọc thì nên truyền `const std::string&` để khỏi sao chép chuỗi. Sơ đồ viết gọn là `string`.",
         "Trong sơ đồ, `Lớp.hàm` nghĩa là hàm `hàm` của lớp `Lớp`. Trong C++ viết `Lop::ham(...)` với hàm static, hoặc `doiTuong.ham(...)` với hàm thường."
       ],
-      "pos": [0, 0]
+      "pos": [
+        0,
+        0
+      ]
     }
   ]
 }

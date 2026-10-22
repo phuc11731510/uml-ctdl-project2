@@ -29,7 +29,10 @@
       "read": 3,
       "stage": 2,
       "readWhy": "Kiểu nhỏ nhất của phần dữ liệu; Account và màn hình đăng nhập đều dùng.",
-      "pos": [450, 1950]
+      "pos": [
+        450,
+        1950
+      ]
     },
     {
       "id": "Account",
@@ -71,13 +74,20 @@
           "name": "Account",
           "ctor": true,
           "vis": "#",
-          "params": ["username: string", "password: string"],
+          "params": [
+            "username: string",
+            "password: string"
+          ],
           "summary": "Gán username và mật khẩu. Chỉ lớp con gọi.",
           "role": "Để `protected` vì không ai được tạo một `Account` trơn: chỉ `Admin` và `Employee` gọi hàm này trong danh sách khởi tạo của hàm dựng của mình.",
-          "pre": ["Không có (lớp này không tự kiểm tra; dữ liệu đã được kiểm ở nơi tạo)."],
-          "post": ["`getUsername()` trả `username`; `checkPassword(password)` trả true."],
+          "pre": [
+            "Không có (lớp này không tự kiểm tra; dữ liệu đã được kiểm ở nơi tạo)."
+          ],
+          "post": [
+            "`getUsername()` trả `username`; `checkPassword(password)` trả true."
+          ],
           "example": "Trong hàm dựng của Admin: `Admin::Admin(const std::string& username, const std::string& password) : Account(username, password) {}`.",
-          "cpp": "`Account::Account(const std::string& username, const std::string& password) : m_username(username), m_password(password) {}`"
+          "cpp": "Gán hai thuộc tính trong danh sách khởi tạo."
         },
         {
           "name": "getUsername",
@@ -86,51 +96,73 @@
           "returns": "string",
           "summary": "Trả username như lúc tạo.",
           "role": "Dùng để ghi file (`toLine`), để đặt tên file hồ sơ và để hiển thị.",
-          "pre": ["Không có."],
-          "post": ["Không đổi dữ liệu."],
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "Không đổi dữ liệu."
+          ],
           "complexity": "O(1)",
           "example": "Tài khoản tạo với `\"NVA\"` thì trả `\"NVA\"` (giữ nguyên chữ hoa).",
-          "cpp": "`std::string getUsername() const { return m_username; }`"
+          "cpp": "Trả `m_username`; khai báo `const`."
         },
         {
           "name": "matchesUsername",
           "vis": "+",
-          "params": ["name: string"],
+          "params": [
+            "name: string"
+          ],
           "returns": "bool",
           "summary": "Đúng khi `name` trùng username, không phân biệt hoa thường.",
           "role": "Mọi chỗ tìm tài khoản theo tên đều dùng hàm này (đăng nhập, kiểm trùng, tìm, xóa), nên quy tắc «không phân biệt hoa thường» chỉ viết ở một chỗ.",
-          "pre": ["Không có."],
-          "post": ["Bằng `StringUtil.equalsIgnoreCase(m_username, name)`."],
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "Bằng `StringUtil.equalsIgnoreCase(m_username, name)`."
+          ],
           "complexity": "O(độ dài username)",
           "example": "Tài khoản `nva`: `matchesUsername(\"NVA\")` = true; `matchesUsername(\"Nva\")` = true; `matchesUsername(\"nva1\")` = false.",
-          "cpp": "`return StringUtil::equalsIgnoreCase(m_username, name);`"
+          "cpp": "Gọi hàm so sánh không phân biệt hoa thường của lớp tiện ích; khai báo `const`."
         },
         {
           "name": "checkPassword",
           "vis": "+",
-          "params": ["password: string"],
+          "params": [
+            "password: string"
+          ],
           "returns": "bool",
           "summary": "So khớp mật khẩu, có phân biệt hoa thường.",
           "role": "Dùng khi đăng nhập và ở bước «nhập mật khẩu để xác nhận chủ tài khoản» khi đổi mật khẩu.",
           "detail": "So khớp đúng từng ký tự: mật khẩu là dữ liệu bí mật nên `Abc` khác `abc`.",
-          "pre": ["Không có."],
-          "post": ["Bằng `m_password == password`."],
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "Bằng `m_password == password`."
+          ],
           "complexity": "O(độ dài mật khẩu)",
           "example": "Mật khẩu `Abc12345`: `checkPassword(\"Abc12345\")` = true; `checkPassword(\"abc12345\")` = false.",
-          "cpp": "`return m_password == password;`"
+          "cpp": "So sánh trực tiếp hai chuỗi bằng `==`; khai báo `const`."
         },
         {
           "name": "setPassword",
           "vis": "+",
-          "params": ["newPassword: string"],
+          "params": [
+            "newPassword: string"
+          ],
           "returns": "void",
           "summary": "Đổi mật khẩu trong bộ nhớ (chưa ghi file).",
           "role": "Gọi khi đổi mật khẩu thành công. Người gọi (`HrSystem`) ghi file ngay sau đó.",
-          "pre": ["Mật khẩu mới đã được kiểm tra đúng quy tắc (6–20 ký tự, không dấu cách, khác `111111`, khác mật khẩu cũ)."],
-          "post": ["`checkPassword(newPassword)` trả true."],
+          "pre": [
+            "Mật khẩu mới đã được kiểm tra đúng quy tắc (6–20 ký tự, không dấu cách, khác `111111`, khác mật khẩu cũ)."
+          ],
+          "post": [
+            "`checkPassword(newPassword)` trả true."
+          ],
           "complexity": "O(1)",
           "example": "`acc.setPassword(\"Moi12345\")` rồi `acc.checkPassword(\"111111\")` = false, `acc.checkPassword(\"Moi12345\")` = true.",
-          "cpp": "`void setPassword(const std::string& newPassword) { m_password = newPassword; }`"
+          "cpp": "Gán thuộc tính."
         },
         {
           "name": "toLine",
@@ -141,10 +173,14 @@
           "summary": "Một dòng để ghi vào file. Mỗi lớp con tự định dạng.",
           "role": "`AccountList.save` gọi hàm này cho từng tài khoản khi ghi lại file.",
           "detail": "`Admin` ghi 2 cột, `Employee` ghi 3 cột; các cột cách nhau một dấu cách.",
-          "pre": ["Không có."],
-          "post": ["Kết quả không chứa ký tự xuống dòng."],
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "Kết quả không chứa ký tự xuống dòng."
+          ],
           "example": "`Admin(\"admin1\", \"123456\").toLine()` = `\"admin1 123456\"`; `Employee(\"nva\", \"111111\", true).toLine()` = `\"nva 111111 1\"`.",
-          "cpp": "Trong `Account.h`: `virtual std::string toLine() const = 0;`"
+          "cpp": "Khai báo thuần ảo (`= 0`) và `const`."
         },
         {
           "name": "getRole",
@@ -154,10 +190,14 @@
           "returns": "Role",
           "summary": "Tài khoản là admin hay nhân viên.",
           "role": "Biết vai trò mà không cần biết kiểu cụ thể của đối tượng.",
-          "pre": ["Không có."],
-          "post": ["`Admin` trả `Role::ADMIN`, `Employee` trả `Role::EMPLOYEE`."],
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "`Admin` trả `Role::ADMIN`, `Employee` trả `Role::EMPLOYEE`."
+          ],
           "example": "`Admin(\"admin1\", \"123456\").getRole()` = `Role::ADMIN`.",
-          "cpp": "Trong `Account.h`: `virtual Role getRole() const = 0;`"
+          "cpp": "Khai báo thuần ảo (`= 0`) và `const`."
         }
       ],
       "impl": {
@@ -170,7 +210,10 @@
       "read": 4,
       "stage": 2,
       "readWhy": "Lớp cha của Admin và Employee: đọc trước hai lớp con.",
-      "pos": [900, 1950]
+      "pos": [
+        900,
+        1950
+      ]
     },
     {
       "id": "Admin",
@@ -191,28 +234,43 @@
           "name": "Admin",
           "ctor": true,
           "vis": "+",
-          "params": ["username: string = \"\"", "password: string = \"\""],
+          "params": [
+            "username: string = \"\"",
+            "password: string = \"\""
+          ],
           "summary": "Tạo tài khoản admin. Gọi không tham số thì được một admin rỗng.",
           "role": "Bản không tham số cần cho `vector<Admin>` và cho `fromLine` (tạo biến rỗng trước rồi ghi giá trị vào). Bản có tham số dùng khi tạo admin mặc định.",
-          "pre": ["Không có."],
-          "post": ["`getUsername()` = `username`."],
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "`getUsername()` = `username`."
+          ],
           "example": "`Admin a;` là admin rỗng. `Admin b(\"admin2\", \"123456\");` là admin2 với mật khẩu 123456.",
-          "cpp": "Trong `Admin.h`: `Admin(const std::string& username = \"\", const std::string& password = \"\");`. Thân: `Admin::Admin(const std::string& username, const std::string& password) : Account(username, password) {}`."
+          "cpp": "Một hàm dựng có giá trị mặc định cho cả hai tham số (giá trị mặc định chỉ ghi ở file .h); chuyển lên hàm dựng của `Account` qua danh sách khởi tạo."
         },
         {
           "name": "fromLine",
           "static": true,
           "vis": "+",
-          "params": ["line: string", "out: Admin&"],
+          "params": [
+            "line: string",
+            "out: Admin&"
+          ],
           "returns": "bool",
           "summary": "Đọc một dòng `username matkhau` của Administrators.txt.",
           "role": "`AccountList.load` của danh sách admin gọi hàm này cho mỗi dòng của file.",
           "detail": "Tách dòng thành các từ theo dấu cách. Hợp lệ khi có đúng 2 từ. Hàm không kiểm tra username có đúng quy tắc hay không: file admin do người soạn tay, nên chỉ kiểm số cột.",
-          "pre": ["Dòng không rỗng (nơi gọi đã bỏ dòng trống)."],
-          "post": ["Trả true: `out` mang username và mật khẩu đọc được.", "Trả false: `out` không đổi."],
+          "pre": [
+            "Dòng không rỗng (nơi gọi đã bỏ dòng trống)."
+          ],
+          "post": [
+            "Trả true: `out` mang username và mật khẩu đọc được.",
+            "Trả false: `out` không đổi."
+          ],
           "complexity": "O(độ dài dòng)",
           "example": "`\"admin1 123456\"` → true, `out` là admin1 với mật khẩu 123456. `\"admin1\"` → false (thiếu mật khẩu). `\"admin1 123 456\"` → false (thừa cột, có thể là mật khẩu chứa dấu cách).",
-          "cpp": "`std::istringstream in(line); std::string u, p, extra; if (!(in >> u >> p)) return false; if (in >> extra) return false; out = Admin(u, p); return true;` (`#include <sstream>`)."
+          "cpp": "Tách từ bằng `std::istringstream` và toán tử `>>`; hợp lệ khi đọc được đúng 2 từ (thử đọc từ thứ ba phải thất bại)."
         },
         {
           "name": "toLine",
@@ -222,10 +280,14 @@
           "returns": "string",
           "summary": "Dòng 2 cột `username matkhau`.",
           "role": "Ghi lại Administrators.txt (khi chương trình tạo thêm admin mặc định).",
-          "pre": ["Không có."],
-          "post": ["`fromLine(toLine(), a)` đọc lại được đúng tài khoản này."],
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "`fromLine(toLine(), a)` đọc lại được đúng tài khoản này."
+          ],
           "example": "`Admin(\"admin1\", \"123456\").toLine()` = `\"admin1 123456\"`.",
-          "cpp": "`std::string toLine() const override { return m_username + \" \" + m_password; }`"
+          "cpp": "Ghép username, một dấu cách và mật khẩu; khai báo `override`."
         },
         {
           "name": "getRole",
@@ -235,10 +297,14 @@
           "returns": "Role",
           "summary": "Luôn trả `Role::ADMIN`.",
           "role": "Cho biết đây là admin.",
-          "pre": ["Không có."],
-          "post": ["Trả `Role::ADMIN`."],
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "Trả `Role::ADMIN`."
+          ],
           "example": "`Admin().getRole()` = `Role::ADMIN`.",
-          "cpp": "`Role getRole() const override { return Role::ADMIN; }`"
+          "cpp": "Trả `Role::ADMIN`; khai báo `override`."
         }
       ],
       "impl": {
@@ -250,7 +316,10 @@
       "read": 5,
       "stage": 2,
       "readWhy": "Lớp con đơn giản nhất của Account: chỉ đọc và ghi 2 cột.",
-      "pos": [675, 2400]
+      "pos": [
+        675,
+        2400
+      ]
     },
     {
       "id": "Employee",
@@ -278,7 +347,7 @@
           "summary": "Mật khẩu mặc định của nhân viên mới.",
           "role": "Dùng ở `createNew`, và ở luật «mật khẩu mới không được là 111111» (`HrSystem.checkNewPassword`).",
           "example": "`Employee::DEFAULT_PASSWORD` là `\"111111\"`.",
-          "cpp": "Trong `Employee.h`: `static const std::string DEFAULT_PASSWORD;`. Trong `Employee.cpp`: `const std::string Employee::DEFAULT_PASSWORD = \"111111\";`."
+          "cpp": "Khai báo `static const std::string` trong file .h, gán giá trị trong file .cpp."
         },
         {
           "name": "m_needsPasswordChange",
@@ -294,33 +363,50 @@
           "name": "Employee",
           "ctor": true,
           "vis": "+",
-          "params": ["username: string = \"\"", "password: string = \"\"", "needsPasswordChange: bool = false"],
+          "params": [
+            "username: string = \"\"",
+            "password: string = \"\"",
+            "needsPasswordChange: bool = false"
+          ],
           "summary": "Tạo tài khoản nhân viên. Gọi không tham số thì được một nhân viên rỗng.",
           "role": "Bản không tham số cần cho `vector<Employee>` và cho `fromLine`. Thêm nhân viên mới thì dùng `createNew` thay vì gọi trực tiếp.",
-          "pre": ["Không có."],
-          "post": ["`needsPasswordChange()` = `needsPasswordChange`."],
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "`needsPasswordChange()` = `needsPasswordChange`."
+          ],
           "example": "`Employee e(\"lthb\", \"abc12345\", false);`",
-          "cpp": "`Employee::Employee(const std::string& username, const std::string& password, bool needsPasswordChange) : Account(username, password), m_needsPasswordChange(needsPasswordChange) {}` (giá trị mặc định chỉ ghi ở file .h)."
+          "cpp": "Giá trị mặc định chỉ ghi ở file .h; username và mật khẩu chuyển lên `Account`, cờ gán trong danh sách khởi tạo."
         },
         {
           "name": "createNew",
           "static": true,
           "vis": "+",
-          "params": ["username: string"],
+          "params": [
+            "username: string"
+          ],
           "returns": "Employee",
           "summary": "Tạo nhân viên mới theo luật của đề: mật khẩu `111111`, cờ bật.",
           "role": "Dùng khi admin thêm nhân viên. Gom luật «pass mặc định là 111111» vào một chỗ.",
-          "pre": ["`username` đã được kiểm tra đúng quy tắc và chưa ai dùng."],
-          "post": ["`toLine()` = `username + \" 111111 1\"`."],
+          "pre": [
+            "`username` đã được kiểm tra đúng quy tắc và chưa ai dùng."
+          ],
+          "post": [
+            "`toLine()` = `username + \" 111111 1\"`."
+          ],
           "complexity": "O(1)",
           "example": "`Employee::createNew(\"nva\").toLine()` = `\"nva 111111 1\"`.",
-          "cpp": "`return Employee(username, DEFAULT_PASSWORD, true);`"
+          "cpp": "Gọi hàm dựng với mật khẩu mặc định và cờ bật."
         },
         {
           "name": "fromLine",
           "static": true,
           "vis": "+",
-          "params": ["line: string", "out: Employee&"],
+          "params": [
+            "line: string",
+            "out: Employee&"
+          ],
           "returns": "bool",
           "summary": "Đọc một dòng của Employees.txt (3 cột, hoặc 2 cột theo đúng đề).",
           "role": "`AccountList.load` của danh sách nhân viên gọi hàm này cho mỗi dòng của file.",
@@ -328,11 +414,16 @@
             "Dạng 3 cột `username matkhau co`: cờ phải là `0` hoặc `1`.",
             "Dạng 2 cột `username matkhau` (đúng như đề): cờ bật khi mật khẩu đang là `111111`. Nhờ vậy một file Employees.txt soạn tay theo đề (chỉ 2 cột) vẫn đọc được. Lần ghi file tiếp theo sẽ tự thêm cột 3."
           ],
-          "pre": ["Dòng không rỗng (nơi gọi đã bỏ dòng trống)."],
-          "post": ["Trả true: `out` mang dữ liệu đọc được.", "Trả false: `out` không đổi."],
+          "pre": [
+            "Dòng không rỗng (nơi gọi đã bỏ dòng trống)."
+          ],
+          "post": [
+            "Trả true: `out` mang dữ liệu đọc được.",
+            "Trả false: `out` không đổi."
+          ],
           "complexity": "O(độ dài dòng)",
           "example": "`\"nva 111111 1\"` → true, cờ bật. `\"lthb abc12345 0\"` → true, cờ tắt. `\"ttc 111111\"` → true, cờ bật (dạng 2 cột). `\"nva abc 2\"` → false (cờ không phải 0 hoặc 1). `\"nva\"` → false.",
-          "cpp": "`std::istringstream in(line); std::string u, p, flag, extra; if (!(in >> u >> p)) return false; if (!(in >> flag)) { out = Employee(u, p, p == DEFAULT_PASSWORD); return true; } if (in >> extra) return false; if (flag != \"0\" && flag != \"1\") return false; out = Employee(u, p, flag == \"1\"); return true;` (`#include <sstream>`)."
+          "cpp": "Tách từ bằng `std::istringstream`. Đọc được 2 từ rồi hết dòng là dạng 2 cột (cờ bật khi mật khẩu là `111111`); có từ thứ ba thì nó phải là `0` hoặc `1` và không được có từ thứ tư."
         },
         {
           "name": "toLine",
@@ -342,10 +433,14 @@
           "returns": "string",
           "summary": "Dòng 3 cột `username matkhau co`.",
           "role": "Ghi lại Employees.txt sau mỗi lần thêm, xóa nhân viên hoặc đổi mật khẩu.",
-          "pre": ["Không có."],
-          "post": ["Luôn đủ 3 cột; cột 3 là `1` hoặc `0`."],
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "Luôn đủ 3 cột; cột 3 là `1` hoặc `0`."
+          ],
           "example": "Nhân viên mới `nva` → `\"nva 111111 1\"`. Sau khi đổi mật khẩu thành `Moi12345` → `\"nva Moi12345 0\"`.",
-          "cpp": "`return m_username + \" \" + m_password + \" \" + (m_needsPasswordChange ? \"1\" : \"0\");`"
+          "cpp": "Ghép 3 cột cách nhau bằng dấu cách; cờ ghi thành `1` hoặc `0`."
         },
         {
           "name": "getRole",
@@ -355,10 +450,14 @@
           "returns": "Role",
           "summary": "Luôn trả `Role::EMPLOYEE`.",
           "role": "Cho biết đây là nhân viên.",
-          "pre": ["Không có."],
-          "post": ["Trả `Role::EMPLOYEE`."],
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "Trả `Role::EMPLOYEE`."
+          ],
           "example": "`Employee().getRole()` = `Role::EMPLOYEE`.",
-          "cpp": "`Role getRole() const override { return Role::EMPLOYEE; }`"
+          "cpp": "Trả `Role::EMPLOYEE`; khai báo `override`."
         },
         {
           "name": "needsPasswordChange",
@@ -367,22 +466,32 @@
           "returns": "bool",
           "summary": "Cờ «phải đổi mật khẩu» có đang bật không.",
           "role": "Ngay sau khi nhân viên đăng nhập đúng, chương trình hỏi hàm này để biết có phải buộc đổi mật khẩu không.",
-          "pre": ["Không có."],
-          "post": ["Không đổi dữ liệu."],
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "Không đổi dữ liệu."
+          ],
           "example": "Nhân viên vừa được `createNew` → true.",
-          "cpp": "`bool needsPasswordChange() const { return m_needsPasswordChange; }`"
+          "cpp": "Trả thuộc tính cờ; khai báo `const`."
         },
         {
           "name": "setNeedsPasswordChange",
           "vis": "+",
-          "params": ["value: bool"],
+          "params": [
+            "value: bool"
+          ],
           "returns": "void",
           "summary": "Bật hoặc tắt cờ (chưa ghi file).",
           "role": "Tắt cờ sau khi đổi mật khẩu thành công, cả lần bắt buộc lẫn lần tự nguyện.",
-          "pre": ["Không có."],
-          "post": ["`needsPasswordChange()` = `value`."],
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "`needsPasswordChange()` = `value`."
+          ],
           "example": "`e.setNeedsPasswordChange(false)` rồi `e.toLine()` kết thúc bằng `\" 0\"`.",
-          "cpp": "`void setNeedsPasswordChange(bool value) { m_needsPasswordChange = value; }`"
+          "cpp": "Gán thuộc tính cờ."
         }
       ],
       "impl": {
@@ -395,7 +504,10 @@
       "read": 6,
       "stage": 2,
       "readWhy": "Lớp con thứ hai của Account, thêm cờ «phải đổi mật khẩu».",
-      "pos": [1125, 2400]
+      "pos": [
+        1125,
+        2400
+      ]
     },
     {
       "id": "ProfileField",
@@ -436,7 +548,10 @@
       "read": 7,
       "stage": 2,
       "readWhy": "Đọc ngay trước UserProfile vì UserProfile dùng nó để lấy và đặt từng thông tin.",
-      "pos": [2400, 1950]
+      "pos": [
+        2400,
+        1950
+      ]
     },
     {
       "id": "UserProfile",
@@ -493,39 +608,61 @@
           "name": "UserProfile",
           "ctor": true,
           "vis": "+",
-          "params": ["fullName: string = \"\"", "address: string = \"\"", "phone: string = \"\"", "email: string = \"\""],
+          "params": [
+            "fullName: string = \"\"",
+            "address: string = \"\"",
+            "phone: string = \"\"",
+            "email: string = \"\""
+          ],
           "summary": "Tạo hồ sơ. Gọi không tham số thì được hồ sơ rỗng.",
           "role": "Menu thêm nhân viên tạo hồ sơ rỗng rồi điền từng thông tin bằng `set`; `fromLines` cũng cần một hồ sơ rỗng để ghi vào.",
-          "pre": ["Không có."],
-          "post": ["`get(ProfileField::FULL_NAME)` = `fullName`, tương tự với 3 thông tin còn lại."],
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "`get(ProfileField::FULL_NAME)` = `fullName`, tương tự với 3 thông tin còn lại."
+          ],
           "example": "`UserProfile p(\"Nguyen Van A\", \"12 Le Loi, Q1\", \"0912345678\", \"nva@gmail.com\");`",
-          "cpp": "Giá trị mặc định chỉ ghi ở file .h; thân hàm dùng danh sách khởi tạo `: m_fullName(fullName), m_address(address), m_phone(phone), m_email(email) {}`."
+          "cpp": "Gán 4 thuộc tính trong danh sách khởi tạo; giá trị mặc định chỉ ghi ở file .h."
         },
         {
           "name": "get",
           "vis": "+",
-          "params": ["field: ProfileField"],
+          "params": [
+            "field: ProfileField"
+          ],
           "returns": "string",
           "summary": "Lấy một thông tin theo tên.",
           "role": "Menu cập nhật hiện giá trị hiện tại của từng mục; bảng hiển thị và màn hình xem thông tin lấy từng cột.",
-          "pre": ["Không có."],
-          "post": ["Không đổi dữ liệu."],
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "Không đổi dữ liệu."
+          ],
           "complexity": "O(1)",
           "example": "Với hồ sơ ở ví dụ trên: `p.get(ProfileField::PHONE)` = `\"0912345678\"`.",
-          "cpp": "`switch (field) { case ProfileField::FULL_NAME: return m_fullName; case ProfileField::ADDRESS: return m_address; case ProfileField::PHONE: return m_phone; case ProfileField::EMAIL: return m_email; } return \"\";`"
+          "cpp": "Một `switch` trên `field`, mỗi nhánh trả một thuộc tính."
         },
         {
           "name": "set",
           "vis": "+",
-          "params": ["field: ProfileField", "value: string"],
+          "params": [
+            "field: ProfileField",
+            "value: string"
+          ],
           "returns": "void",
           "summary": "Đổi một thông tin theo tên.",
           "role": "Admin sửa đúng một thông tin trong menu cập nhật; menu thêm nhân viên điền lần lượt 4 thông tin.",
-          "pre": ["`value` đã được kiểm tra đúng quy tắc của thông tin đó và không chứa xuống dòng."],
-          "post": ["`get(field)` = `value`; 3 thông tin kia không đổi."],
+          "pre": [
+            "`value` đã được kiểm tra đúng quy tắc của thông tin đó và không chứa xuống dòng."
+          ],
+          "post": [
+            "`get(field)` = `value`; 3 thông tin kia không đổi."
+          ],
           "complexity": "O(1)",
           "example": "`p.set(ProfileField::PHONE, \"0987654321\")` rồi `p.get(ProfileField::PHONE)` = `\"0987654321\"`.",
-          "cpp": "`switch` giống `get`, mỗi nhánh gán `m_... = value; break;`."
+          "cpp": "Một `switch` giống `get`, mỗi nhánh gán một thuộc tính."
         },
         {
           "name": "toLines",
@@ -534,26 +671,38 @@
           "returns": "vector<string>",
           "summary": "4 dòng để ghi file: họ tên, địa chỉ, số điện thoại, email.",
           "role": "`ProfileStore.save` dùng để ghi file hồ sơ.",
-          "pre": ["Không có."],
-          "post": ["Đúng 4 phần tử, theo thứ tự của `ProfileField`."],
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "Đúng 4 phần tử, theo thứ tự của `ProfileField`."
+          ],
           "complexity": "O(1)",
           "example": "Hồ sơ ở ví dụ trên → `[\"Nguyen Van A\", \"12 Le Loi, Q1\", \"0912345678\", \"nva@gmail.com\"]`.",
-          "cpp": "`std::vector<std::string> lines; lines.push_back(m_fullName); lines.push_back(m_address); lines.push_back(m_phone); lines.push_back(m_email); return lines;`"
+          "cpp": "Thêm lần lượt 4 thuộc tính vào một vector bằng `push_back`."
         },
         {
           "name": "fromLines",
           "static": true,
           "vis": "+",
-          "params": ["lines: vector<string>", "out: UserProfile&"],
+          "params": [
+            "lines: vector<string>",
+            "out: UserProfile&"
+          ],
           "returns": "bool",
           "summary": "Đổi các dòng đọc từ file hồ sơ thành `UserProfile`; cần ít nhất 4 dòng.",
           "role": "`ProfileStore.load` dùng sau khi đọc file hồ sơ.",
           "detail": "Lấy 4 dòng đầu theo thứ tự họ tên, địa chỉ, số điện thoại, email; mỗi dòng được bỏ khoảng trắng đầu cuối. Từ dòng thứ 5 trở đi (nếu có) bị bỏ qua. Không kiểm tra định dạng: file do chương trình tự ghi nên đã đúng.",
-          "pre": ["Không có."],
-          "post": ["Ít hơn 4 dòng: trả false, `out` không đổi.", "Đủ 4 dòng: trả true, `toLines()` của `out` bằng 4 dòng đầu (đã trim)."],
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "Ít hơn 4 dòng: trả false, `out` không đổi.",
+            "Đủ 4 dòng: trả true, `toLines()` của `out` bằng 4 dòng đầu (đã trim)."
+          ],
           "complexity": "O(1)",
           "example": "`fromLines([\"Nguyen Van A\", \"12 Le Loi, Q1\", \"0912345678\", \"nva@gmail.com\"], p)` trả true. `fromLines([\"Nguyen Van A\", \"12 Le Loi, Q1\"], p)` trả false.",
-          "cpp": "`if ((int)lines.size() < 4) return false; out = UserProfile(StringUtil::trim(lines[0]), StringUtil::trim(lines[1]), StringUtil::trim(lines[2]), StringUtil::trim(lines[3])); return true;`"
+          "cpp": "Ít hơn 4 dòng thì trả false; ngược lại tạo hồ sơ từ 4 dòng đầu, mỗi dòng bỏ khoảng trắng đầu cuối."
         }
       ],
       "impl": {
@@ -565,7 +714,10 @@
       "read": 8,
       "stage": 2,
       "readWhy": "Hồ sơ 4 thông tin; khép lại phần dữ liệu trước khi sang phần lưu file.",
-      "pos": [1950, 1950]
+      "pos": [
+        1950,
+        1950
+      ]
     }
   ]
 }

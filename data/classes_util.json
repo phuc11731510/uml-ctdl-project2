@@ -16,78 +16,113 @@
           "name": "trim",
           "static": true,
           "vis": "+",
-          "params": ["s: string"],
+          "params": [
+            "s: string"
+          ],
           "returns": "string",
           "summary": "Bỏ khoảng trắng (dấu cách, tab, xuống dòng) ở đầu và cuối chuỗi.",
           "role": "Gọi ngay sau khi đọc một dòng từ bàn phím (`Console.readLine`) hoặc từ file, để `\" nva\"` và `\"nva\"` được coi là một.",
-          "pre": ["Không có."],
-          "post": ["Kết quả không bắt đầu và không kết thúc bằng khoảng trắng; phần giữa giữ nguyên."],
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "Kết quả không bắt đầu và không kết thúc bằng khoảng trắng; phần giữa giữ nguyên."
+          ],
           "complexity": "O(n)",
           "example": "`trim(\"  nva \")` trả `\"nva\"`. `trim(\"Nguyen  Van A \")` trả `\"Nguyen  Van A\"` (hai dấu cách ở giữa giữ nguyên). `trim(\"   \")` trả chuỗi rỗng.",
-          "cpp": "Dùng hai chỉ số: tăng `begin` khi `s[begin]` là khoảng trắng, giảm `end` tương tự, rồi trả `s.substr(begin, end - begin)`. Khoảng trắng: `c == ' ' || c == '\\t' || c == '\\r' || c == '\\n'`."
+          "cpp": "Dùng hai chỉ số: tiến chỉ số đầu qua các khoảng trắng, lùi chỉ số cuối tương tự, rồi cắt bằng `substr`."
         },
         {
           "name": "toLower",
           "static": true,
           "vis": "+",
-          "params": ["s: string"],
+          "params": [
+            "s: string"
+          ],
           "returns": "string",
           "summary": "Đổi các chữ A–Z thành a–z; mọi ký tự khác giữ nguyên.",
           "role": "Dùng ở mọi chỗ cần so sánh không phân biệt hoa thường, và để tên file hồ sơ luôn viết thường.",
-          "pre": ["Không có."],
-          "post": ["Kết quả dài bằng `s`; không còn chữ A–Z."],
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "Kết quả dài bằng `s`; không còn chữ A–Z."
+          ],
           "complexity": "O(n)",
           "example": "`toLower(\"NVa_01\")` trả `\"nva_01\"`.",
-          "cpp": "Vòng `for` qua từng ký tự: `if (c >= 'A' && c <= 'Z') c = c - 'A' + 'a';`. Cách này không đụng tới các byte của chữ có dấu, nên vẫn đúng khi sau này chuyển sang tiếng Việt có dấu."
+          "cpp": "Duyệt từng ký tự và chỉ đổi các chữ A–Z. Cách này không đụng tới byte của chữ có dấu, nên vẫn đúng khi chuyển sang tiếng Việt có dấu."
         },
         {
           "name": "equalsIgnoreCase",
           "static": true,
           "vis": "+",
-          "params": ["a: string", "b: string"],
+          "params": [
+            "a: string",
+            "b: string"
+          ],
           "returns": "bool",
           "summary": "So sánh hai chuỗi, coi chữ hoa và chữ thường là như nhau.",
           "role": "So username: đăng nhập bằng `NVA` hay `nva` đều được, và không cho tạo `NVA` khi đã có `nva` (Windows coi `NVA.txt` và `nva.txt` là một file).",
-          "pre": ["Không có."],
-          "post": ["Bằng `toLower(a) == toLower(b)`."],
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "Bằng `toLower(a) == toLower(b)`."
+          ],
           "complexity": "O(n)",
           "example": "`equalsIgnoreCase(\"NVA\", \"nva\")` trả true; `equalsIgnoreCase(\"nva\", \"nva1\")` trả false.",
-          "cpp": "`return toLower(a) == toLower(b);`"
+          "cpp": "Đổi cả hai chuỗi về chữ thường rồi so sánh."
         },
         {
           "name": "isAllDigits",
           "static": true,
           "vis": "+",
-          "params": ["s: string"],
+          "params": [
+            "s: string"
+          ],
           "returns": "bool",
           "summary": "Chuỗi không rỗng và mọi ký tự đều là chữ số 0–9.",
           "role": "Kiểm số điện thoại (`Validator.checkPhone`) và là bước đầu của `tryParseInt`.",
-          "pre": ["Không có."],
-          "post": ["Chuỗi rỗng thì trả false."],
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "Chuỗi rỗng thì trả false."
+          ],
           "complexity": "O(n)",
           "example": "`isAllDigits(\"0912345678\")` trả true; `isAllDigits(\"0912 345 678\")` trả false; `isAllDigits(\"\")` trả false.",
-          "cpp": "`if (s.empty()) return false;` rồi vòng `for`: `if (s[i] < '0' || s[i] > '9') return false;`, hết vòng thì `return true;`."
+          "cpp": "Chuỗi rỗng thì false; còn lại kiểm từng ký tự có nằm trong khoảng `'0'`–`'9'` không."
         },
         {
           "name": "tryParseInt",
           "static": true,
           "vis": "+",
-          "params": ["s: string", "value: int&"],
+          "params": [
+            "s: string",
+            "value: int&"
+          ],
           "returns": "bool",
           "summary": "Đổi chuỗi toàn chữ số thành số nguyên; trả false nếu chuỗi không phải số.",
           "role": "Đọc lựa chọn menu mà chương trình không bao giờ bị lỗi, kể cả khi người dùng gõ chữ hay để trống.",
           "detail": "Người dùng gõ `1abc`, `-2`, `abc` hay để trống đều bị coi là lựa chọn sai.",
-          "pre": ["`s` đã được trim."],
-          "post": ["Trả true khi `isAllDigits(s)` đúng và `s` dài tối đa 9 chữ số (để không tràn `int`); khi đó `value` là số tương ứng.", "Trả false thì `value` giữ nguyên."],
+          "pre": [
+            "`s` đã được trim."
+          ],
+          "post": [
+            "Trả true khi `isAllDigits(s)` đúng và `s` dài tối đa 9 chữ số (để không tràn `int`); khi đó `value` là số tương ứng.",
+            "Trả false thì `value` giữ nguyên."
+          ],
           "complexity": "O(n)",
           "example": "`tryParseInt(\"3\", v)` trả true và v = 3. `tryParseInt(\"1abc\", v)`, `tryParseInt(\"-2\", v)`, `tryParseInt(\"\", v)` đều trả false.",
-          "cpp": "Kiểm bằng `isAllDigits(s)` và `s.size() <= 9`, rồi `int result = 0; for (...) result = result * 10 + (s[i] - '0'); value = result; return true;`. Không dùng `std::stoi`: hàm đó ném ngoại lệ khi gặp chuỗi sai, và với `\"1abc\"` nó đọc được 1 mà không báo lỗi."
+          "cpp": "Kiểm bằng `isAllDigits` và độ dài tối đa 9, rồi cộng dồn từng chữ số (nhân 10 rồi cộng). Không dùng `std::stoi` vì nó ném ngoại lệ khi gặp chuỗi sai và chấp nhận `\"1abc\"`."
         },
         {
           "name": "textLength",
           "static": true,
           "vis": "+",
-          "params": ["s: string"],
+          "params": [
+            "s: string"
+          ],
           "returns": "int",
           "summary": "Số ký tự người dùng nhìn thấy trong chuỗi.",
           "role": "Đo độ dài để kiểm giới hạn (họ tên tối đa 50 ký tự, địa chỉ tối đa 100...) và để căn cột nếu muốn.",
@@ -95,25 +130,36 @@
             "Hiện tại bằng `s.size()` vì chương trình chỉ dùng chữ không dấu, mỗi ký tự là 1 byte.",
             "Đây là chỗ duy nhất đo độ dài. Khi chuyển sang tiếng Việt có dấu (lưu bằng UTF-8), chữ «ễ» chiếm 3 byte nên `size()` đếm sai; khi đó chỉ sửa thân hàm này."
           ],
-          "pre": ["Không có."],
-          "post": ["Hiện tại bằng `s.size()`."],
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "Hiện tại bằng `s.size()`."
+          ],
           "complexity": "O(1) (bản có dấu sau này là O(n))",
           "example": "`textLength(\"Nguyen Van A\")` trả 12.",
-          "cpp": "Hiện tại: `return (int)s.size();`. Bản có dấu sau này: đếm các byte không phải byte nối, tức các byte có `((unsigned char)s[i] & 0xC0) != 0x80`."
+          "cpp": "Hiện tại trả `s.size()`. Khi chuyển sang có dấu: đếm các byte không phải byte nối của UTF-8 (byte nối có dạng `10xxxxxx`)."
         },
         {
           "name": "fitWidth",
           "static": true,
           "vis": "+",
-          "params": ["s: string", "width: int"],
+          "params": [
+            "s: string",
+            "width: int"
+          ],
           "returns": "string",
           "summary": "(Tùy chọn) Đưa chuỗi về đúng `width` ký tự: dài thì cắt và thêm `...`, ngắn thì thêm dấu cách.",
           "role": "Chỉ cần khi muốn bảng «Hiển thị thông tin toàn bộ employee» thẳng cột. Bản đơn giản của bảng (các cột cách nhau bằng ` | `) không dùng hàm này.",
-          "pre": ["`width` ≥ 4."],
-          "post": ["`textLength(kết quả)` bằng `width`."],
+          "pre": [
+            "`width` ≥ 4."
+          ],
+          "post": [
+            "`textLength(kết quả)` bằng `width`."
+          ],
           "complexity": "O(width)",
           "example": "`fitWidth(\"34 Tran Hung Dao, Q1\", 12)` trả `\"34 Tran H...\"`. `fitWidth(\"nva\", 6)` trả `\"nva   \"` (thêm 3 dấu cách).",
-          "cpp": "`int len = textLength(s); if (len > width) return s.substr(0, width - 3) + \"...\"; return s + std::string(width - len, ' ');`"
+          "cpp": "Dài hơn `width` thì cắt bằng `substr` và nối `...`; ngắn hơn thì nối thêm dấu cách, tạo bằng `std::string(số lượng, ' ')`."
         }
       ],
       "impl": {
@@ -125,7 +171,10 @@
       "read": 1,
       "stage": 1,
       "readWhy": "Đọc đầu tiên vì gần như lớp nào cũng gọi tới. Các hàm đều ngắn và không phụ thuộc lớp nào khác.",
-      "pos": [0, 950]
+      "pos": [
+        0,
+        950
+      ]
     },
     {
       "id": "FileUtil",
@@ -143,22 +192,33 @@
           "name": "readLines",
           "static": true,
           "vis": "+",
-          "params": ["path: string", "lines: vector<string>&"],
+          "params": [
+            "path: string",
+            "lines: vector<string>&"
+          ],
           "returns": "bool",
           "summary": "Đọc mọi dòng của file vào `lines`; trả false nếu không mở được file.",
           "role": "Cách duy nhất chương trình đọc file. Danh sách tài khoản đọc cả file một lần lúc khởi động; file hồ sơ đọc mỗi khi cần hiển thị.",
           "detail": "Xóa nội dung cũ của `lines` trước khi đọc. Mỗi dòng của file thành một phần tử, không kèm ký tự xuống dòng. Nếu cuối dòng còn ký tự `\\r` (file soạn ở nơi khác) thì bỏ đi. Dòng trống vẫn được giữ; nơi gọi tự quyết định bỏ qua.",
-          "pre": ["Không có."],
-          "post": ["Trả false (thường do file chưa tồn tại): `lines` rỗng.", "Trả true: `lines[i]` là dòng thứ i + 1 của file."],
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "Trả false (thường do file chưa tồn tại): `lines` rỗng.",
+            "Trả true: `lines[i]` là dòng thứ i + 1 của file."
+          ],
           "complexity": "O(kích thước file)",
           "example": "File `data/users/nva.txt` có 4 dòng thì `readLines(\"data/users/nva.txt\", lines)` trả true và `lines` = `[\"Nguyen Van A\", \"12 Le Loi, Q1\", \"0912345678\", \"nva@gmail.com\"]`. File không tồn tại thì trả false.",
-          "cpp": "`lines.clear(); std::ifstream in(path.c_str()); if (!in.is_open()) return false; std::string line; while (std::getline(in, line)) { if (!line.empty() && line[line.size() - 1] == '\\r') line.erase(line.size() - 1); lines.push_back(line); } return true;` (`#include <fstream>`)."
+          "cpp": "Mở bằng `std::ifstream`; không mở được thì trả false. Đọc từng dòng bằng `std::getline`, bỏ ký tự `\\r` ở cuối nếu có."
         },
         {
           "name": "writeLines",
           "static": true,
           "vis": "+",
-          "params": ["path: string", "lines: vector<string>"],
+          "params": [
+            "path: string",
+            "lines: vector<string>"
+          ],
           "returns": "bool",
           "summary": "Ghi đè toàn bộ file bằng các dòng trong `lines`, theo cách an toàn.",
           "role": "Cách duy nhất chương trình ghi file. Mọi lần «ghi cập nhật file» trong đề (thêm, xóa, sửa, đổi mật khẩu) đều đi qua hàm này.",
@@ -167,55 +227,79 @@
             "Vì sao không ghi thẳng vào file cũ: nếu chương trình bị tắt giữa lúc đang ghi, file cũ chỉ còn một nửa và mất dữ liệu. Ghi ra file tạm trước thì lúc đó file cũ vẫn còn nguyên.",
             "File chưa tồn tại thì hàm tạo mới."
           ],
-          "pre": ["Thư mục chứa file đã tồn tại (xem `ensureFolder`)."],
-          "post": ["Trả true: nội dung file đúng bằng `lines`.", "Trả false: file cũ không đổi."],
+          "pre": [
+            "Thư mục chứa file đã tồn tại (xem `ensureFolder`)."
+          ],
+          "post": [
+            "Trả true: nội dung file đúng bằng `lines`.",
+            "Trả false: file cũ không đổi."
+          ],
           "complexity": "O(tổng độ dài các dòng)",
           "perf": "Employees.txt vài trăm dòng (mỗi dòng khoảng 30 byte) ghi mất vài mili giây, nên ghi lại cả file sau mỗi thay đổi là chấp nhận được.",
           "example": "`writeLines(\"data/Employees.txt\", lines)` với `lines` = `[\"nva 111111 1\", \"lthb abc12345 0\"]` cho file 2 dòng:\nnva 111111 1\nlthb abc12345 0",
-          "cpp": "`std::string tmp = path + \".tmp\"; std::ofstream out(tmp.c_str()); if (!out.is_open()) return false; for (int i = 0; i < (int)lines.size(); i++) out << lines[i] << '\\n'; out.close(); if (out.fail()) return false; return MoveFileExA(tmp.c_str(), path.c_str(), MOVEFILE_REPLACE_EXISTING) != 0;` (`#include <windows.h>`)."
+          "cpp": "Ghi mọi dòng ra file tạm bằng `std::ofstream`, đóng và kiểm lỗi ghi, rồi thay file cũ bằng `MoveFileExA` với cờ `MOVEFILE_REPLACE_EXISTING` (`<windows.h>`)."
         },
         {
           "name": "fileExists",
           "static": true,
           "vis": "+",
-          "params": ["path: string"],
+          "params": [
+            "path: string"
+          ],
           "returns": "bool",
           "summary": "Kiểm tra file có tồn tại (mở được để đọc) không.",
           "role": "Dùng khi cần biết một nhân viên có file hồ sơ hay không mà không cần đọc nội dung.",
-          "pre": ["Không có."],
-          "post": ["Không thay đổi gì trên đĩa."],
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "Không thay đổi gì trên đĩa."
+          ],
           "complexity": "O(1)",
           "example": "Sau khi thêm nhân viên `nva`: `fileExists(\"data/users/nva.txt\")` trả true.",
-          "cpp": "`std::ifstream f(path.c_str()); return f.is_open();`"
+          "cpp": "Thử mở bằng `std::ifstream` và hỏi `is_open()`."
         },
         {
           "name": "deleteFile",
           "static": true,
           "vis": "+",
-          "params": ["path: string"],
+          "params": [
+            "path: string"
+          ],
           "returns": "bool",
           "summary": "Xóa một file; trả true nếu xóa được.",
           "role": "Xóa file hồ sơ khi admin xóa nhân viên (đề: «xóa file [username].txt»).",
-          "pre": ["Không có."],
-          "post": ["File không tồn tại thì trả false."],
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "File không tồn tại thì trả false."
+          ],
           "complexity": "O(1)",
           "example": "`deleteFile(\"data/users/nva.txt\")` trả true; sau đó `fileExists(\"data/users/nva.txt\")` trả false.",
-          "cpp": "`return std::remove(path.c_str()) == 0;` (`#include <cstdio>`)."
+          "cpp": "`std::remove` trong `<cstdio>`; thành công khi trả 0."
         },
         {
           "name": "ensureFolder",
           "static": true,
           "vis": "+",
-          "params": ["path: string"],
+          "params": [
+            "path: string"
+          ],
           "returns": "bool",
           "summary": "Tạo thư mục nếu chưa có; trả true nếu sau đó thư mục tồn tại.",
           "role": "Lúc khởi động, tạo `data` và `data/users` để các lần ghi file sau không lỗi vì thiếu thư mục.",
           "detail": "Mỗi lần chỉ tạo được một cấp: phải tạo `data` trước rồi mới tạo `data/users`. Thư mục đã có sẵn thì coi là thành công.",
-          "pre": ["`path` không có dấu `/` ở cuối.", "Thư mục cha đã tồn tại."],
-          "post": ["Trả true: thư mục tồn tại."],
+          "pre": [
+            "`path` không có dấu `/` ở cuối.",
+            "Thư mục cha đã tồn tại."
+          ],
+          "post": [
+            "Trả true: thư mục tồn tại."
+          ],
           "complexity": "O(1)",
           "example": "Lần chạy đầu: `ensureFolder(\"data\")` tạo thư mục và trả true. Lần chạy sau: thư mục đã có, vẫn trả true.",
-          "cpp": "`if (_mkdir(path.c_str()) == 0) return true; return errno == EEXIST;` (`#include <direct.h>`, `#include <cerrno>`)."
+          "cpp": "`_mkdir` trong `<direct.h>`; coi là thành công khi tạo được hoặc khi lỗi là «đã tồn tại» (`errno == EEXIST`)."
         }
       ],
       "impl": {
@@ -228,7 +312,10 @@
       "read": 2,
       "stage": 1,
       "readWhy": "Lớp duy nhất mở file; hai lớp lưu trữ ở chặng 3 gọi tới.",
-      "pos": [0, 1450]
+      "pos": [
+        0,
+        1450
+      ]
     }
   ]
 }

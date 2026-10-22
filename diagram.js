@@ -844,7 +844,7 @@
       el('div', { style: { marginTop: '8px' } },
         el('div', { class: 'row' }, el('span', { class: 'rnum', style: { background: 'var(--accent)' } }, '5'), el('span', null, 'số thứ tự đọc')),
         el('div', { class: 'row' }, el('span', { class: 'tref', style: { cursor: 'default' } }, 'string'), el('span', null, 'tên kiểu: rê chuột xem định nghĩa (máy tính), bấm hoặc chạm để nhảy tới')),
-        el('div', { class: 'row' }, el('span', { class: 'status-dot', style: { color: '#0d9488', borderColor: '#0d9488' } }, 'Hỗ trợ'), el('span', null, 'hạ tầng dùng chung (chuỗi, file, màu, khung menu, mã lỗi)')),
+        el('div', { class: 'row' }, el('span', { class: 'status-dot', style: { color: '#0d9488', borderColor: '#0d9488' } }, 'Hỗ trợ'), el('span', null, 'hạ tầng dùng chung (chuỗi, file, khung menu)')),
         el('div', { class: 'row' }, el('span', { class: 'tparam' }, 'T'), el('span', null, 'tham số của lớp template')),
         el('div', { class: 'row', style: { color: 'var(--muted)', fontSize: '12px' } }, 'Thẻ không có nhãn là phần làm trực tiếp chức năng của đề. Màu mép trái thẻ là gói.')));
 

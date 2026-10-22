@@ -9,7 +9,7 @@
       "stage": 0,
       "readWhy": "Đọc trước nhất: mọi chữ ký trong sơ đồ dùng các tên kiểu này. Chúng là kiểu có sẵn của C++ nên không có thẻ lớp riêng.",
       "summary": "Bảng tra các kiểu có sẵn của C++ dùng trong chữ ký: string, vector<T>, int, bool, char, void.",
-      "role": "Không phải một lớp mà là bảng tra. Sơ đồ viết `string` và `vector<T>` cho gọn; trong mã C++ là `std::string` và `std::vector<T>`. Rê chuột lên một tên kiểu trong chữ ký bất kỳ để xem định nghĩa, hoặc bấm để mở dòng tương ứng ở đây.",
+      "role": "Không phải một lớp mà là bảng tra. Sơ đồ viết `string` và `vector<T>` cho gọn; trong mã C++ là `std::string` và `std::vector<T>`. Rê chuột lên một tên kiểu trong chữ ký để xem định nghĩa, hoặc bấm để mở dòng tương ứng ở đây.",
       "spec": "Không trực tiếp. Nhóm được phép dùng thư viện chuẩn của C++ (`vector`, `string`, `fstream`...).",
       "uses": [],
       "invariants": [],
@@ -19,20 +19,20 @@
           "token": "string",
           "type": "chuỗi ký tự",
           "vis": "",
-          "summary": "Chuỗi ký tự, độ dài thay đổi được. Username, mật khẩu, họ tên, đường dẫn file đều là string.",
-          "detail": "Trong file `.h`, viết đầy đủ `std::string` và không đặt `using namespace std;` (quy ước thường gặp của C++ Coding Standard).",
-          "example": "`std::string name = \"nva\";` thì `name.size()` bằng 3, `name[0]` là `'n'`, còn `name + \".txt\"` là `\"nva.txt\"`.",
-          "cpp": "`std::string` (`#include <string>`)."
+          "summary": "Chuỗi ký tự, độ dài thay đổi được. Username, mật khẩu, họ tên, đường dẫn file và mọi câu thông báo lỗi đều là string.",
+          "detail": "Trong bản gọn, nhiều hàm trả một string làm kết quả kiểm tra: chuỗi rỗng nghĩa là hợp lệ, chuỗi khác rỗng là câu thông báo lỗi để in ra.",
+          "example": "`std::string name = \"nva\";` thì `name.size()` bằng 3; `name.empty()` là false; `name + \".txt\"` là `\"nva.txt\"`.",
+          "cpp": "`std::string` (`#include <string>`). Trong file .h viết đầy đủ `std::string`, không đặt `using namespace std;`."
         },
         {
           "name": "vector<T>",
           "token": "vector",
           "type": "mảng động các phần tử kiểu T",
           "vis": "",
-          "summary": "Mảng tự nới rộng khi thêm phần tử. Là nơi chứa tài khoản bên trong `AccountList<T>`, và dùng để trả danh sách dòng, danh sách cảnh báo.",
-          "detail": "Chỉ cần vài thao tác: `push_back(x)` thêm vào cuối; `size()` cho số phần tử; `v[i]` là phần tử thứ i (đếm từ 0); `v.erase(v.begin() + i)` xóa phần tử thứ i; `clear()` xóa hết.",
-          "example": "`std::vector<std::string> lines; lines.push_back(\"nva 111111 1\");` thì `lines.size()` bằng 1 và `lines[0]` là `\"nva 111111 1\"`.",
-          "cpp": "`std::vector<T>` (`#include <vector>`). Vòng lặp: `for (int i = 0; i < (int)v.size(); i++)`."
+          "summary": "Mảng tự nới rộng khi thêm phần tử. Là nơi chứa tài khoản bên trong `AccountList<T>` và dùng để trả danh sách dòng của file.",
+          "detail": "Chỉ cần: `push_back(x)` thêm vào cuối; `size()`; `v[i]` (đếm từ 0); `v.erase(v.begin() + i)` xóa phần tử thứ i; `clear()`.",
+          "example": "`std::vector<std::string> lines; lines.push_back(\"nva 111111 1\");` thì `lines.size()` bằng 1.",
+          "cpp": "`std::vector<T>` (`#include <vector>`)."
         },
         {
           "name": "int",
@@ -40,7 +40,7 @@
           "type": "số nguyên",
           "vis": "",
           "summary": "Số nguyên có dấu.",
-          "example": "Lựa chọn menu `3`; chỉ số trong danh sách `0`; `-1` nghĩa là «không tìm thấy».",
+          "example": "Lựa chọn menu `3`; chỉ số `0`; `-1` nghĩa là «không tìm thấy».",
           "cpp": "`int`"
         },
         {
@@ -48,8 +48,8 @@
           "token": "bool",
           "type": "đúng hoặc sai",
           "vis": "",
-          "summary": "Giá trị logic `true` hoặc `false`. Nhiều hàm trả bool để báo thành công hay thất bại.",
-          "example": "`FileUtil.writeLines` trả `false` khi không ghi được file.",
+          "summary": "Giá trị logic `true` hoặc `false`.",
+          "example": "`Util.writeLines` trả `false` khi không ghi được file.",
           "cpp": "`bool`"
         },
         {
@@ -58,7 +58,7 @@
           "type": "một ký tự",
           "vis": "",
           "summary": "Một ký tự (1 byte).",
-          "example": "`'a'`, `'*'`, `'0'`. `Console.readPassword` đọc từng phím rồi ghép các `char` thành mật khẩu.",
+          "example": "`Console.readPassword` đọc từng phím rồi ghép các `char` thành mật khẩu.",
           "cpp": "`char`"
         },
         {
@@ -76,9 +76,9 @@
         "cpp": "Không có lớp nào; đây là kiểu của C++ và thư viện chuẩn."
       },
       "notes": [
-        "Dấu `&` sau kiểu trong chữ ký (ví dụ `out: Admin&`) là tham chiếu: hàm ghi kết quả thẳng vào biến của nơi gọi. Dùng khi hàm cần trả hai thứ, ví dụ trả `bool` báo thành công và ghi đối tượng đọc được vào `out`.",
-        "Tham số kiểu string chỉ để đọc thì nên truyền `const std::string&` để khỏi sao chép chuỗi. Sơ đồ viết gọn là `string`.",
-        "Trong sơ đồ, `Lớp.hàm` nghĩa là hàm `hàm` của lớp `Lớp`. Trong C++ viết `Lop::ham(...)` với hàm static, hoặc `doiTuong.ham(...)` với hàm thường."
+        "Dấu `&` sau kiểu trong chữ ký (ví dụ `out: Admin&`) là tham chiếu: hàm ghi kết quả thẳng vào biến của nơi gọi.",
+        "Trong sơ đồ, `Lớp.hàm` nghĩa là hàm `hàm` của lớp `Lớp`. Trong C++ viết `Lop::ham(...)` với hàm static, hoặc `doiTuong.ham(...)` với hàm thường.",
+        "Ngân sách dòng của cả bản gọn (đã tính dòng trống) có ở README và ở mục «Cài đặt C++» của từng lớp; tổng khoảng 865 dòng."
       ],
       "pos": [0, 0]
     }

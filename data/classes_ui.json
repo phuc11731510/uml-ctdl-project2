@@ -6,7 +6,7 @@
       "package": "ui",
       "status": "core",
       "summary": "Lớp duy nhất đọc bàn phím và in ra màn hình: in có màu, khung tiêu đề, đọc dòng, đọc mật khẩu che `*`, đọc lựa chọn menu, hỏi y/n.",
-      "role": "Gom mọi thứ phụ thuộc console của Windows (`SetConsoleTextAttribute`, `_getch`, `cls`). Màu chữ là 5 hằng số ngay trong lớp.",
+      "role": "Gom mọi thứ phụ thuộc console của Windows (`SetConsoleTextAttribute`, `_getch`, xóa màn hình). Màu chữ là 5 hằng số ngay trong lớp.",
       "spec": "«Mã hóa pass thành dấu * khi đăng nhập»; «Dùng màu để thiết kế giao diện dễ nhìn»; «thông báo thông tin lỗi đến user».",
       "uses": [
         "`Util.trim(s)`: bỏ khoảng trắng đầu cuối.",
@@ -266,7 +266,7 @@
           "vis": "+",
           "params": [],
           "returns": "void",
-          "summary": "Xóa sạch nội dung đang hiện trên console (lệnh `cls`), con trỏ về góc trên bên trái.",
+          "summary": "Ghi đè mọi ô của cửa sổ console bằng dấu cách rồi đưa con trỏ về góc trên bên trái, để màn hình trống mà không bị chớp như khi dùng `system(\"cls\")`.",
           "role": "Đầu mỗi lần hiện menu hoặc màn hình đăng nhập.",
           "pre": [
             "Không có."
@@ -275,11 +275,12 @@
             "Màn hình trống."
           ],
           "example": "Mỗi vòng của `Menu.run` bắt đầu bằng `clearScreen()`.",
-          "cpp": "`system(\"cls\")` (`<cstdlib>`)."
+          "cpp": "Dùng các hàm của `<windows.h>`: lấy kích thước vùng chữ bằng `GetConsoleScreenBufferInfo`, ghi dấu cách vào mọi ô bằng `FillConsoleOutputCharacterA` (và trả màu thường cho mọi ô bằng `FillConsoleOutputAttribute`), rồi `SetConsoleCursorPosition` về `{0, 0}`. Gọi `std::cout.flush()` trước, để chữ còn nằm trong bộ đệm không hiện ra sau khi đã xóa.",
+          "detail": "Không dùng `system(\"cls\")`: lệnh đó mở cả một tiến trình `cmd.exe` mới chỉ để xóa màn hình, chậm vài chục mili giây nên màn hình chớp nhẹ mỗi lần menu hiện lại. Gọi thẳng hàm của Windows thì xóa gần như tức thì, không mở tiến trình nào."
         }
       ],
       "impl": {
-        "cpp": "**Ước tính khoảng 95 dòng**: `Console.h` khoảng 20, `Console.cpp` khoảng 75. Chỉ include `<windows.h>` và `<conio.h>` trong file .cpp."
+        "cpp": "**Ước tính khoảng 105 dòng**: `Console.h` khoảng 20, `Console.cpp` khoảng 85. Chỉ include `<windows.h>` và `<conio.h>` trong file .cpp."
       },
       "read": 11,
       "stage": 5,

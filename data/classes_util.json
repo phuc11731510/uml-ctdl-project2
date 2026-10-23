@@ -20,7 +20,7 @@
             "s: string"
           ],
           "returns": "string",
-          "summary": "Bỏ khoảng trắng (dấu cách, tab, `\\r`, `\\n`) ở đầu và cuối chuỗi.",
+          "summary": "Trả bản sao của `s` đã bỏ mọi khoảng trắng (dấu cách, tab, `\\r`, `\\n`) ở đầu và cuối; khoảng trắng ở giữa giữ nguyên. Chuỗi toàn khoảng trắng thành chuỗi rỗng.",
           "role": "Gọi ngay sau khi đọc một dòng từ bàn phím (`Console.readLine`) hoặc từ file, để `\" nva\"` và `\"nva\"` được coi là một.",
           "pre": [
             "Không có."
@@ -40,7 +40,7 @@
             "s: string"
           ],
           "returns": "string",
-          "summary": "Đổi các chữ A–Z thành a–z; mọi ký tự khác giữ nguyên.",
+          "summary": "Trả bản sao của `s` với mỗi chữ A–Z đổi thành a–z; số, `_` và các ký tự khác giữ nguyên.",
           "role": "So sánh không phân biệt hoa thường, và đặt tên file hồ sơ luôn viết thường.",
           "pre": [
             "Không có."
@@ -61,7 +61,7 @@
             "b: string"
           ],
           "returns": "bool",
-          "summary": "So sánh hai chuỗi, coi chữ hoa và chữ thường là như nhau.",
+          "summary": "Đổi cả hai chuỗi về chữ thường rồi so: trả true khi chúng giống nhau từng ký tự (kể cả độ dài).",
           "role": "So username: đăng nhập bằng `NVA` hay `nva` đều được, và không cho tạo `NVA` khi đã có `nva`.",
           "pre": [
             "Không có."
@@ -81,7 +81,7 @@
             "s: string"
           ],
           "returns": "bool",
-          "summary": "Chuỗi không rỗng và mọi ký tự là chữ số 0–9.",
+          "summary": "Trả true khi `s` không rỗng và mọi ký tự đều là chữ số 0–9; có chữ cái, dấu cách hay dấu `-` là false.",
           "role": "Kiểm số điện thoại (`Validator.checkPhone`) và kiểm lựa chọn menu trước khi đổi sang số (`Console.readChoice`).",
           "pre": [
             "Không có."
@@ -102,7 +102,7 @@
             "lines: vector<string>&"
           ],
           "returns": "bool",
-          "summary": "Đọc mọi dòng của file vào `lines`; trả false nếu không mở được file.",
+          "summary": "Mở file `path`, đọc từng dòng (đã bỏ khoảng trắng đầu cuối) vào `lines`; trả false nếu không mở được file.",
           "role": "Cách duy nhất chương trình đọc file: danh sách tài khoản lúc khởi động, file hồ sơ mỗi khi cần hiển thị hoặc sửa.",
           "detail": "Xóa nội dung cũ của `lines` trước khi đọc. Mỗi dòng thành một phần tử, đã qua `trim`. Dòng trống vẫn được giữ; nơi gọi tự bỏ qua.",
           "pre": [
@@ -125,7 +125,7 @@
             "lines: vector<string>"
           ],
           "returns": "bool",
-          "summary": "Ghi đè toàn bộ file bằng các dòng trong `lines` (tạo mới nếu chưa có).",
+          "summary": "Mở file `path` để ghi đè (chưa có thì tạo mới), ghi mỗi phần tử của `lines` thành một dòng; trả false nếu không mở được file.",
           "role": "Cách duy nhất chương trình ghi file. Mọi lần «ghi cập nhật file» trong đề đều đi qua hàm này.",
           "detail": "Ghi thẳng vào file, không qua file tạm. Nếu chương trình bị tắt đúng lúc đang ghi thì file có thể chỉ còn một nửa; với bài tập này rủi ro đó chấp nhận được.",
           "pre": [
@@ -147,7 +147,7 @@
             "path: string"
           ],
           "returns": "bool",
-          "summary": "Xóa một file; trả true nếu xóa được.",
+          "summary": "Xóa file ở đường dẫn `path` khỏi ổ đĩa; trả true nếu đã xóa, false nếu file không có hoặc không xóa được.",
           "role": "Xóa file hồ sơ khi admin xóa nhân viên (đề: «xóa file [username].txt»).",
           "pre": [
             "Không có."
@@ -167,7 +167,7 @@
             "path: string"
           ],
           "returns": "bool",
-          "summary": "Tạo thư mục nếu chưa có; trả true nếu sau đó thư mục tồn tại.",
+          "summary": "Tạo thư mục `path` cùng các thư mục cha còn thiếu, nếu chưa có; trả true nếu sau đó thư mục tồn tại.",
           "role": "Lúc khởi động, tạo `data/users` (và `data`) để các lần ghi sau không lỗi vì thiếu thư mục.",
           "detail": "Tạo được nhiều cấp cùng lúc: `ensureFolder(\"data/users\")` tạo luôn cả `data` nếu chưa có.",
           "pre": [

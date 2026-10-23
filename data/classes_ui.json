@@ -22,7 +22,7 @@
           "vis": "+",
           "static": true,
           "readonly": true,
-          "summary": "Xám nhạt: chữ thường.",
+          "summary": "Mã màu 7 (xám nhạt): màu chữ mặc định, dùng cho nội dung thường.",
           "role": "Màu mặc định; mọi hàm in trả về màu này.",
           "example": "`printLine(\"1. Them Employee\")` dùng màu này."
         },
@@ -32,7 +32,7 @@
           "vis": "+",
           "static": true,
           "readonly": true,
-          "summary": "Vàng: khung sao, tiêu đề, cảnh báo.",
+          "summary": "Mã màu 14 (vàng): dùng cho khung sao, tiêu đề và cảnh báo.",
           "role": "Giống ảnh mẫu trong đề (sao vàng).",
           "example": "`printTitle(\"DANG NHAP\")`."
         },
@@ -42,7 +42,7 @@
           "vis": "+",
           "static": true,
           "readonly": true,
-          "summary": "Xanh lá: nhãn ô nhập.",
+          "summary": "Mã màu 10 (xanh lá): dùng cho lời nhắc trước ô nhập.",
           "role": "Giống ảnh mẫu trong đề (chữ `User:` xanh lá).",
           "example": "`User: `, `Pass: `, `Chon: `."
         },
@@ -52,7 +52,7 @@
           "vis": "+",
           "static": true,
           "readonly": true,
-          "summary": "Xanh ngọc: báo thành công.",
+          "summary": "Mã màu 11 (xanh ngọc): dùng cho câu báo thành công.",
           "role": "`printSuccess` dùng.",
           "example": "«Da them nhan vien nva»."
         },
@@ -62,7 +62,7 @@
           "vis": "+",
           "static": true,
           "readonly": true,
-          "summary": "Đỏ: báo lỗi.",
+          "summary": "Mã màu 12 (đỏ): dùng cho câu báo lỗi.",
           "role": "`printError` dùng.",
           "example": "«Username da ton tai»."
         }
@@ -76,7 +76,7 @@
             "color: int"
           ],
           "returns": "void",
-          "summary": "Đổi màu chữ cho những gì in ra sau đó.",
+          "summary": "Đặt màu chữ của console thành `color`; mọi thứ in ra sau đó mang màu này cho tới lần đổi tiếp.",
           "role": "Các hàm in bên dưới dùng.",
           "pre": [
             "`color` là một trong 5 hằng màu."
@@ -96,7 +96,7 @@
             "color: int = COLOR_NORMAL"
           ],
           "returns": "void",
-          "summary": "In một dòng với màu cho trước, rồi trả về màu thường.",
+          "summary": "Đổi sang màu `color`, in `text` kèm xuống dòng, rồi đổi lại màu thường.",
           "role": "Cách in chung cho mọi dòng chữ của chương trình.",
           "pre": [
             "Không có."
@@ -115,7 +115,7 @@
             "title: string"
           ],
           "returns": "void",
-          "summary": "In khung sao 3 dòng, tiêu đề ở giữa, màu vàng.",
+          "summary": "In 3 dòng màu vàng: một hàng `*`, dòng `*` + tiêu đề căn giữa + `*`, rồi lại một hàng `*`.",
           "role": "Dòng đầu của màn hình đăng nhập và các menu.",
           "detail": "Khung rộng 38 ký tự; dòng giữa là `*`, tiêu đề căn giữa trong 36 ô, rồi `*`.",
           "pre": [
@@ -135,7 +135,7 @@
             "message: string"
           ],
           "returns": "void",
-          "summary": "In thông báo thành công, màu xanh ngọc.",
+          "summary": "In `message` thành một dòng màu xanh ngọc, rồi trả lại màu thường.",
           "role": "Báo kết quả sau khi thêm, xóa, sửa, đổi mật khẩu.",
           "pre": [
             "Không có."
@@ -154,7 +154,7 @@
             "message: string"
           ],
           "returns": "void",
-          "summary": "In câu thông báo lỗi, màu đỏ.",
+          "summary": "In `message` thành một dòng màu đỏ, rồi trả lại màu thường.",
           "role": "Mọi câu lỗi do `Validator` và `HrSystem` trả về đều in qua đây.",
           "pre": [
             "`message` khác rỗng."
@@ -173,7 +173,7 @@
             "prompt: string"
           ],
           "returns": "string",
-          "summary": "In lời nhắc màu xanh lá, đọc một dòng, trả về chuỗi đã trim.",
+          "summary": "In `prompt` màu xanh lá (không xuống dòng), đọc cả dòng người dùng gõ, trả về chuỗi đã bỏ khoảng trắng đầu cuối.",
           "role": "Mọi ô nhập thường (username, họ tên, lựa chọn menu...).",
           "detail": "Đọc cả dòng bằng `std::getline` nên địa chỉ có dấu cách vẫn đọc trọn. `std::cin` hỏng (Ctrl+Z) thì `clear()` và trả chuỗi rỗng để vòng lặp không chạy mãi.",
           "pre": [
@@ -193,7 +193,7 @@
             "prompt: string"
           ],
           "returns": "string",
-          "summary": "Đọc mật khẩu từng phím, mỗi ký tự hiện thành `*`.",
+          "summary": "In `prompt`, đọc từng phím mà không hiện chữ: mỗi ký tự in thành `*`, Backspace xóa ký tự cuối, Enter kết thúc; trả mật khẩu đã gõ.",
           "role": "Ô Pass khi đăng nhập và mọi ô mật khẩu khi đổi mật khẩu. Đúng yêu cầu «mã hóa pass thành dấu *».",
           "detail": "Enter (13): kết thúc. Backspace (8): xóa ký tự cuối và in `\\b \\b`. Mã 0 hoặc 224 (phím mũi tên, F1...): đọc bỏ thêm một mã. Ký tự mã 32–126: thêm vào và in `*` (tối đa 40 ký tự). Phím khác bỏ qua. Không có phím Esc để hủy: muốn hủy thì gõ sai hoặc để trống.",
           "pre": [
@@ -213,7 +213,7 @@
             "maxChoice: int"
           ],
           "returns": "int",
-          "summary": "Đọc lựa chọn menu; trả số trong 1..`maxChoice`, hoặc −1 nếu gõ sai.",
+          "summary": "Đọc một dòng và đổi thành số; trả số đó nếu nằm trong 1..`maxChoice`, còn gõ chữ, để trống hay số ngoài khoảng thì trả −1.",
           "role": "`Menu.run` và menu cập nhật dùng.",
           "pre": [
             "1 ≤ `maxChoice` ≤ 99."
@@ -232,7 +232,7 @@
             "question: string"
           ],
           "returns": "bool",
-          "summary": "Hỏi có hoặc không; chỉ `y` hoặc `Y` là có.",
+          "summary": "In `question` kèm `(y/n)`, đọc một dòng; trả true chỉ khi gõ `y` hoặc `Y`, gõ gì khác là false.",
           "role": "Hỏi lại trước khi xóa nhân viên; nhấn Enter nhầm cũng không xóa.",
           "pre": [
             "Không có."
@@ -249,7 +249,7 @@
           "vis": "+",
           "params": [],
           "returns": "void",
-          "summary": "In «Nhan phim bat ky de tiep tuc...» rồi chờ một phím.",
+          "summary": "In «Nhan phim bat ky de tiep tuc...» rồi đứng chờ tới khi người dùng nhấn một phím.",
           "role": "Sau mỗi chức năng, để người dùng kịp đọc kết quả.",
           "pre": [
             "Không có."
@@ -266,7 +266,7 @@
           "vis": "+",
           "params": [],
           "returns": "void",
-          "summary": "Xóa màn hình.",
+          "summary": "Xóa sạch nội dung đang hiện trên console (lệnh `cls`), con trỏ về góc trên bên trái.",
           "role": "Đầu mỗi lần hiện menu hoặc màn hình đăng nhập.",
           "pre": [
             "Không có."
@@ -307,7 +307,7 @@
           "name": "m_title",
           "type": "string",
           "vis": "-",
-          "summary": "Tiêu đề in trong khung sao.",
+          "summary": "Chuỗi tiêu đề in trong khung sao ở đầu menu, ví dụ `MENU ADMIN (admin1)`.",
           "role": "Cho biết đang ở menu nào và đăng nhập bằng tài khoản nào.",
           "example": "`\"MENU ADMIN (admin1)\"`."
         },
@@ -315,7 +315,7 @@
           "name": "m_exitLabel",
           "type": "string",
           "vis": "-",
-          "summary": "Chữ của mục thoát, luôn là mục cuối.",
+          "summary": "Chữ của mục thoát; `run` luôn in nó ở số cuối cùng, ví dụ `Thoat (dang xuat)`.",
           "role": "Để người dùng biết chọn mục này sẽ về đâu.",
           "example": "`\"Thoat (dang xuat)\"`."
         }
@@ -329,7 +329,7 @@
             "title: string",
             "exitLabel: string"
           ],
-          "summary": "Gán tiêu đề và chữ mục thoát. Lớp con gọi trong danh sách khởi tạo.",
+          "summary": "Gán `title` vào `m_title` và `exitLabel` vào `m_exitLabel`. Lớp con gọi trong danh sách khởi tạo.",
           "role": "Lớp con gọi trong danh sách khởi tạo.",
           "pre": [
             "Không có."
@@ -363,7 +363,7 @@
           "vis": "-",
           "params": [],
           "returns": "vector<string>",
-          "summary": "Danh sách mục, không gồm mục thoát.",
+          "summary": "Hàm thuần ảo: lớp con trả tên các mục chức năng theo thứ tự hiện, không gồm mục thoát.",
           "role": "Lớp con trả nội dung riêng.",
           "pre": [
             "Không có."
@@ -382,7 +382,7 @@
             "choice: int"
           ],
           "returns": "void",
-          "summary": "Làm việc của mục được chọn.",
+          "summary": "Hàm thuần ảo: lớp con chạy chức năng ứng với số `choice` (từ 1 tới số mục) người dùng vừa chọn.",
           "role": "Lớp con viết bằng `switch`. Gặp lỗi thì in lỗi rồi `return`: đó là «hủy chức năng, cho chọn chức năng khác» của đề.",
           "pre": [
             "1 ≤ `choice` ≤ số mục; không bao giờ là mục thoát."
@@ -402,7 +402,7 @@
             "profile: UserProfile"
           ],
           "returns": "void",
-          "summary": "In username và 4 thông tin, mỗi thông tin một dòng.",
+          "summary": "In 5 dòng: dòng username, rồi 4 dòng `<tên thông tin>: <giá trị>` lấy từ `profile`.",
           "role": "Dùng chung cho «Tìm Employee» của admin và «Xem thông tin tài khoản» của nhân viên.",
           "pre": [
             "Không có."
@@ -447,7 +447,7 @@
           "name": "m_system",
           "type": "HrSystem&",
           "vis": "-",
-          "summary": "Tham chiếu tới hệ thống dùng chung.",
+          "summary": "Tham chiếu tới `HrSystem` dùng chung của chương trình; mọi chức năng admin gọi qua đây.",
           "role": "Mọi chức năng gọi qua đây. Menu chỉ mượn, không sở hữu.",
           "example": "`AdminMenu menu(m_system, name);` trong `Application`."
         }
@@ -461,7 +461,7 @@
             "system: HrSystem&",
             "username: string"
           ],
-          "summary": "Tạo menu admin; tiêu đề có tên admin đang đăng nhập.",
+          "summary": "Gọi hàm dựng `Menu` với tiêu đề `MENU ADMIN (<username>)` và mục thoát `Thoat (dang xuat)`, rồi lưu tham chiếu `system`.",
           "role": "`Application` tạo mỗi lần admin đăng nhập.",
           "pre": [
             "`username` là admin vừa đăng nhập."
@@ -478,7 +478,7 @@
           "override": true,
           "params": [],
           "returns": "vector<string>",
-          "summary": "5 mục chức năng của admin.",
+          "summary": "Trả 5 tên mục theo thứ tự: Thêm, Xóa, Tìm, Cập nhật, Hiển thị thông tin Employee.",
           "role": "Nội dung menu admin theo ảnh mẫu của đề.",
           "pre": [
             "Không có."
@@ -497,7 +497,7 @@
             "choice: int"
           ],
           "returns": "void",
-          "summary": "Gọi hàm ứng với mục đã chọn.",
+          "summary": "Ứng với `choice` từ 1 tới 5, gọi lần lượt `addEmployee`, `removeEmployee`, `findEmployee`, `updateEmployee`, `showAllEmployees`.",
           "role": "Nối số mục với chức năng.",
           "pre": [
             "1 ≤ `choice` ≤ 5."
@@ -530,7 +530,7 @@
           "vis": "-",
           "params": [],
           "returns": "void",
-          "summary": "Hỏi username, hỏi xác nhận y/n, rồi xóa.",
+          "summary": "Hỏi username, hỏi xác nhận y/n; đồng ý thì xóa nhân viên (dòng trong Employees.txt và file hồ sơ) và báo kết quả, không đồng ý thì hủy.",
           "role": "Chức năng b của admin.",
           "pre": [
             "Không có."
@@ -546,7 +546,7 @@
           "vis": "-",
           "params": [],
           "returns": "void",
-          "summary": "Hỏi username, in thông tin nhân viên đó.",
+          "summary": "Hỏi username, tìm đúng nhân viên đó (không tìm một phần); có thì in username và 4 thông tin, không thì báo lỗi.",
           "role": "Chức năng c của admin: tìm theo đúng username, không phân biệt hoa thường.",
           "pre": [
             "Không có."
@@ -579,7 +579,7 @@
           "vis": "-",
           "params": [],
           "returns": "void",
-          "summary": "In mọi nhân viên, mỗi người một dòng, sắp theo username; các cột cách nhau bằng ` | `.",
+          "summary": "In dòng tiêu đề rồi mỗi nhân viên một dòng (STT, username, 4 thông tin), sắp theo username, các cột cách nhau bằng ` | `; chưa có nhân viên thì báo.",
           "role": "Chức năng e của admin. Không căn thẳng cột cho gọn.",
           "pre": [
             "Không có."
@@ -622,7 +622,7 @@
           "name": "m_system",
           "type": "HrSystem&",
           "vis": "-",
-          "summary": "Tham chiếu tới hệ thống dùng chung.",
+          "summary": "Tham chiếu tới `HrSystem` dùng chung của chương trình; mọi chức năng nhân viên gọi qua đây.",
           "role": "Mọi chức năng gọi qua đây.",
           "example": "`EmployeeMenu menu(m_system, name);` trong `Application`."
         },
@@ -630,7 +630,7 @@
           "name": "m_username",
           "type": "string",
           "vis": "-",
-          "summary": "Nhân viên đang đăng nhập.",
+          "summary": "Username của nhân viên đang đăng nhập (như trong file); mọi chức năng chỉ làm trên tài khoản này.",
           "role": "Nhân viên chỉ xem và đổi được tài khoản của chính mình.",
           "example": "`\"nva\"`"
         }
@@ -644,7 +644,7 @@
             "system: HrSystem&",
             "username: string"
           ],
-          "summary": "Tạo menu cho nhân viên vừa đăng nhập.",
+          "summary": "Gọi hàm dựng `Menu` với tiêu đề `MENU EMPLOYEE (<username>)` và mục thoát `Thoat (dang xuat)`, rồi lưu `system` và `username`.",
           "role": "`Application` tạo mỗi lần nhân viên đăng nhập.",
           "pre": [
             "`username` là nhân viên vừa đăng nhập."
@@ -678,7 +678,7 @@
           "override": true,
           "params": [],
           "returns": "vector<string>",
-          "summary": "2 mục của nhân viên.",
+          "summary": "Trả 2 tên mục theo thứ tự: Xem thông tin tài khoản, Đổi password.",
           "role": "Nội dung menu nhân viên theo ảnh mẫu của đề.",
           "pre": [
             "Không có."
@@ -697,7 +697,7 @@
             "choice: int"
           ],
           "returns": "void",
-          "summary": "1 → xem thông tin; 2 → đổi mật khẩu.",
+          "summary": "`choice` bằng 1 thì gọi `showMyInfo`, bằng 2 thì gọi `changePassword`.",
           "role": "Nối số mục với chức năng.",
           "pre": [
             "1 ≤ `choice` ≤ 2."
@@ -713,7 +713,7 @@
           "vis": "-",
           "params": [],
           "returns": "void",
-          "summary": "In thông tin tài khoản của chính mình.",
+          "summary": "Đọc hồ sơ của `m_username` rồi in username cùng 4 thông tin; thiếu file hồ sơ thì báo lỗi.",
           "role": "Chức năng a của nhân viên: «Hiển thị thông tin của file [username].txt».",
           "pre": [
             "Không có."
@@ -795,7 +795,7 @@
           "vis": "-",
           "static": true,
           "readonly": true,
-          "summary": "Số lần đăng nhập sai liên tiếp tối đa.",
+          "summary": "Hằng số 3: đăng nhập sai liên tiếp đủ số lần này thì chương trình kết thúc.",
           "role": "Đề: «Nếu đăng nhập sai 3 lần thì thoát».",
           "example": "3"
         },
@@ -803,7 +803,7 @@
           "name": "m_system",
           "type": "HrSystem",
           "vis": "-",
-          "summary": "Hệ thống duy nhất của chương trình.",
+          "summary": "Đối tượng `HrSystem` duy nhất của chương trình, tạo cùng `Application` và cho các menu mượn.",
           "role": "Các menu mượn tham chiếu tới đối tượng này.",
           "example": "`HrSystem m_system;`"
         }

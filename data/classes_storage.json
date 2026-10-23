@@ -25,7 +25,7 @@
           "name": "m_items",
           "type": "vector<T>",
           "vis": "-",
-          "summary": "Mọi tài khoản của một file, nạp vào bộ nhớ lúc khởi động.",
+          "summary": "Vector chứa mọi tài khoản đọc từ file, theo thứ tự dòng trong file (hoặc theo username sau khi sắp xếp).",
           "role": "Mọi thao tác tìm, thêm, xóa, sắp xếp làm trên vector này; xong thì ghi lại file.",
           "example": "`AccountList<Employee>`: `nva` (111111, cờ bật), `lthb` (abc12345, cờ tắt)."
         },
@@ -33,7 +33,7 @@
           "name": "m_filePath",
           "type": "string",
           "vis": "-",
-          "summary": "File mà danh sách đọc và ghi.",
+          "summary": "Đường dẫn file txt mà `load` đọc và `save` ghi, ví dụ `data/Employees.txt`.",
           "role": "Truyền vào lúc tạo, không đổi.",
           "example": "`\"data/Employees.txt\"`."
         }
@@ -46,7 +46,7 @@
           "params": [
             "filePath: string"
           ],
-          "summary": "Tạo danh sách rỗng gắn với một file; chưa đọc file.",
+          "summary": "Lưu `filePath` vào `m_filePath`; danh sách bắt đầu rỗng, chưa đọc file.",
           "role": "`HrSystem` tạo hai danh sách trong danh sách khởi tạo của hàm dựng của mình.",
           "pre": [
             "Không có."
@@ -62,7 +62,7 @@
           "vis": "+",
           "params": [],
           "returns": "bool",
-          "summary": "Đọc file vào bộ nhớ; lặng lẽ bỏ qua dòng trống, dòng sai định dạng và dòng trùng username.",
+          "summary": "Xóa danh sách cũ rồi đọc từng dòng của file thành một tài khoản; bỏ qua dòng trống, dòng sai định dạng và dòng trùng username. Trả false nếu chưa có file.",
           "role": "Gọi một lần lúc khởi động cho mỗi danh sách.",
           "detail": "Không báo cảnh báo cho dòng hỏng. Nếu file do chương trình tự ghi thì không có dòng hỏng.",
           "pre": [
@@ -82,7 +82,7 @@
           "vis": "+",
           "params": [],
           "returns": "bool",
-          "summary": "Ghi lại toàn bộ file, mỗi tài khoản một dòng.",
+          "summary": "Lấy `toLine()` của từng tài khoản theo thứ tự rồi ghi đè cả file, mỗi tài khoản một dòng; trả false nếu ghi lỗi.",
           "role": "Gọi ngay sau mỗi thay đổi, nên khi chương trình còn chạy thì file đã cập nhật.",
           "pre": [
             "Thư mục chứa file đã tồn tại."
@@ -99,7 +99,7 @@
           "vis": "+",
           "params": [],
           "returns": "int",
-          "summary": "Số tài khoản.",
+          "summary": "Trả số tài khoản đang có trong danh sách.",
           "role": "Kiểm đủ 3 admin chưa; duyệt danh sách.",
           "pre": [
             "Không có."
@@ -117,7 +117,7 @@
             "index: int"
           ],
           "returns": "T&",
-          "summary": "Phần tử thứ `index` (đếm từ 0); trả tham chiếu nên sửa được.",
+          "summary": "Trả tham chiếu tới tài khoản ở vị trí `index` (đếm từ 0), nên sửa qua kết quả là sửa luôn trong danh sách.",
           "role": "Sau `indexOf`, lấy tài khoản để kiểm hoặc đổi mật khẩu.",
           "pre": [
             "0 ≤ `index` < `size()`; hàm không kiểm."
@@ -135,7 +135,7 @@
             "username: string"
           ],
           "returns": "int",
-          "summary": "Vị trí tài khoản có username khớp (không phân biệt hoa thường); −1 nếu không có.",
+          "summary": "Duyệt từ đầu, trả vị trí của tài khoản đầu tiên có username khớp `username` (không phân biệt hoa thường); không có thì trả −1.",
           "role": "Cách tìm duy nhất; kiểm trùng là `indexOf(u) != -1`.",
           "pre": [
             "Không có."
@@ -155,7 +155,7 @@
             "item: T"
           ],
           "returns": "void",
-          "summary": "Thêm vào cuối (chưa ghi file).",
+          "summary": "Thêm `item` vào cuối danh sách. Chỉ đổi trong bộ nhớ; muốn lưu thì gọi `save`.",
           "role": "Thêm nhân viên mới; thêm admin mặc định.",
           "pre": [
             "Username của `item` chưa có trong danh sách."
@@ -173,7 +173,7 @@
             "index: int"
           ],
           "returns": "void",
-          "summary": "Xóa phần tử thứ `index` (chưa ghi file).",
+          "summary": "Xóa tài khoản ở vị trí `index`, các phần tử sau dồn lên một ô. Chỉ đổi trong bộ nhớ; muốn lưu thì gọi `save`.",
           "role": "Xóa nhân viên; bỏ nhân viên trùng tên với admin lúc khởi động.",
           "pre": [
             "0 ≤ `index` < `size()`."
@@ -190,7 +190,7 @@
           "vis": "+",
           "params": [],
           "returns": "void",
-          "summary": "Sắp xếp theo username tăng dần, không phân biệt hoa thường.",
+          "summary": "Sắp xếp lại danh sách theo username tăng dần, so bằng chữ thường (`lthb` đứng trước `NVA`).",
           "role": "Trước khi in bảng «Hiển thị thông tin toàn bộ employee».",
           "pre": [
             "Không có."
@@ -211,7 +211,7 @@
             "b: T"
           ],
           "returns": "bool",
-          "summary": "Hàm so sánh cho `std::sort`: a đứng trước b khi username của a nhỏ hơn (theo chữ thường).",
+          "summary": "Trả true khi username của `a` (đổi chữ thường) đứng trước username của `b` theo thứ tự từ điển; `std::sort` dùng hàm này để so hai phần tử.",
           "role": "Chỉ `sortByUsername` dùng.",
           "pre": [
             "Không có."

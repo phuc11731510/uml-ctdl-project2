@@ -24,7 +24,7 @@
             "s: string"
           ],
           "returns": "string",
-          "summary": "3–20 ký tự, chỉ chữ không dấu, số, `_`, bắt đầu bằng chữ, không phải tên Windows cấm.",
+          "summary": "Kiểm `s` có dùng được làm username không: 3–20 ký tự, chỉ chữ không dấu, số và `_`, bắt đầu bằng chữ, không trùng tên file Windows cấm. Trả `\"\"` nếu đạt, nếu không trả câu lỗi.",
           "role": "Username còn là tên file hồ sơ, nên quy tắc này bảo vệ cả việc tạo file.",
           "detail": "Tên Windows cấm (so chữ thường): `con`, `prn`, `aux`, `nul`, `com1`…`com9`, `lpt1`…`lpt9`. Vì chỉ cho chữ, số và `_`, các ký tự cấm trong tên file (`\\ / : * ? \" < > |`, dấu cách) tự bị loại.",
           "pre": [
@@ -45,7 +45,7 @@
             "s: string"
           ],
           "returns": "string",
-          "summary": "6–20 ký tự có mã 33–126 (không dấu cách, không chữ có dấu).",
+          "summary": "Kiểm `s` làm mật khẩu: 6–20 ký tự, mỗi ký tự có mã 33–126 (không dấu cách, không chữ có dấu). Trả `\"\"` nếu đạt, nếu không trả câu lỗi.",
           "role": "Dấu cách bị cấm vì trong Employees.txt các cột cách nhau bằng dấu cách. Hai luật «khác 111111» và «khác mật khẩu cũ» nằm ở `HrSystem.checkNewPassword`.",
           "pre": [
             "Không có."
@@ -65,7 +65,7 @@
             "s: string"
           ],
           "returns": "string",
-          "summary": "Không rỗng, tối đa 50 ký tự, chỉ chữ cái không dấu và dấu cách.",
+          "summary": "Kiểm họ tên: không rỗng, tối đa 50 ký tự, chỉ gồm chữ cái không dấu và dấu cách. Trả `\"\"` nếu đạt, nếu không trả câu lỗi.",
           "role": "Hàm duy nhất quyết định ký tự nào được phép trong họ tên.",
           "pre": [
             "`s` đã được trim (nên không thể chỉ gồm dấu cách)."
@@ -85,7 +85,7 @@
             "s: string"
           ],
           "returns": "string",
-          "summary": "Không rỗng, tối đa 100 ký tự in được (chữ không dấu, số, dấu câu, dấu cách).",
+          "summary": "Kiểm địa chỉ: không rỗng, tối đa 100 ký tự in được (chữ không dấu, số, dấu câu, dấu cách). Trả `\"\"` nếu đạt, nếu không trả câu lỗi.",
           "role": "Địa chỉ nhập tự do nhất, nên chỉ chặn độ dài và ký tự lạ.",
           "pre": [
             "`s` đã được trim."
@@ -105,7 +105,7 @@
             "s: string"
           ],
           "returns": "string",
-          "summary": "Đúng 10 chữ số, bắt đầu bằng 0.",
+          "summary": "Kiểm số điện thoại: đúng 10 chữ số và chữ số đầu là 0. Trả `\"\"` nếu đạt, nếu không trả câu lỗi.",
           "role": "Kiểm số di động Việt Nam ở dạng đơn giản nhất.",
           "pre": [
             "`s` đã được trim."
@@ -125,7 +125,7 @@
             "s: string"
           ],
           "returns": "string",
-          "summary": "Dạng `ten@ten-mien.duoi` ở mức đơn giản; tối đa 50 ký tự, không dấu cách.",
+          "summary": "Kiểm email ở mức đơn giản: dạng `ten@ten-mien.duoi`, tối đa 50 ký tự, không dấu cách. Trả `\"\"` nếu đạt, nếu không trả câu lỗi.",
           "role": "Chặn các lỗi gõ thường gặp; không cố bắt mọi trường hợp của chuẩn email.",
           "detail": "Lỗi khi: rỗng hoặc dài hơn 50; có dấu cách; số `@` khác 1; trước `@` rỗng; sau `@` không có `.`, hoặc `.` nằm ngay sau `@` hay ở cuối.",
           "pre": [
@@ -147,7 +147,7 @@
             "value: string"
           ],
           "returns": "string",
-          "summary": "Kiểm một thông tin hồ sơ theo tên của nó.",
+          "summary": "Chọn hàm kiểm theo `field` (họ tên, địa chỉ, số điện thoại hay email) rồi trả đúng kết quả của hàm đó.",
           "role": "Menu thêm nhân viên và menu cập nhật duyệt 4 thông tin bằng vòng lặp, nên cần một hàm kiểm chung.",
           "pre": [
             "`value` đã được trim."
@@ -198,7 +198,7 @@
           "name": "m_admins",
           "type": "AccountList<Admin>",
           "vis": "-",
-          "summary": "Danh sách admin, gắn với `data/Administrators.txt`.",
+          "summary": "Danh sách mọi tài khoản admin, đọc từ và ghi vào `data/Administrators.txt`.",
           "role": "Đăng nhập admin, kiểm username trùng, tạo admin mặc định.",
           "example": "`admin1`, `admin2`, `admin3`, cùng mật khẩu `123456`."
         },
@@ -206,7 +206,7 @@
           "name": "m_employees",
           "type": "AccountList<Employee>",
           "vis": "-",
-          "summary": "Danh sách nhân viên, gắn với `data/Employees.txt`.",
+          "summary": "Danh sách mọi tài khoản nhân viên (kèm cờ phải đổi mật khẩu), đọc từ và ghi vào `data/Employees.txt`.",
           "role": "Mọi chức năng về nhân viên.",
           "example": "`nva` (111111, cờ bật), `lthb` (abc12345, cờ tắt)."
         }
@@ -217,7 +217,7 @@
           "ctor": true,
           "vis": "+",
           "params": [],
-          "summary": "Gắn hai danh sách với hai file; chưa đọc file.",
+          "summary": "Gắn `m_admins` với `data/Administrators.txt` và `m_employees` với `data/Employees.txt`; chưa đọc file nào.",
           "role": "`Application` có đúng một `HrSystem`.",
           "pre": [
             "Không có."
@@ -264,7 +264,7 @@
             "accountName: string&"
           ],
           "returns": "bool",
-          "summary": "Kiểm tra đăng nhập chung; đúng thì cho biết vai trò và username như trong file.",
+          "summary": "Tìm `username` trong danh sách admin rồi nhân viên và so mật khẩu. Đúng thì ghi vai trò vào `role`, username như trong file vào `accountName` và trả true; sai thì trả false.",
           "role": "Màn hình đăng nhập trong `Application` gọi hàm này.",
           "detail": "Tìm trong admin trước, rồi nhân viên (không phân biệt hoa thường). Không có tài khoản hay sai mật khẩu đều trả false như nhau, để người lạ không dò được username nào có thật.",
           "pre": [
@@ -286,7 +286,7 @@
             "username: string"
           ],
           "returns": "bool",
-          "summary": "Nhân viên này có phải đổi mật khẩu ngay không (cờ đang bật).",
+          "summary": "Tìm `username` trong danh sách nhân viên; trả true nếu có và cờ phải đổi mật khẩu đang bật. Admin hoặc tên lạ thì trả false.",
           "role": "Ngay sau khi nhân viên đăng nhập đúng, `Application` hỏi hàm này.",
           "pre": [
             "Không có."
@@ -306,7 +306,7 @@
             "password: string"
           ],
           "returns": "bool",
-          "summary": "Mật khẩu có đúng là mật khẩu hiện tại của nhân viên này không.",
+          "summary": "Tìm `username` trong danh sách nhân viên và so `password` với mật khẩu đang lưu; trả true khi đúng.",
           "role": "Bước «nhập mật khẩu để xác nhận chủ tài khoản» khi đổi mật khẩu tự nguyện.",
           "pre": [
             "Không có."
@@ -325,7 +325,7 @@
             "username: string"
           ],
           "returns": "string",
-          "summary": "Username có dùng được cho nhân viên mới không: đúng quy tắc và chưa ai dùng.",
+          "summary": "Kiểm `username` cho nhân viên mới: đúng quy tắc định dạng (`Validator.checkUsername`), rồi chưa có ở admin lẫn nhân viên. Trả `\"\"` hoặc câu lỗi.",
           "role": "Menu thêm nhân viên gọi ngay sau khi admin gõ username, để báo lỗi trước khi hỏi 4 thông tin còn lại.",
           "pre": [
             "`username` đã được trim."
@@ -344,7 +344,7 @@
             "newPassword: string"
           ],
           "returns": "string",
-          "summary": "Mật khẩu mới của nhân viên có hợp lệ không: đúng quy tắc, khác `111111`, khác mật khẩu hiện tại.",
+          "summary": "Kiểm mật khẩu mới của nhân viên `username`: đúng quy tắc, khác `111111`, khác mật khẩu hiện tại. Trả `\"\"` hoặc câu lỗi đầu tiên gặp.",
           "role": "Menu nhân viên gọi ngay sau lần gõ mật khẩu mới thứ nhất.",
           "pre": [
             "`username` là nhân viên."
@@ -363,7 +363,7 @@
             "profile: UserProfile"
           ],
           "returns": "string",
-          "summary": "Thêm nhân viên: ghi file hồ sơ, thêm dòng `username 111111 1` vào Employees.txt.",
+          "summary": "Ghi `profile` ra file hồ sơ, thêm tài khoản `username` (mật khẩu `111111`, cờ bật) vào danh sách và ghi lại Employees.txt. Trả `\"\"` hoặc câu lỗi.",
           "role": "Chức năng a của admin.",
           "detail": "Menu đã kiểm từng ô khi nhập, nên ở đây chỉ kiểm lại username (`checkNewUsername`). Ghi file hồ sơ trước (`Util.writeLines(profilePath(username), profile.toLines())`), rồi `add(Employee::createNew(username))` và `m_employees.save()`. Ghi lỗi thì trả `\"Khong ghi duoc file du lieu\"`.",
           "pre": [
@@ -382,7 +382,7 @@
             "username: string"
           ],
           "returns": "string",
-          "summary": "Xóa nhân viên: bỏ dòng khỏi Employees.txt và xóa file hồ sơ.",
+          "summary": "Tìm nhân viên `username`, bỏ khỏi danh sách, ghi lại Employees.txt rồi xóa file hồ sơ. Trả `\"\"`, hoặc câu lỗi nếu không có nhân viên này hay ghi file lỗi.",
           "role": "Chức năng b của admin. Hỏi xác nhận y/n do menu làm trước khi gọi.",
           "pre": [
             "Không có."
@@ -402,7 +402,7 @@
             "profile: UserProfile&"
           ],
           "returns": "string",
-          "summary": "Đọc hồ sơ của một nhân viên.",
+          "summary": "Kiểm `username` là nhân viên rồi đọc file hồ sơ của người đó vào `profile`. Trả `\"\"`, hoặc câu lỗi nếu không có nhân viên hay thiếu file hồ sơ.",
           "role": "Tìm (chức năng c), xem thông tin của nhân viên, bảng hiển thị toàn bộ, menu cập nhật.",
           "pre": [
             "Không có."
@@ -423,7 +423,7 @@
             "value: string"
           ],
           "returns": "string",
-          "summary": "Sửa một thông tin hồ sơ rồi ghi lại file hồ sơ ngay.",
+          "summary": "Kiểm `value` theo quy tắc của `field`, đọc hồ sơ của `username`, thay thông tin đó rồi ghi lại file hồ sơ ngay. Trả `\"\"` hoặc câu lỗi.",
           "role": "Chức năng d của admin; menu cập nhật gọi sau mỗi lần sửa một thông tin.",
           "pre": [
             "`value` đã được trim."
@@ -441,7 +441,7 @@
             "usernames: vector<string>&"
           ],
           "returns": "void",
-          "summary": "Cho username của mọi nhân viên, đã sắp xếp tăng dần.",
+          "summary": "Sắp xếp danh sách nhân viên theo username rồi chép username của từng người vào `usernames` (xóa nội dung cũ trước).",
           "role": "Chức năng e của admin.",
           "pre": [
             "Không có."
@@ -461,7 +461,7 @@
             "newPassword: string"
           ],
           "returns": "string",
-          "summary": "Đặt mật khẩu mới, tắt cờ «phải đổi mật khẩu», ghi Employees.txt.",
+          "summary": "Đặt `newPassword` cho nhân viên `username`, tắt cờ phải đổi mật khẩu, rồi ghi lại Employees.txt. Trả `\"\"` hoặc câu lỗi.",
           "role": "Dùng chung cho đổi mật khẩu bắt buộc (lần đầu) và tự nguyện. Với đổi tự nguyện, menu đã kiểm mật khẩu cũ bằng `verifyPassword` trước khi gọi.",
           "detail": "Gọi lại `checkNewPassword` để chắc chắn; lỗi thì trả câu đó.",
           "pre": [
@@ -481,7 +481,7 @@
             "username: string"
           ],
           "returns": "bool",
-          "summary": "Username đã có ở admin hoặc nhân viên chưa (không phân biệt hoa thường).",
+          "summary": "Trả true nếu `username` đã có trong danh sách admin hoặc nhân viên (không phân biệt hoa thường).",
           "role": "Kiểm username mới và chọn tên admin mặc định.",
           "pre": [
             "Không có."
@@ -501,7 +501,7 @@
             "username: string"
           ],
           "returns": "string",
-          "summary": "Đường dẫn file hồ sơ: `data/users/<username viết thường>.txt`.",
+          "summary": "Trả đường dẫn file hồ sơ của `username`: `data/users/` + username đổi chữ thường + `.txt`.",
           "role": "Mọi chỗ đọc, ghi, xóa file hồ sơ dùng hàm này. Thư mục con `users/` tránh việc username `Employees` đè lên `data/Employees.txt`.",
           "pre": [
             "Không có."

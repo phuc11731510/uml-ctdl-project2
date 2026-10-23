@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "Thiết kế UML ứng dụng quản lý nhân sự (Project 2 CTDL&GT)",
-    "version": "0.1",
+    "version": "0.1-gon",
     "updated": "2026-10-23"
   },
   "packages": [
@@ -9,63 +9,63 @@
       "id": "util",
       "name": "Tiện ích chung",
       "color": "#f59e0b",
-      "description": "Kiểu cơ bản, xử lý chuỗi và đọc ghi file: lớp nào cũng có thể dùng."
+      "description": "Kiểu cơ bản; xử lý chuỗi và đọc ghi file gộp trong một lớp Util."
     },
     {
       "id": "model",
       "name": "Tài khoản và hồ sơ",
       "color": "#3b82f6",
-      "description": "Dữ liệu của chương trình: tài khoản admin, tài khoản nhân viên, hồ sơ nhân viên."
+      "description": "Account, Admin, Employee và hồ sơ 4 thông tin. Đều viết gọn trong file .h."
     },
     {
       "id": "storage",
       "name": "Lưu trữ file",
       "color": "#14b8a6",
-      "description": "Đọc và ghi Administrators.txt, Employees.txt và các file hồ sơ; có lớp template AccountList<T>."
+      "description": "Lớp template AccountList<T>, dùng cho cả Administrators.txt và Employees.txt."
     },
     {
       "id": "logic",
       "name": "Nghiệp vụ và kiểm tra",
       "color": "#22c55e",
-      "description": "Các chức năng của đề (đăng nhập, thêm, xóa, tìm, sửa, đổi mật khẩu) và các ràng buộc dữ liệu. Không in ra màn hình, không đọc bàn phím."
+      "description": "Validator (ràng buộc dữ liệu) và HrSystem (mọi chức năng của đề, kể cả đọc ghi file hồ sơ). Lỗi trả về dạng câu thông báo."
     },
     {
       "id": "ui",
       "name": "Giao diện console",
       "color": "#a855f7",
-      "description": "Màn hình đăng nhập, các menu, đọc bàn phím, che mật khẩu, in có màu."
+      "description": "Console, khung Menu, menu admin, menu nhân viên, và Application (gồm cả màn hình đăng nhập)."
     }
   ],
   "readingStages": [
     {
       "id": 0,
       "title": "Kiểu cơ bản",
-      "text": "Các kiểu có sẵn của C++ dùng trong chữ ký (string, vector...). Không phải lớp nên chỉ có một thẻ tra cứu; đọc trước nhất."
+      "text": "Các kiểu có sẵn của C++ dùng trong chữ ký. Không phải lớp; đọc trước nhất."
     },
     {
       "id": 1,
       "title": "Tiện ích chung",
-      "text": "Hai lớp chỉ có hàm tĩnh: xử lý chuỗi và đọc ghi file. Ngắn, đọc nhanh; hầu hết các lớp sau đều gọi tới."
+      "text": "Một lớp Util gồm các hàm tĩnh xử lý chuỗi và đọc ghi file."
     },
     {
       "id": 2,
       "title": "Tài khoản và hồ sơ",
-      "text": "Dữ liệu của chương trình: lớp cha Account, hai lớp con Admin và Employee, và hồ sơ 4 thông tin của nhân viên."
+      "text": "Lớp cha Account, hai lớp con Admin và Employee, và hồ sơ 4 thông tin của nhân viên."
     },
     {
       "id": 3,
       "title": "Lưu trữ file",
-      "text": "Lớp template AccountList<T> (phần «template» của thang điểm) và kho file hồ sơ."
+      "text": "Lớp template AccountList<T>: phần «template» của thang điểm."
     },
     {
       "id": 4,
       "title": "Nghiệp vụ và kiểm tra",
-      "text": "Mã lỗi, các ràng buộc dữ liệu, và HrSystem: nơi làm mọi chức năng của đề rồi ghi file ngay."
+      "text": "Các ràng buộc dữ liệu và HrSystem: nơi làm mọi chức năng của đề rồi ghi file ngay."
     },
     {
       "id": 5,
       "title": "Giao diện console",
-      "text": "Màu chữ, đọc bàn phím, khung menu chung, các menu cụ thể, màn hình đăng nhập và lớp khởi động chương trình."
+      "text": "Đọc bàn phím và in có màu, khung menu chung, hai menu cụ thể, và lớp khởi động có màn hình đăng nhập."
     }
   ],
   "layoutRef": {

@@ -26,16 +26,27 @@ Nếu sau khi các file được sửa mà trang vẫn hiện bản cũ, nhấn 
 - **Mọi tên lớp và tên kiểu đều bấm được**: bấm `UserProfile` hay `string` để nhảy tới nơi nó được định nghĩa. Nút «← Quay lại» ở đầu khung đưa về lựa chọn trước.
 - Mặc định chỉ vẽ các quan hệ cấu trúc cho gọn; các quan hệ phụ thuộc của một lớp hiện khi chọn lớp đó, hoặc bật «Hiện mọi quan hệ phụ thuộc» ở thanh bên.
 
-## Các quyết định thiết kế chính
+## Ước tính số dòng code C++ (tính cả dòng trống)
 
-- Một màn hình đăng nhập chung cho admin và nhân viên; vai trò nhận ra từ file chứa tài khoản. Sai 3 lần liên tiếp thì kết thúc chương trình.
-- `data/Administrators.txt`: mỗi dòng `username matkhau`. Thiếu admin thì chương trình tự tạo cho đủ 3 (`admin1`, `admin2`... mật khẩu `123456`).
-- `data/Employees.txt`: mỗi dòng `username matkhau co`; cờ `1` nghĩa là phải đổi mật khẩu ở lần đăng nhập tới. Dòng 2 cột theo đúng đề vẫn đọc được.
-- `data/users/<username>.txt`: 4 dòng họ tên, địa chỉ, số điện thoại, email. Tên file viết thường.
-- Username không trùng giữa admin và nhân viên, không phân biệt hoa thường, chỉ gồm chữ không dấu, số và `_`.
-- Mỗi thay đổi được ghi file ngay (ghi ra file tạm rồi thay file cũ).
-- Phần template: lớp `AccountList<T>` do nhóm tự viết, dùng cho cả `Admin` và `Employee`.
-- Chữ trên màn hình console viết không dấu; ba chỗ cần sửa khi chuyển sang có dấu là `Console.readLine`, `StringUtil.textLength` và `Validator.checkFullName`.
+| File | Dòng |
+| --- | ---: |
+| `Util.h` | 60 |
+| `Account.h` (gồm `Role`) | 30 |
+| `Admin.h` | 18 |
+| `Employee.h` | 32 |
+| `UserProfile.h` (gồm `ProfileField`) | 38 |
+| `AccountList.h` | 65 |
+| `Validator.h` | 65 |
+| `HrSystem.h` + `HrSystem.cpp` | 30 + 120 |
+| `Console.h` + `Console.cpp` | 20 + 75 |
+| `Menu.h` + `Menu.cpp` | 20 + 22 |
+| `AdminMenu.h` + `AdminMenu.cpp` | 18 + 105 |
+| `EmployeeMenu.h` + `EmployeeMenu.cpp` | 16 + 60 |
+| `Application.h` + `Application.cpp` | 16 + 50 |
+| `main.cpp` | 6 |
+| **Tổng** | **khoảng 866** |
+
+Đây là ước tính theo từng hàm, giả định: dấu `{` cùng dòng với câu lệnh, một dòng trống giữa hai hàm, một dòng chú thích cho mỗi lớp (không chú thích từng hàm), các số giới hạn viết thẳng trong mã. Nếu Coding Standard của lớp bắt chú thích từng hàm, tách mọi lớp thành `.h`/`.cpp` hoặc cấm «số ma thuật», tổng sẽ nhiều hơn.
 
 ## Các file
 
@@ -45,11 +56,11 @@ Nếu sau khi các file được sửa mà trang vẫn hiện bản cũ, nhấn 
 | `common.js`, `diagram.js`, `main.js` | Mã trang (không dùng thư viện ngoài) |
 | `data/meta.json` | Tên, phiên bản, các gói (màu), các chặng đọc và kích thước chuẩn để co giãn bố cục |
 | `data/classes_types.json` | Thẻ «Kiểu cơ bản» (`BasicTypes`): `string`, `vector<T>`, `int`, `bool`, `char`, `void` |
-| `data/classes_util.json` | `StringUtil`, `FileUtil` |
+| `data/classes_util.json` | `Util` |
 | `data/classes_model.json` | `Role`, `Account`, `Admin`, `Employee`, `ProfileField`, `UserProfile` |
-| `data/classes_storage.json` | `AccountList<T>`, `ProfileStore` |
-| `data/classes_logic.json` | `ErrorCode`, `Validator`, `HrSystem` |
-| `data/classes_ui.json` | `ConsoleColor`, `Console`, `Menu`, `ProfileEditMenu`, `AdminMenu`, `EmployeeMenu`, `LoginScreen`, `Application` |
+| `data/classes_storage.json` | `AccountList<T>` |
+| `data/classes_logic.json` | `Validator`, `HrSystem` |
+| `data/classes_ui.json` | `Console`, `Menu`, `AdminMenu`, `EmployeeMenu`, `Application` |
 | `data/relations.json` | Các quan hệ giữa lớp |
 
 Muốn sửa nội dung thì sửa các file JSON; sơ đồ được vẽ lại từ dữ liệu, nên không phải sửa mã trang. Mỗi thành viên có các trường `summary`, `role` (vai trò), `detail`, `pre`, `post`, `complexity`, `example`, `cpp`; mỗi lớp có thêm `spec` (yêu cầu của đề) và `uses` (cần biết từ lớp khác). Khi thêm hoặc xóa lớp, cần cập nhật `read` (thứ tự đọc) và `pos` (vị trí ban đầu) cho lớp đó; lớp template có thêm `tparams`.

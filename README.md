@@ -31,7 +31,7 @@ Nếu sau khi các file được sửa mà trang vẫn hiện bản cũ, nhấn 
 | File | Dòng |
 | --- | ---: |
 | `Util.h` | 60 |
-| `Account.h` (gồm `Role`) | 30 |
+| `Account.h` (gồm `Role`) | 32 |
 | `Admin.h` | 18 |
 | `Employee.h` | 32 |
 | `UserProfile.h` (gồm `ProfileField`) | 38 |
@@ -44,7 +44,7 @@ Nếu sau khi các file được sửa mà trang vẫn hiện bản cũ, nhấn 
 | `EmployeeMenu.h` + `EmployeeMenu.cpp` | 16 + 60 |
 | `Application.h` + `Application.cpp` | 16 + 50 |
 | `main.cpp` | 6 |
-| **Tổng** | **khoảng 866** |
+| **Tổng** | **khoảng 868** |
 
 Đây là ước tính theo từng hàm, giả định: dấu `{` cùng dòng với câu lệnh, một dòng trống giữa hai hàm, một dòng chú thích cho mỗi lớp (không chú thích từng hàm), các số giới hạn viết thẳng trong mã. Nếu Coding Standard của lớp bắt chú thích từng hàm, tách mọi lớp thành `.h`/`.cpp` hoặc cấm «số ma thuật», tổng sẽ nhiều hơn.
 

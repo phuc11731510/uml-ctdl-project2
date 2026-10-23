@@ -53,18 +53,19 @@
         {
           "name": "m_username",
           "type": "string",
-          "vis": "#",
+          "vis": "-",
           "summary": "Tên đăng nhập, giữ nguyên chữ hoa, chữ thường như lúc tạo.",
           "role": "Khóa để tìm tài khoản; với nhân viên còn là tên file hồ sơ.",
-          "example": "`nva`, `admin1`."
+          "example": "`nva`, `admin1`.",
+          "detail": "Private: lớp con và lớp khác đọc qua `getUsername()`."
         },
         {
           "name": "m_password",
           "type": "string",
-          "vis": "#",
+          "vis": "-",
           "summary": "Mật khẩu, lưu nguyên văn trong file.",
           "role": "So khớp khi đăng nhập và khi xác nhận chủ tài khoản lúc đổi mật khẩu.",
-          "detail": "«Mã hóa pass thành dấu *» trong đề là che khi gõ (`Console.readPassword`), không phải mã hóa khi lưu.",
+          "detail": "Private: lớp con đọc qua `getPassword()` khi ghi file, đổi qua `setPassword`. «Mã hóa pass thành dấu *» trong đề là che khi gõ (`Console.readPassword`), không phải mã hóa khi lưu.",
           "example": "`111111`, `Moi12345`."
         }
       ],
@@ -72,12 +73,12 @@
         {
           "name": "Account",
           "ctor": true,
-          "vis": "#",
+          "vis": "+",
           "params": [
             "username: string",
             "password: string"
           ],
-          "summary": "Gán username và mật khẩu. Chỉ lớp con gọi.",
+          "summary": "Gán username và mật khẩu. Lớp con gọi trong danh sách khởi tạo.",
           "role": "`Admin` và `Employee` gọi trong danh sách khởi tạo của hàm dựng của mình.",
           "pre": [
             "Không có."
@@ -86,7 +87,7 @@
             "`getUsername()` trả `username`."
           ],
           "example": "`Admin(...) : Account(username, password) {}`",
-          "cpp": "Gán hai thuộc tính trong danh sách khởi tạo."
+          "cpp": "Gán hai thuộc tính trong danh sách khởi tạo. Để public cũng không ai tạo được `Account` trực tiếp, vì lớp có hàm thuần ảo."
         },
         {
           "name": "getUsername",
@@ -103,6 +104,22 @@
           ],
           "example": "Tài khoản tạo với `\"NVA\"` thì trả `\"NVA\"`.",
           "cpp": "Trả `m_username`; khai báo `const`."
+        },
+        {
+          "name": "getPassword",
+          "vis": "+",
+          "params": [],
+          "returns": "string",
+          "summary": "Trả mật khẩu đang lưu.",
+          "role": "`toLine` của `Admin` và `Employee` cần ghi mật khẩu ra file, mà `m_password` là private nên lớp con phải đọc qua hàm này. Kiểm mật khẩu thì dùng `checkPassword`, không dùng hàm này.",
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "Không đổi dữ liệu."
+          ],
+          "example": "Tài khoản mới tạo của nhân viên: `getPassword()` = `\"111111\"`.",
+          "cpp": "Trả `m_password`; khai báo `const`."
         },
         {
           "name": "matchesUsername",
@@ -195,7 +212,7 @@
         }
       ],
       "impl": {
-        "cpp": "**Ước tính khoảng 30 dòng**, chỉ file `Account.h` (gồm cả `enum class Role`). Thân các hàm viết ngay trong lớp. Nhớ `virtual ~Account() {}`."
+        "cpp": "**Ước tính khoảng 32 dòng**, chỉ file `Account.h` (gồm cả `enum class Role`). Thân các hàm viết ngay trong lớp. Nhớ `virtual ~Account() {}`. Thuộc tính đặt ở phần `private:`, các hàm ở phần `public:`."
       },
       "notes": [
         "`fromLine` không nằm ở đây vì nó là hàm static tạo đối tượng mới, mà hàm static không thể ảo. Mỗi lớp con có `fromLine` riêng và `AccountList<T>` gọi `T::fromLine`: lý do cần template."
@@ -217,7 +234,7 @@
       "role": "Không thêm dữ liệu so với `Account`; chỉ biết đọc, ghi định dạng 2 cột và trả vai trò `ADMIN`.",
       "spec": "«Administrators.txt: lưu danh sách các admin (có tối thiểu 3 người quản lý) gồm Username, Password.»",
       "uses": [
-        "`Account`: lớp cha. Có `m_username`, `m_password` (`protected`), hàm dựng `Account(username, password)`, và hai hàm thuần ảo `toLine()`, `getRole()` phải viết.",
+        "`Account`: lớp cha. Hàm dựng `Account(username, password)`; `getUsername()`, `getPassword()` (hai thuộc tính là private nên đọc qua hai hàm này); hai hàm thuần ảo `toLine()`, `getRole()` phải viết.",
         "`Role::ADMIN`."
       ],
       "invariants": [],
@@ -278,7 +295,7 @@
             "`fromLine` đọc lại được đúng tài khoản này."
           ],
           "example": "`\"admin1 123456\"`.",
-          "cpp": "Ghép username, một dấu cách và mật khẩu; khai báo `override`."
+          "cpp": "Ghép `getUsername()`, một dấu cách và `getPassword()`; khai báo `override`."
         },
         {
           "name": "getRole",
@@ -321,7 +338,7 @@
       "role": "Thêm vào `Account` cờ «phải đổi mật khẩu ở lần đăng nhập tới», thay cho câu hỏi «có phải lần đăng nhập đầu không». Admin thêm nhân viên thì cờ bật; đổi mật khẩu xong thì cờ tắt.",
       "spec": "«Employees.txt: Username, Password» (thêm cột cờ so với đề); «Pass mặc định là 111111»; «Nếu là lần đăng nhập đầu tiên thì bắt buộc đổi mật khẩu».",
       "uses": [
-        "`Account`: lớp cha. Có `m_username`, `m_password` (`protected`), hàm dựng `Account(username, password)`, và hai hàm thuần ảo `toLine()`, `getRole()` phải viết.",
+        "`Account`: lớp cha. Hàm dựng `Account(username, password)`; `getUsername()`, `getPassword()` (hai thuộc tính là private nên đọc qua hai hàm này); hai hàm thuần ảo `toLine()`, `getRole()` phải viết.",
         "`Role::EMPLOYEE`."
       ],
       "invariants": [
@@ -431,7 +448,7 @@
             "Cột 3 là `1` hoặc `0`."
           ],
           "example": "Mới tạo → `\"nva 111111 1\"`; đổi mật khẩu xong → `\"nva Moi12345 0\"`.",
-          "cpp": "Ghép 3 cột cách nhau bằng dấu cách; cờ ghi thành `1` hoặc `0`."
+          "cpp": "Ghép `getUsername()`, `getPassword()` và cờ (`1` hoặc `0`), cách nhau bằng dấu cách; khai báo `override`."
         },
         {
           "name": "getRole",

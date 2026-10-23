@@ -306,7 +306,7 @@
         {
           "name": "m_title",
           "type": "string",
-          "vis": "#",
+          "vis": "-",
           "summary": "Tiêu đề in trong khung sao.",
           "role": "Cho biết đang ở menu nào và đăng nhập bằng tài khoản nào.",
           "example": "`\"MENU ADMIN (admin1)\"`."
@@ -314,7 +314,7 @@
         {
           "name": "m_exitLabel",
           "type": "string",
-          "vis": "#",
+          "vis": "-",
           "summary": "Chữ của mục thoát, luôn là mục cuối.",
           "role": "Để người dùng biết chọn mục này sẽ về đâu.",
           "example": "`\"Thoat (dang xuat)\"`."
@@ -324,12 +324,12 @@
         {
           "name": "Menu",
           "ctor": true,
-          "vis": "#",
+          "vis": "+",
           "params": [
             "title: string",
             "exitLabel: string"
           ],
-          "summary": "Gán tiêu đề và chữ mục thoát. Chỉ lớp con gọi.",
+          "summary": "Gán tiêu đề và chữ mục thoát. Lớp con gọi trong danh sách khởi tạo.",
           "role": "Lớp con gọi trong danh sách khởi tạo.",
           "pre": [
             "Không có."
@@ -338,7 +338,7 @@
             "Hai thuộc tính có giá trị."
           ],
           "example": "`AdminMenu(HrSystem& system, const std::string& username) : Menu(\"MENU ADMIN (\" + username + \")\", \"Thoat (dang xuat)\"), m_system(system) {}`",
-          "cpp": "Gán hai thuộc tính trong danh sách khởi tạo."
+          "cpp": "Gán hai thuộc tính trong danh sách khởi tạo. Để public cũng không ai tạo được `Menu` trực tiếp, vì lớp có hàm thuần ảo."
         },
         {
           "name": "run",
@@ -360,7 +360,7 @@
         {
           "name": "getOptions",
           "abstract": true,
-          "vis": "#",
+          "vis": "-",
           "params": [],
           "returns": "vector<string>",
           "summary": "Danh sách mục, không gồm mục thoát.",
@@ -372,12 +372,12 @@
             "Mục i (đếm từ 0) ứng với lựa chọn i + 1."
           ],
           "example": "`EmployeeMenu` trả `[\"Xem thong tin tai khoan\", \"Doi password\"]`.",
-          "cpp": "Khai báo thuần ảo (`= 0`), `protected`."
+          "cpp": "Khai báo thuần ảo (`= 0`) ở phần `private:`. C++ vẫn cho lớp con override hàm ảo private; chỉ `run` gọi hàm này, nên bên ngoài không cần thấy."
         },
         {
           "name": "handleChoice",
           "abstract": true,
-          "vis": "#",
+          "vis": "-",
           "params": [
             "choice: int"
           ],
@@ -391,12 +391,12 @@
             "Mọi thông báo đã được in."
           ],
           "example": "`AdminMenu`: `switch (choice) { case 1: addEmployee(); break; ... }`.",
-          "cpp": "Khai báo thuần ảo (`= 0`), `protected`."
+          "cpp": "Khai báo thuần ảo (`= 0`) ở phần `private:`. C++ vẫn cho lớp con override hàm ảo private; chỉ `run` gọi hàm này, nên bên ngoài không cần thấy."
         },
         {
           "name": "printProfile",
           "static": true,
-          "vis": "#",
+          "vis": "+",
           "params": [
             "username: string",
             "profile: UserProfile"
@@ -411,11 +411,11 @@
             "In đúng 5 dòng."
           ],
           "example": "Username: nva\nHo ten: Nguyen Van A\nDia chi: 12 Le Loi, Q1\nSo dien thoai: 0912345678\nEmail: nva@gmail.com",
-          "cpp": "In dòng username, rồi vòng `for` qua `FIELD_COUNT` thông tin, mỗi dòng ghép `labelOf` với `get` của thông tin đó."
+          "cpp": "Hàm `static` public (không dùng thuộc tính nào của menu), để lớp con gọi được. In dòng username, rồi vòng `for` qua `FIELD_COUNT` thông tin, mỗi dòng ghép `labelOf` với `get` của thông tin đó."
         }
       ],
       "impl": {
-        "cpp": "**Ước tính khoảng 42 dòng**: `Menu.h` khoảng 20 (gồm `virtual ~Menu() {}`), `Menu.cpp` khoảng 22."
+        "cpp": "**Ước tính khoảng 42 dòng**: `Menu.h` khoảng 20 (gồm `virtual ~Menu() {}`), `Menu.cpp` khoảng 22. Hàm dựng, `run` và `printProfile` ở phần `public:`; thuộc tính và hai hàm thuần ảo ở phần `private:`."
       },
       "notes": [],
       "read": 12,
@@ -435,7 +435,7 @@
       "role": "Hỏi người dùng, kiểm từng ô ngay khi nhập, rồi gọi `HrSystem`. Menu cập nhật là một vòng lặp nhỏ ngay trong `updateEmployee`, không cần lớp riêng.",
       "spec": "«Các chức năng chính của Admin» a–e và màn hình MENU trong đề.",
       "uses": [
-        "`Menu`: lớp cha; hàm dựng `Menu(title, exitLabel)`; viết `getOptions()` và `handleChoice(choice)`; có sẵn `printProfile(username, profile)`.",
+        "`Menu`: lớp cha; hàm dựng `Menu(title, exitLabel)`; viết `getOptions()` và `handleChoice(choice)` (private, override); có sẵn hàm static public `printProfile(username, profile)`.",
         "`HrSystem`: `checkNewUsername(u)`, `addEmployee(u, profile)`, `removeEmployee(u)`, `findEmployee(u, profile)`, `updateField(u, field, value)` (đều trả `\"\"` khi thành công, ngược lại là câu lỗi), `listEmployees(usernames)` (danh sách đã sắp xếp).",
         "`Validator.checkField(field, value)`: `\"\"` hoặc câu lỗi.",
         "`Console`: `readLine`, `readChoice`, `confirm`, `printLine`, `printSuccess`, `printError`, `printTitle`, `clearScreen`, `pause`.",
@@ -474,7 +474,7 @@
         },
         {
           "name": "getOptions",
-          "vis": "#",
+          "vis": "-",
           "override": true,
           "params": [],
           "returns": "vector<string>",
@@ -487,11 +487,11 @@
             "Đúng 5 phần tử."
           ],
           "example": "`[\"Them Employee\", \"Xoa Employee\", \"Tim Employee\", \"Cap nhat Employee\", \"Hien thi thong tin Employee\"]`.",
-          "cpp": "Trả một vector gồm 5 chuỗi tên mục."
+          "cpp": "Trả một vector gồm 5 chuỗi tên mục; đặt ở phần `private:` như ở `Menu`, khai báo `override`."
         },
         {
           "name": "handleChoice",
-          "vis": "#",
+          "vis": "-",
           "override": true,
           "params": [
             "choice: int"
@@ -506,7 +506,7 @@
             "Đã chạy xong một chức năng."
           ],
           "example": "`choice` = 4 → `updateEmployee()`.",
-          "cpp": "Một `switch` gọi 5 hàm riêng."
+          "cpp": "Một `switch` gọi 5 hàm riêng; đặt ở phần `private:` như ở `Menu`, khai báo `override`."
         },
         {
           "name": "addEmployee",
@@ -612,7 +612,7 @@
       "role": "Hai chức năng của nhân viên và lần đổi mật khẩu bắt buộc; phần «hỏi mật khẩu mới hai lần» dùng chung cho cả hai cách đổi.",
       "spec": "«Chức năng của employee»: hiển thị thông tin file [username].txt; đổi password (nhập mật khẩu để xác nhận, nhập 2 lần mật khẩu mới, ghi Employees.txt); bắt buộc đổi mật khẩu ở lần đăng nhập đầu.",
       "uses": [
-        "`Menu`: lớp cha; hàm dựng `Menu(title, exitLabel)`; viết `getOptions()` và `handleChoice(choice)`; có sẵn `printProfile(username, profile)`.",
+        "`Menu`: lớp cha; hàm dựng `Menu(title, exitLabel)`; viết `getOptions()` và `handleChoice(choice)` (private, override); có sẵn hàm static public `printProfile(username, profile)`.",
         "`HrSystem`: `findEmployee(u, profile)`; `verifyPassword(u, p)` (true nếu đúng mật khẩu hiện tại); `checkNewPassword(u, p)` và `changePassword(u, p)` (trả `\"\"` khi thành công, ngược lại là câu lỗi).",
         "`Console`: `readPassword(prompt)` (che `*`), `printSuccess`, `printError`, `printLine`, `pause`."
       ],
@@ -674,7 +674,7 @@
         },
         {
           "name": "getOptions",
-          "vis": "#",
+          "vis": "-",
           "override": true,
           "params": [],
           "returns": "vector<string>",
@@ -687,11 +687,11 @@
             "Đúng 2 phần tử."
           ],
           "example": "`[\"Xem thong tin tai khoan\", \"Doi password\"]`.",
-          "cpp": "Trả một vector gồm 2 chuỗi tên mục."
+          "cpp": "Trả một vector gồm 2 chuỗi tên mục; đặt ở phần `private:` như ở `Menu`, khai báo `override`."
         },
         {
           "name": "handleChoice",
-          "vis": "#",
+          "vis": "-",
           "override": true,
           "params": [
             "choice: int"
@@ -706,7 +706,7 @@
             "Đã chạy xong một chức năng."
           ],
           "example": "`choice` = 2 → `changePassword()`.",
-          "cpp": "Một `if` chọn giữa hai hàm riêng."
+          "cpp": "Một `if` chọn giữa hai hàm riêng; đặt ở phần `private:` như ở `Menu`, khai báo `override`."
         },
         {
           "name": "showMyInfo",

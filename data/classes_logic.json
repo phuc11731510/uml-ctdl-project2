@@ -252,7 +252,8 @@
           ],
           "complexity": "O(n²)",
           "example": "Lần chạy đầu, thư mục trống: tạo `data`, `data/users`, Employees.txt rỗng, Administrators.txt có `admin1`, `admin2`, `admin3`; `messages` có 3 câu.",
-          "cpp": "Làm lần lượt các bước ở phần mô tả. Phần tạo admin là một vòng `while` thử tên `admin1`, `admin2`... (ghép số bằng `std::to_string`) cho tới khi đủ 3."
+          "cpp": "Làm lần lượt các bước ở phần mô tả. Phần tạo admin là một vòng `while` thử tên `admin1`, `admin2`... (ghép số bằng `std::to_string`) cho tới khi đủ 3.",
+          "implNote": "Kiểm nhân viên trùng admin và tên admin mặc định đã có bằng `indexOf` / `isUsernameTaken`, không so `==`."
         },
         {
           "name": "login",
@@ -276,7 +277,8 @@
           ],
           "complexity": "O(n)",
           "example": "File có `nva 111111 1`: `login(\"NVA\", \"111111\", role, name)` trả true, `role` = `Role::EMPLOYEE`, `name` = `\"nva\"`. Sai mật khẩu hay username lạ → false.",
-          "cpp": "Tìm vị trí trong danh sách admin bằng `indexOf`; có và đúng mật khẩu thì ghi kết quả vào hai tham số rồi trả true. Không thì làm tương tự với danh sách nhân viên."
+          "cpp": "Tìm vị trí trong danh sách admin bằng `indexOf`; có và đúng mật khẩu thì ghi kết quả vào hai tham số rồi trả true. Không thì làm tương tự với danh sách nhân viên.",
+          "implNote": "Tìm tài khoản bằng `indexOf`, không tự viết vòng lặp so username bằng `==`, để `NVA` và `nva` được coi là một. Menu nhận username như trong file (`accountName`), không phải chữ người dùng gõ."
         },
         {
           "name": "needsPasswordChange",
@@ -294,7 +296,8 @@
             "Admin hoặc username lạ: false."
           ],
           "example": "Dòng `nva 111111 1` → true.",
-          "cpp": "Tìm vị trí bằng `indexOf`; không có thì false, có thì hỏi cờ của nhân viên đó."
+          "cpp": "Tìm vị trí bằng `indexOf`; không có thì false, có thì hỏi cờ của nhân viên đó.",
+          "implNote": "Tìm tài khoản bằng `indexOf`, không tự viết vòng lặp so username bằng `==`, để `NVA` và `nva` được coi là một."
         },
         {
           "name": "verifyPassword",
@@ -313,7 +316,8 @@
             "Username không phải nhân viên: false."
           ],
           "example": "Dòng `lthb abc12345 0`: `verifyPassword(\"lthb\", \"abc12345\")` = true.",
-          "cpp": "Tìm vị trí bằng `indexOf`; không có thì false, có thì gọi `checkPassword` của nhân viên đó."
+          "cpp": "Tìm vị trí bằng `indexOf`; không có thì false, có thì gọi `checkPassword` của nhân viên đó.",
+          "implNote": "Tìm tài khoản bằng `indexOf`, không tự viết vòng lặp so username bằng `==`, để `NVA` và `nva` được coi là một."
         },
         {
           "name": "checkNewUsername",
@@ -388,7 +392,8 @@
             "Trả `\"\"`: không còn dòng của nhân viên; file hồ sơ đã bị xóa."
           ],
           "example": "`removeEmployee(\"nva\")` → `\"\"`. `removeEmployee(\"admin1\")` → `\"Khong tim thay nhan vien\"` (admin không xóa được admin).",
-          "cpp": "Tìm vị trí, `removeAt`, `save`, rồi xóa file hồ sơ bằng `Util::deleteFile`."
+          "cpp": "Tìm vị trí, `removeAt`, `save`, rồi xóa file hồ sơ bằng `Util::deleteFile`.",
+          "implNote": "Tìm tài khoản bằng `indexOf`, không tự viết vòng lặp so username bằng `==`, để `NVA` và `nva` được coi là một."
         },
         {
           "name": "findEmployee",
@@ -407,7 +412,8 @@
             "Trả `\"\"`: `profile` là hồ sơ đọc được."
           ],
           "example": "`findEmployee(\"NVA\", p)` → `\"\"`. `findEmployee(\"admin1\", p)` → `\"Khong tim thay nhan vien\"`. Thiếu file hồ sơ → `\"Khong doc duoc file ho so\"`.",
-          "cpp": "Kiểm có trong danh sách nhân viên; rồi đọc file hồ sơ bằng `Util::readLines` và đổi sang hồ sơ bằng `UserProfile::fromLines`."
+          "cpp": "Kiểm có trong danh sách nhân viên; rồi đọc file hồ sơ bằng `Util::readLines` và đổi sang hồ sơ bằng `UserProfile::fromLines`.",
+          "implNote": "Tìm tài khoản bằng `indexOf`, không tự viết vòng lặp so username bằng `==`, để `NVA` và `nva` được coi là một."
         },
         {
           "name": "updateField",
@@ -466,7 +472,8 @@
             "Trả `\"\"`: dòng của nhân viên có mật khẩu mới và cờ `0`."
           ],
           "example": "Dòng `nva 111111 1`: `changePassword(\"nva\", \"Moi12345\")` → `\"\"`; dòng thành `nva Moi12345 0`.",
-          "cpp": "Lấy tham chiếu tới nhân viên (`at` của `indexOf`), đặt mật khẩu mới, tắt cờ, rồi `save`."
+          "cpp": "Lấy tham chiếu tới nhân viên (`at` của `indexOf`), đặt mật khẩu mới, tắt cờ, rồi `save`.",
+          "implNote": "Tìm tài khoản bằng `indexOf`, không tự viết vòng lặp so username bằng `==`, để `NVA` và `nva` được coi là một."
         },
         {
           "name": "isUsernameTaken",
@@ -484,7 +491,8 @@
             "Bằng `m_admins.indexOf(u) != -1 || m_employees.indexOf(u) != -1`."
           ],
           "example": "Có admin `admin1`: `isUsernameTaken(\"ADMIN1\")` = true.",
-          "cpp": "`indexOf` khác −1 ở một trong hai danh sách."
+          "cpp": "`indexOf` khác −1 ở một trong hai danh sách.",
+          "implNote": "Dùng `indexOf` ở cả hai danh sách, không so `==`: đã có `nva` thì không cho tạo `NVA`."
         },
         {
           "name": "profilePath",
@@ -503,7 +511,8 @@
             "Tên file luôn viết thường."
           ],
           "example": "`profilePath(\"NVA\")` = `\"data/users/nva.txt\"`.",
-          "cpp": "Ghép `data/users/`, username đã đổi chữ thường, và `.txt`."
+          "cpp": "Ghép `data/users/`, username đã đổi chữ thường, và `.txt`.",
+          "implNote": "Luôn đổi username về chữ thường, vì Windows coi `NVA.txt` và `nva.txt` là một file."
         }
       ],
       "impl": {

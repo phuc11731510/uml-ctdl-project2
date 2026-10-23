@@ -120,7 +120,8 @@
             "Bằng `Util.equalsIgnoreCase(m_username, name)`."
           ],
           "example": "Tài khoản `nva`: `matchesUsername(\"NVA\")` = true; `matchesUsername(\"nva1\")` = false.",
-          "cpp": "Gọi hàm so sánh không phân biệt hoa thường của lớp tiện ích; khai báo `const`."
+          "cpp": "Gọi hàm so sánh không phân biệt hoa thường của lớp tiện ích; khai báo `const`.",
+          "implNote": "Đây là chỗ duy nhất so username. Đăng nhập, tìm, xóa, kiểm trùng đều đi qua hàm này (qua `AccountList.indexOf`); không nơi nào khác so username bằng `==`."
         },
         {
           "name": "checkPassword",

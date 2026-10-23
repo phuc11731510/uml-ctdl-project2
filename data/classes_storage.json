@@ -74,7 +74,8 @@
           ],
           "complexity": "O(n²) do kiểm trùng tuần tự",
           "example": "File có `nva 111111 1`, một dòng trống, `NVA abc 0` → danh sách chỉ có `nva`.",
-          "cpp": "Xóa danh sách cũ, đọc file bằng `Util::readLines`. Với mỗi dòng không rỗng: tạo một `T` rỗng, gọi `T::fromLine`, chỉ thêm khi đọc được và `indexOf` trả −1."
+          "cpp": "Xóa danh sách cũ, đọc file bằng `Util::readLines`. Với mỗi dòng không rỗng: tạo một `T` rỗng, gọi `T::fromLine`, chỉ thêm khi đọc được và `indexOf` trả −1.",
+          "implNote": "Kiểm dòng trùng bằng `indexOf`, không so `==`: file có cả `NVA` và `nva` thì chỉ giữ dòng đầu."
         },
         {
           "name": "save",
@@ -144,7 +145,8 @@
           ],
           "complexity": "O(n) tìm tuần tự",
           "example": "`[nva, lthb]`: `indexOf(\"LTHB\")` = 1; `indexOf(\"ttc\")` = −1.",
-          "cpp": "Tìm tuần tự, so bằng `matchesUsername` của từng phần tử."
+          "cpp": "Tìm tuần tự, so bằng `matchesUsername` của từng phần tử.",
+          "implNote": "So bằng `matchesUsername` của từng phần tử, không dùng `getUsername() == username`. Mọi chức năng tìm theo username đều dựa vào hàm này."
         },
         {
           "name": "add",

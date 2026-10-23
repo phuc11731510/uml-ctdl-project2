@@ -7,7 +7,7 @@
       "status": "core",
       "summary": "Kiểm tra định dạng dữ liệu nhập. Mỗi hàm trả chuỗi rỗng nếu hợp lệ, hoặc câu thông báo lỗi (không dấu) để in ra.",
       "role": "Nơi duy nhất chứa các ràng buộc dữ liệu. Trả thẳng câu thông báo lỗi, nên không cần mã lỗi hay bảng đổi mã thành câu. Chỉ kiểm định dạng; việc username đã có người dùng chưa do `HrSystem` kiểm.",
-      "spec": "«Thực hiện đầy đủ các chức năng được yêu cầu, đầy đủ các ràng buộc dữ liệu (5đ).» Đề không nêu quy tắc cụ thể nên nhóm tự đặt.",
+      "spec": "«Thực hiện đầy đủ các chức năng được yêu cầu, đầy đủ các ràng buộc dữ liệu (5đ).» Đề không nêu quy tắc cụ thể nên các quy tắc dưới đây là đề xuất.",
       "uses": [
         "`Util.isAllDigits(s)`: chuỗi không rỗng và toàn chữ số.",
         "`Util.toLower(s)`: đổi chữ thường.",
@@ -163,7 +163,6 @@
         "cpp": "**Ước tính khoảng 65 dòng**, chỉ file `Validator.h`, hàm `static` viết thân trong lớp. Mỗi hàm đặt câu thông báo vào một hằng cục bộ `const std::string MSG = \"...\";` để không lặp lại."
       },
       "notes": [
-        "Bảng quy tắc nên chép vào báo cáo Word, mục «ràng buộc dữ liệu».",
         "Các con số (3, 20, 6, 50, 100, 10) viết thẳng trong mã cho gọn. Nếu Coding Standard của lớp cấm «số ma thuật» thì thêm hằng, tốn khoảng 8 dòng."
       ],
       "read": 9,
@@ -239,7 +238,7 @@
           "summary": "Chuẩn bị lúc khởi động: tạo thư mục, đọc hai file, bỏ nhân viên trùng tên admin, tạo đủ 3 admin.",
           "role": "Gọi một lần, trước màn hình đăng nhập.",
           "detail": [
-            "Tạo `data` rồi `data/users` (`Util.ensureFolder`); lỗi thì thêm câu vào `messages` và trả false.",
+            "Tạo `data/users` bằng `Util.ensureFolder` (tạo luôn `data`); lỗi thì thêm câu vào `messages` và trả false.",
             "`m_admins.load()`, `m_employees.load()`. Chưa có Employees.txt thì `m_employees.save()` để tạo file rỗng.",
             "Nhân viên trùng username với admin thì bỏ (duyệt từ cuối về đầu để chỉ số không lệch).",
             "Thử lần lượt `admin1`, `admin2`... (bỏ qua tên đã có) cho tới khi đủ 3 admin, mật khẩu `123456`; mỗi admin tạo thêm thì thêm câu «Da tao admin mac dinh: admin2 / 123456» vào `messages`. Có tạo thì `m_admins.save()`."

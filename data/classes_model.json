@@ -319,7 +319,7 @@
       "status": "core",
       "summary": "Tài khoản nhân viên. Một dòng của `Employees.txt`: `username matkhau co`, với cờ `1` nghĩa là phải đổi mật khẩu.",
       "role": "Thêm vào `Account` cờ «phải đổi mật khẩu ở lần đăng nhập tới», thay cho câu hỏi «có phải lần đăng nhập đầu không». Admin thêm nhân viên thì cờ bật; đổi mật khẩu xong thì cờ tắt.",
-      "spec": "«Employees.txt: Username, Password» (nhóm thêm cột cờ); «Pass mặc định là 111111»; «Nếu là lần đăng nhập đầu tiên thì bắt buộc đổi mật khẩu».",
+      "spec": "«Employees.txt: Username, Password» (thêm cột cờ so với đề); «Pass mặc định là 111111»; «Nếu là lần đăng nhập đầu tiên thì bắt buộc đổi mật khẩu».",
       "uses": [
         "`Account`: lớp cha. Có `m_username`, `m_password` (`protected`), hàm dựng `Account(username, password)`, và hai hàm thuần ảo `toLine()`, `getRole()` phải viết.",
         "`Role::EMPLOYEE`."
@@ -489,7 +489,7 @@
         "cpp": "**Ước tính khoảng 32 dòng**, chỉ file `Employee.h`: `class Employee : public Account { ... };`."
       },
       "notes": [
-        "Cột 3 là phần nhóm thêm so với đề; nên ghi rõ trong báo cáo Word.",
+        "Cột 3 là phần thêm so với đề.",
         "Hồ sơ (họ tên, địa chỉ...) không nằm trong lớp này mà ở file `data/users/<username>.txt`, do `HrSystem` đọc ghi."
       ],
       "read": 5,

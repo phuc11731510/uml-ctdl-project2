@@ -10,7 +10,7 @@
       "readWhy": "Đọc trước nhất: mọi chữ ký trong sơ đồ dùng các tên kiểu này. Chúng là kiểu có sẵn của C++ nên không có thẻ lớp riêng.",
       "summary": "Bảng tra các kiểu có sẵn của C++ dùng trong chữ ký: string, vector<T>, int, bool, char, void.",
       "role": "Không phải một lớp mà là bảng tra. Sơ đồ viết `string` và `vector<T>` cho gọn; trong mã C++ là `std::string` và `std::vector<T>`. Rê chuột lên một tên kiểu trong chữ ký để xem định nghĩa, hoặc bấm để mở dòng tương ứng ở đây.",
-      "spec": "Không trực tiếp. Nhóm được phép dùng thư viện chuẩn của C++ (`vector`, `string`, `fstream`...).",
+      "spec": "Không trực tiếp. Được phép dùng thư viện chuẩn của C++ (`vector`, `string`, `fstream`, `filesystem`...).",
       "uses": [],
       "invariants": [],
       "attributes": [

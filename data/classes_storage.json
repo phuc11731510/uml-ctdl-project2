@@ -8,7 +8,7 @@
       ],
       "package": "storage",
       "status": "core",
-      "summary": "Lớp template nhóm tự viết: danh sách tài khoản kiểu T trong bộ nhớ, gắn với một file txt. Dùng hai lần: `AccountList<Admin>` và `AccountList<Employee>`.",
+      "summary": "Lớp template: danh sách tài khoản kiểu T trong bộ nhớ, gắn với một file txt. Dùng hai lần: `AccountList<Admin>` và `AccountList<Employee>`.",
       "role": "Viết một lần, dùng cho cả hai file tài khoản. Bên trong là một `vector<T>`. Lớp lo việc đọc file lúc khởi động, tìm theo username, thêm, xóa, sắp xếp, và ghi lại toàn bộ file. Nó chỉ cần kiểu T có đủ 5 thứ ghi ở mục «Cần biết từ lớp khác»; `Admin` và `Employee` đều có.",
       "spec": "Yêu cầu chấm điểm «cài đặt theo hướng đối tượng và template (2đ)»; lưu danh sách admin và employee.",
       "uses": [

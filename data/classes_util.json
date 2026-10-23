@@ -7,7 +7,7 @@
       "status": "support",
       "summary": "Các hàm tĩnh dùng chung: bỏ khoảng trắng, đổi chữ thường, so sánh không phân biệt hoa thường, kiểm chuỗi toàn chữ số, đọc và ghi file, xóa file, tạo thư mục.",
       "role": "Các hàm xử lý chuỗi và đọc ghi file gom chung một lớp, chỉ có file .h. Mọi lớp khác gọi tới đây thay vì tự viết lại vòng lặp xử lý chuỗi hay tự mở file.",
-      "spec": "Lưu dữ liệu bằng file txt và «ghi cập nhật» file sau mỗi thay đổi; so username không phân biệt hoa thường (quyết định của nhóm).",
+      "spec": "Lưu dữ liệu bằng file txt và «ghi cập nhật» file sau mỗi thay đổi; so username không phân biệt hoa thường.",
       "uses": [],
       "invariants": [],
       "attributes": [],
@@ -157,7 +157,7 @@
           ],
           "complexity": "O(1)",
           "example": "`deleteFile(\"data/users/nva.txt\")` trả true và file biến mất.",
-          "cpp": "`std::remove` trong `<cstdio>`; thành công khi trả 0."
+          "cpp": "`std::filesystem::remove` trong `<filesystem>`: trả true nếu đã xóa, false nếu file không có. Truyền thêm một biến `std::error_code` để hàm báo lỗi qua biến đó thay vì ném ngoại lệ."
         },
         {
           "name": "ensureFolder",
@@ -168,24 +168,24 @@
           ],
           "returns": "bool",
           "summary": "Tạo thư mục nếu chưa có; trả true nếu sau đó thư mục tồn tại.",
-          "role": "Lúc khởi động, tạo `data` rồi `data/users` để các lần ghi sau không lỗi vì thiếu thư mục.",
-          "detail": "Mỗi lần chỉ tạo được một cấp: tạo `data` trước rồi mới tới `data/users`.",
+          "role": "Lúc khởi động, tạo `data/users` (và `data`) để các lần ghi sau không lỗi vì thiếu thư mục.",
+          "detail": "Tạo được nhiều cấp cùng lúc: `ensureFolder(\"data/users\")` tạo luôn cả `data` nếu chưa có.",
           "pre": [
-            "Thư mục cha đã tồn tại; `path` không có `/` ở cuối."
+            "`path` không có `/` ở cuối."
           ],
           "post": [
             "Trả true: thư mục tồn tại (vừa tạo hoặc đã có từ trước)."
           ],
           "complexity": "O(1)",
-          "example": "Lần chạy đầu `ensureFolder(\"data\")` tạo thư mục; lần sau vẫn trả true.",
-          "cpp": "`_mkdir` trong `<direct.h>`; coi là thành công khi tạo được hoặc khi lỗi là «đã tồn tại» (`errno == EEXIST`)."
+          "example": "Lần chạy đầu `ensureFolder(\"data/users\")` tạo cả `data` và `data/users`; lần sau vẫn trả true.",
+          "cpp": "`std::filesystem::create_directories` trong `<filesystem>` (truyền thêm biến `std::error_code` như ở `deleteFile`), rồi trả kết quả của `std::filesystem::is_directory(path)`."
         }
       ],
       "impl": {
-        "cpp": "**Ước tính khoảng 60 dòng**, chỉ file `Util.h`: `class Util { public: static std::string trim(std::string s) { ... } ... };`. Hàm viết thân ngay trong lớp nên không cần `Util.cpp`."
+        "cpp": "**Ước tính khoảng 60 dòng**, chỉ file `Util.h`: `class Util { public: static std::string trim(std::string s) { ... } ... };`. Hàm viết thân ngay trong lớp nên không cần `Util.cpp`. `<filesystem>` cần C++17: trong Visual Studio vào Project → Properties → C/C++ → Language → C++ Language Standard, chọn ISO C++17 (mặc định là C++14)."
       },
       "notes": [
-        "Đường dẫn tương đối như `data/Employees.txt` tính từ thư mục làm việc lúc chạy (Visual Studio: thư mục dự án; bấm đúp .exe: thư mục chứa .exe). Nhóm nên thống nhất một cách chạy khi quay video."
+        "Đường dẫn tương đối như `data/Employees.txt` tính từ thư mục làm việc lúc chạy (Visual Studio: thư mục dự án; bấm đúp .exe: thư mục chứa .exe)."
       ],
       "read": 1,
       "stage": 1,

@@ -6,7 +6,7 @@
       "package": "logic",
       "status": "core",
       "summary": "Kiểm tra định dạng dữ liệu nhập. Mỗi hàm trả chuỗi rỗng nếu hợp lệ, hoặc câu thông báo lỗi (không dấu) để in ra.",
-      "role": "Nơi duy nhất chứa các ràng buộc dữ liệu. Bản gọn trả thẳng câu thông báo thay cho mã lỗi `ErrorCode` của bản đầy đủ, nên không cần bảng đổi mã thành câu. Chỉ kiểm định dạng; việc username đã có người dùng chưa do `HrSystem` kiểm.",
+      "role": "Nơi duy nhất chứa các ràng buộc dữ liệu. Trả thẳng câu thông báo lỗi, nên không cần mã lỗi hay bảng đổi mã thành câu. Chỉ kiểm định dạng; việc username đã có người dùng chưa do `HrSystem` kiểm.",
       "spec": "«Thực hiện đầy đủ các chức năng được yêu cầu, đầy đủ các ràng buộc dữ liệu (5đ).» Đề không nêu quy tắc cụ thể nên nhóm tự đặt.",
       "uses": [
         "`Util.isAllDigits(s)`: chuỗi không rỗng và toàn chữ số.",
@@ -160,7 +160,7 @@
         }
       ],
       "impl": {
-        "cpp": "**Ngân sách khoảng 65 dòng**, chỉ file `Validator.h`, hàm `static` viết thân trong lớp. Mỗi hàm đặt câu thông báo vào một hằng cục bộ `const std::string MSG = \"...\";` để không lặp lại."
+        "cpp": "**Ước tính khoảng 65 dòng**, chỉ file `Validator.h`, hàm `static` viết thân trong lớp. Mỗi hàm đặt câu thông báo vào một hằng cục bộ `const std::string MSG = \"...\";` để không lặp lại."
       },
       "notes": [
         "Bảng quy tắc nên chép vào báo cáo Word, mục «ràng buộc dữ liệu».",
@@ -180,7 +180,7 @@
       "package": "logic",
       "status": "core",
       "summary": "Bộ não của chương trình: giữ hai danh sách tài khoản, đọc ghi file hồ sơ, làm mọi chức năng của đề và ghi file ngay sau mỗi thay đổi. Không in, không đọc bàn phím.",
-      "role": "Các menu chỉ hỏi người dùng rồi gọi `HrSystem`. Hàm có thể lỗi trả về chuỗi: rỗng là thành công, khác rỗng là câu thông báo để menu in ra. Bản gọn gộp kho hồ sơ (`ProfileStore`) vào đây và bỏ phần hoàn tác khi ghi file lỗi.",
+      "role": "Các menu chỉ hỏi người dùng rồi gọi `HrSystem`. Hàm có thể lỗi trả về chuỗi: rỗng là thành công, khác rỗng là câu thông báo để menu in ra. Việc đọc và ghi file hồ sơ cũng làm ở đây.",
       "spec": "Mọi chức năng của đề: đăng nhập chung và nhận ra vai trò; thêm, xóa, tìm, cập nhật, hiển thị nhân viên; xem thông tin, đổi mật khẩu; buộc đổi mật khẩu lần đầu; «có tối thiểu 3 người quản lý».",
       "uses": [
         "`AccountList<T>` (T là `Admin` hoặc `Employee`): `load()`, `save()` (trả false nếu ghi lỗi), `size()`, `at(i)` (sửa được), `indexOf(username)` (−1 nếu không có, không phân biệt hoa thường), `add(item)`, `removeAt(i)`, `sortByUsername()`.",
@@ -516,11 +516,11 @@
         }
       ],
       "impl": {
-        "cpp": "**Ngân sách khoảng 150 dòng**: `HrSystem.h` khoảng 30, `HrSystem.cpp` khoảng 120. Câu lỗi dùng nhiều lần đặt thành hằng ở đầu file .cpp: `const std::string FILE_ERROR = \"Khong ghi duoc file du lieu\";`."
+        "cpp": "**Ước tính khoảng 150 dòng**: `HrSystem.h` khoảng 30, `HrSystem.cpp` khoảng 120. Câu lỗi dùng nhiều lần đặt thành hằng ở đầu file .cpp: `const std::string FILE_ERROR = \"Khong ghi duoc file du lieu\";`."
       },
       "notes": [
-        "Bản gọn bỏ hoàn tác: nếu ghi file lỗi giữa chừng, dữ liệu trong bộ nhớ có thể khác file cho tới lần chạy sau. Ghi file trên máy cá nhân hầu như không lỗi nên chấp nhận được.",
-        "`changePassword` của bản gọn gộp `changePassword` và `forceChangePassword` của bản đầy đủ."
+        "Không có hoàn tác: nếu ghi file lỗi giữa chừng, dữ liệu trong bộ nhớ có thể khác file cho tới lần chạy sau. Ghi file trên máy cá nhân hầu như không lỗi nên chấp nhận được.",
+        "`changePassword` dùng cho cả lần đổi bắt buộc ở lần đăng nhập đầu và lần đổi từ menu nhân viên."
       ],
       "read": 10,
       "stage": 4,

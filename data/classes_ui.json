@@ -6,7 +6,7 @@
       "package": "ui",
       "status": "core",
       "summary": "Lớp duy nhất đọc bàn phím và in ra màn hình: in có màu, khung tiêu đề, đọc dòng, đọc mật khẩu che `*`, đọc lựa chọn menu, hỏi y/n.",
-      "role": "Gom mọi thứ phụ thuộc console của Windows (`SetConsoleTextAttribute`, `_getch`, `cls`). Bản gọn thay kiểu `ConsoleColor` bằng 5 hằng số màu ngay trong lớp.",
+      "role": "Gom mọi thứ phụ thuộc console của Windows (`SetConsoleTextAttribute`, `_getch`, `cls`). Màu chữ là 5 hằng số ngay trong lớp.",
       "spec": "«Mã hóa pass thành dấu * khi đăng nhập»; «Dùng màu để thiết kế giao diện dễ nhìn»; «thông báo thông tin lỗi đến user».",
       "uses": [
         "`Util.trim(s)`: bỏ khoảng trắng đầu cuối.",
@@ -195,7 +195,7 @@
           "returns": "string",
           "summary": "Đọc mật khẩu từng phím, mỗi ký tự hiện thành `*`.",
           "role": "Ô Pass khi đăng nhập và mọi ô mật khẩu khi đổi mật khẩu. Đúng yêu cầu «mã hóa pass thành dấu *».",
-          "detail": "Enter (13): kết thúc. Backspace (8): xóa ký tự cuối và in `\\b \\b`. Mã 0 hoặc 224 (phím mũi tên, F1...): đọc bỏ thêm một mã. Ký tự mã 32–126: thêm vào và in `*` (tối đa 40 ký tự). Phím khác bỏ qua. Bản gọn không có Esc để hủy: muốn hủy thì gõ sai hoặc để trống.",
+          "detail": "Enter (13): kết thúc. Backspace (8): xóa ký tự cuối và in `\\b \\b`. Mã 0 hoặc 224 (phím mũi tên, F1...): đọc bỏ thêm một mã. Ký tự mã 32–126: thêm vào và in `*` (tối đa 40 ký tự). Phím khác bỏ qua. Không có phím Esc để hủy: muốn hủy thì gõ sai hoặc để trống.",
           "pre": [
             "Không có."
           ],
@@ -279,11 +279,8 @@
         }
       ],
       "impl": {
-        "cpp": "**Ngân sách khoảng 95 dòng**: `Console.h` khoảng 20, `Console.cpp` khoảng 75. Chỉ include `<windows.h>` và `<conio.h>` trong file .cpp."
+        "cpp": "**Ước tính khoảng 95 dòng**: `Console.h` khoảng 20, `Console.cpp` khoảng 75. Chỉ include `<windows.h>` và `<conio.h>` trong file .cpp."
       },
-      "notes": [
-        "Bản gọn bỏ so với bản đầy đủ: kiểu `ConsoleColor`, `messageOf` và `ErrorCode` (lỗi đã là câu chữ sẵn), `printWarning`, phím Esc để hủy."
-      ],
       "read": 11,
       "stage": 5,
       "readWhy": "Mọi màn hình đều in và đọc qua lớp này.",
@@ -298,7 +295,7 @@
       "package": "ui",
       "status": "support",
       "summary": "Khung chung của menu: in tiêu đề và các mục, đọc lựa chọn, giao cho lớp con xử lý, lặp tới khi chọn mục thoát.",
-      "role": "`run()` viết một lần (mẫu Template Method); lớp con chỉ viết `getOptions` và `handleChoice`. Giữ lại trong bản gọn vì chỉ tốn khoảng 40 dòng, lại tiết kiệm được hai vòng lặp menu và là chỗ thể hiện kế thừa, đa hình ở phần giao diện.",
+      "role": "`run()` viết một lần (mẫu Template Method); lớp con chỉ viết `getOptions` và `handleChoice`. Nhờ vậy hai menu không phải tự viết vòng lặp, và đây là chỗ thể hiện kế thừa, đa hình ở phần giao diện.",
       "spec": "«Người dùng có thể lựa chọn thực hiện chức năng khác hoặc kết thúc chương trình sau khi hoàn thành mỗi thao tác/chức năng»; các màn hình MENU trong đề.",
       "uses": [
         "`Console`: `clearScreen()`, `printTitle(title)`, `printLine(text)`, `readChoice(max)` (số đã chọn hoặc −1), `printError(message)`, `pause()`.",
@@ -418,7 +415,7 @@
         }
       ],
       "impl": {
-        "cpp": "**Ngân sách khoảng 42 dòng**: `Menu.h` khoảng 20 (gồm `virtual ~Menu() {}`), `Menu.cpp` khoảng 22."
+        "cpp": "**Ước tính khoảng 42 dòng**: `Menu.h` khoảng 20 (gồm `virtual ~Menu() {}`), `Menu.cpp` khoảng 22."
       },
       "notes": [],
       "read": 12,
@@ -435,7 +432,7 @@
       "package": "ui",
       "status": "core",
       "summary": "Menu của admin: 1 Thêm, 2 Xóa, 3 Tìm, 4 Cập nhật (có vòng lặp con), 5 Hiển thị tất cả, 6 Thoát.",
-      "role": "Hỏi người dùng, kiểm từng ô ngay khi nhập, rồi gọi `HrSystem`. Bản gọn viết menu cập nhật thành một vòng lặp nhỏ ngay trong `updateEmployee` thay cho lớp `ProfileEditMenu` riêng.",
+      "role": "Hỏi người dùng, kiểm từng ô ngay khi nhập, rồi gọi `HrSystem`. Menu cập nhật là một vòng lặp nhỏ ngay trong `updateEmployee`, không cần lớp riêng.",
       "spec": "«Các chức năng chính của Admin» a–e và màn hình MENU trong đề.",
       "uses": [
         "`Menu`: lớp cha; hàm dựng `Menu(title, exitLabel)`; viết `getOptions()` và `handleChoice(choice)`; có sẵn `printProfile(username, profile)`.",
@@ -595,7 +592,7 @@
         }
       ],
       "impl": {
-        "cpp": "**Ngân sách khoảng 123 dòng**: `AdminMenu.h` khoảng 18, `AdminMenu.cpp` khoảng 105. `class AdminMenu : public Menu { ... };`."
+        "cpp": "**Ước tính khoảng 123 dòng**: `AdminMenu.h` khoảng 18, `AdminMenu.cpp` khoảng 105. `class AdminMenu : public Menu { ... };`."
       },
       "notes": [],
       "read": 13,
@@ -765,7 +762,7 @@
         }
       ],
       "impl": {
-        "cpp": "**Ngân sách khoảng 76 dòng**: `EmployeeMenu.h` khoảng 16, `EmployeeMenu.cpp` khoảng 60."
+        "cpp": "**Ước tính khoảng 76 dòng**: `EmployeeMenu.h` khoảng 16, `EmployeeMenu.cpp` khoảng 60."
       },
       "notes": [],
       "read": 14,
@@ -782,7 +779,7 @@
       "package": "ui",
       "status": "core",
       "summary": "Điểm bắt đầu: khởi tạo hệ thống, rồi lặp: màn hình đăng nhập → menu theo vai trò → đăng xuất. Kết thúc khi để trống User hoặc sai 3 lần liên tiếp.",
-      "role": "Nối mọi phần lại với nhau. Bản gọn gộp màn hình đăng nhập (`LoginScreen` của bản đầy đủ) vào đây thành hàm `login`.",
+      "role": "Nối mọi phần lại với nhau. Màn hình đăng nhập là hàm `login` của lớp này.",
       "spec": "«User phải đăng nhập... hệ thống nhận ra admin hay employee và tới menu tương ứng»; «Nếu đăng nhập sai 3 lần thì thoát» (áp dụng cho cả admin); «Mã hóa pass thành dấu *».",
       "uses": [
         "`HrSystem`: `initialize(messages)` (false nếu không chuẩn bị được dữ liệu); `login(u, p, role, accountName)` (true nếu đúng); `needsPasswordChange(u)`.",
@@ -852,10 +849,10 @@
         }
       ],
       "impl": {
-        "cpp": "**Ngân sách khoảng 66 dòng**: `Application.h` khoảng 16, `Application.cpp` khoảng 50. Thêm `main.cpp` khoảng 6 dòng: `int main() { Application app; return app.run(); }`."
+        "cpp": "**Ước tính khoảng 66 dòng**: `Application.h` khoảng 16, `Application.cpp` khoảng 50. Thêm `main.cpp` khoảng 6 dòng: `int main() { Application app; return app.run(); }`."
       },
       "notes": [
-        "Khác bản đầy đủ: bộ đếm sai làm lại từ 0 mỗi lần quay về màn hình đăng nhập (sau khi đăng xuất). Vì chỉ quay về được sau một lần đăng nhập đúng, điều này giống với «đếm các lần sai liên tiếp»."
+        "Bộ đếm sai làm lại từ 0 mỗi lần quay về màn hình đăng nhập (sau khi đăng xuất). Vì chỉ quay về được sau một lần đăng nhập đúng, điều này giống với «đếm các lần sai liên tiếp»."
       ],
       "read": 15,
       "stage": 5,

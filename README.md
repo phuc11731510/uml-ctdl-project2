@@ -1,4 +1,4 @@
-# UML Quản lý nhân sự (bản gọn)
+# UML Quản lý nhân sự
 
 Sơ đồ lớp UML tương tác của ứng dụng quản lý nhân sự chạy trên console (Project 2, học phần Cấu trúc dữ liệu và giải thuật). Thiết kế cho C++ trên Windows, cài đặt theo hướng đối tượng và template. Trang chỉ có **một sơ đồ lớp**.
 
@@ -26,22 +26,7 @@ Nếu sau khi các file được sửa mà trang vẫn hiện bản cũ, nhấn 
 - **Mọi tên lớp và tên kiểu đều bấm được**: bấm `UserProfile` hay `string` để nhảy tới nơi nó được định nghĩa. Nút «← Quay lại» ở đầu khung đưa về lựa chọn trước.
 - Mặc định chỉ vẽ các quan hệ cấu trúc cho gọn; các quan hệ phụ thuộc của một lớp hiện khi chọn lớp đó, hoặc bật «Hiện mọi quan hệ phụ thuộc» ở thanh bên.
 
-## Bản gọn khác bản đầy đủ thế nào
-
-Nhánh `ban-gon` là thiết kế rút gọn với mục tiêu **dưới 900 dòng code C++, tính cả dòng trống**. Vẫn đủ mọi chức năng và ràng buộc dữ liệu của đề, vẫn có lớp template `AccountList<T>` và kế thừa `Account` → `Admin`/`Employee`, `Menu` → `AdminMenu`/`EmployeeMenu`. Bản đầy đủ (khoảng 2.000 dòng) ở nhánh `main`.
-
-| Bỏ hoặc gộp | Thay bằng |
-| --- | --- |
-| `StringUtil` + `FileUtil` | một lớp `Util` |
-| `ErrorCode` + `Console.messageOf` | hàm trả thẳng câu thông báo lỗi (`""` là hợp lệ) |
-| `ProfileStore` | hàm riêng trong `HrSystem` |
-| `ProfileEditMenu` | vòng lặp nhỏ trong `AdminMenu.updateEmployee` |
-| `LoginScreen` | hàm `Application.login` |
-| `ConsoleColor` | 5 hằng số màu trong `Console` |
-| ghi file qua file tạm, hoàn tác khi ghi lỗi, đọc `Employees.txt` dạng 2 cột, cảnh báo dòng hỏng, phím Esc để hủy, căn cột bảng | bỏ |
-| lớp nhỏ tách `.h`/`.cpp` | lớp dữ liệu và tiện ích chỉ có file `.h` |
-
-## Ngân sách dòng (tính cả dòng trống)
+## Ước tính số dòng code C++ (tính cả dòng trống)
 
 | File | Dòng |
 | --- | ---: |
@@ -61,7 +46,7 @@ Nhánh `ban-gon` là thiết kế rút gọn với mục tiêu **dưới 900 dò
 | `main.cpp` | 6 |
 | **Tổng** | **khoảng 866** |
 
-Đây là ước tính theo từng hàm, giả định: dấu `{` cùng dòng với câu lệnh, một dòng trống giữa hai hàm, một dòng chú thích cho mỗi lớp (không chú thích từng hàm), các số giới hạn viết thẳng trong mã. Nếu Coding Standard của lớp bắt chú thích từng hàm, tách mọi lớp thành `.h`/`.cpp` hoặc cấm «số ma thuật», tổng sẽ vượt 900.
+Đây là ước tính theo từng hàm, giả định: dấu `{` cùng dòng với câu lệnh, một dòng trống giữa hai hàm, một dòng chú thích cho mỗi lớp (không chú thích từng hàm), các số giới hạn viết thẳng trong mã. Nếu Coding Standard của lớp bắt chú thích từng hàm, tách mọi lớp thành `.h`/`.cpp` hoặc cấm «số ma thuật», tổng sẽ nhiều hơn.
 
 ## Các file
 

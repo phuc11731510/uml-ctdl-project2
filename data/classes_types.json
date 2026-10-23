@@ -20,7 +20,7 @@
           "type": "chuỗi ký tự",
           "vis": "",
           "summary": "Chuỗi ký tự, độ dài thay đổi được. Username, mật khẩu, họ tên, đường dẫn file và mọi câu thông báo lỗi đều là string.",
-          "detail": "Trong bản gọn, nhiều hàm trả một string làm kết quả kiểm tra: chuỗi rỗng nghĩa là hợp lệ, chuỗi khác rỗng là câu thông báo lỗi để in ra.",
+          "detail": "Nhiều hàm trả một string làm kết quả kiểm tra: chuỗi rỗng nghĩa là hợp lệ, chuỗi khác rỗng là câu thông báo lỗi để in ra.",
           "example": "`std::string name = \"nva\";` thì `name.size()` bằng 3; `name.empty()` là false; `name + \".txt\"` là `\"nva.txt\"`.",
           "cpp": "`std::string` (`#include <string>`). Trong file .h viết đầy đủ `std::string`, không đặt `using namespace std;`."
         },
@@ -78,7 +78,7 @@
       "notes": [
         "Dấu `&` sau kiểu trong chữ ký (ví dụ `out: Admin&`) là tham chiếu: hàm ghi kết quả thẳng vào biến của nơi gọi.",
         "Trong sơ đồ, `Lớp.hàm` nghĩa là hàm `hàm` của lớp `Lớp`. Trong C++ viết `Lop::ham(...)` với hàm static, hoặc `doiTuong.ham(...)` với hàm thường.",
-        "Ngân sách dòng của cả bản gọn (đã tính dòng trống) có ở README và ở mục «Cài đặt C++» của từng lớp; tổng khoảng 865 dòng."
+        "Ước tính số dòng (đã tính dòng trống) có ở README và ở mục «Cài đặt C++» của từng lớp; tổng khoảng 865 dòng."
       ],
       "pos": [
         0,

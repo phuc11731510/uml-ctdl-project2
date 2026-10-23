@@ -1,9 +1,9 @@
-# Triển khai GitHub Pages: nhánh main ở địa chỉ gốc, nhánh ban-gon ở thư mục /ban-gon/.
+# Triển khai GitHub Pages từ nhánh main.
 name: Deploy Pages
 
 on:
   push:
-    branches: [main, ban-gon]
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -22,18 +22,11 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Lấy bản đầy đủ (main)
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
-          ref: main
           path: site
-      - name: Lấy bản gọn (ban-gon)
-        uses: actions/checkout@v4
-        with:
-          ref: ban-gon
-          path: site/ban-gon
       - name: Bỏ các file không cần đăng
-        run: rm -rf site/.git site/.github site/ban-gon/.git site/ban-gon/.github
+        run: rm -rf site/.git site/.github
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

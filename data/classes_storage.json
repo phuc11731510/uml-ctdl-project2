@@ -64,7 +64,7 @@
           "returns": "bool",
           "summary": "Đọc file vào bộ nhớ; lặng lẽ bỏ qua dòng trống, dòng sai định dạng và dòng trùng username.",
           "role": "Gọi một lần lúc khởi động cho mỗi danh sách.",
-          "detail": "Bản gọn không báo cảnh báo cho dòng hỏng (bản đầy đủ có). Nếu file do chương trình tự ghi thì không có dòng hỏng.",
+          "detail": "Không báo cảnh báo cho dòng hỏng. Nếu file do chương trình tự ghi thì không có dòng hỏng.",
           "pre": [
             "Không có."
           ],
@@ -224,10 +224,10 @@
         }
       ],
       "impl": {
-        "cpp": "**Ngân sách khoảng 65 dòng**, chỉ file `AccountList.h` (template bắt buộc viết hết trong .h; tách ra .cpp sẽ lỗi liên kết). Khai báo: `template <typename T> class AccountList { ... };`."
+        "cpp": "**Ước tính khoảng 65 dòng**, chỉ file `AccountList.h` (template bắt buộc viết hết trong .h; tách ra .cpp sẽ lỗi liên kết). Khai báo: `template <typename T> class AccountList { ... };`."
       },
       "notes": [
-        "Bản gọn bỏ `contains` (dùng `indexOf(u) != -1`) và bỏ danh sách cảnh báo khi đọc file."
+        "Không có hàm `contains`: muốn biết có hay không thì dùng `indexOf(u) != -1`."
       ],
       "read": 8,
       "stage": 3,

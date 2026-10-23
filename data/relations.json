@@ -13,7 +13,7 @@
     { "id": "r11", "from": "HrSystem", "to": "Validator", "kind": "dependency", "label": "kiểm dữ liệu", "explain": "Kiểm username, mật khẩu và thông tin hồ sơ trước khi ghi." },
     { "id": "r12", "from": "HrSystem", "to": "Admin", "kind": "dependency", "label": "tạo admin mặc định", "explain": "`initialize` tạo `Admin(tên, \"123456\")` khi chưa đủ 3 admin." },
     { "id": "r13", "from": "HrSystem", "to": "Employee", "kind": "dependency", "label": "createNew, đổi mật khẩu", "explain": "Thêm nhân viên bằng `Employee::createNew`; đổi mật khẩu bằng `setPassword` và `setNeedsPasswordChange`." },
-    { "id": "r14", "from": "HrSystem", "to": "UserProfile", "kind": "dependency", "label": "đọc, ghi hồ sơ", "explain": "Bản gọn gộp kho hồ sơ vào HrSystem: đọc và ghi `data/users/<username>.txt` qua `toLines` và `fromLines`." },
+    { "id": "r14", "from": "HrSystem", "to": "UserProfile", "kind": "dependency", "label": "đọc, ghi hồ sơ", "explain": "`HrSystem` đọc và ghi `data/users/<username>.txt` qua `toLines` và `fromLines`." },
     { "id": "r15", "from": "HrSystem", "to": "Util", "kind": "dependency", "label": "file, thư mục", "explain": "Đọc, ghi, xóa file hồ sơ; tạo thư mục lúc khởi động." },
     { "id": "r16", "from": "HrSystem", "to": "Role", "kind": "dependency", "label": "login()", "explain": "`login` ghi vai trò vào tham số `role`." },
     { "id": "r17", "from": "Console", "to": "Util", "kind": "dependency", "label": "trim, isAllDigits", "explain": "`readLine` bỏ khoảng trắng; `readChoice` kiểm chuỗi toàn chữ số trước khi đổi sang số." },

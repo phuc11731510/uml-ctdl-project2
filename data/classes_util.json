@@ -6,7 +6,7 @@
       "package": "util",
       "status": "support",
       "summary": "Các hàm tĩnh dùng chung: bỏ khoảng trắng, đổi chữ thường, so sánh không phân biệt hoa thường, kiểm chuỗi toàn chữ số, đọc và ghi file, xóa file, tạo thư mục.",
-      "role": "Bản gọn gộp hai lớp `StringUtil` và `FileUtil` của bản đầy đủ thành một lớp chỉ có file .h. Mọi lớp khác gọi tới đây thay vì tự viết lại vòng lặp xử lý chuỗi hay tự mở file.",
+      "role": "Các hàm xử lý chuỗi và đọc ghi file gom chung một lớp, chỉ có file .h. Mọi lớp khác gọi tới đây thay vì tự viết lại vòng lặp xử lý chuỗi hay tự mở file.",
       "spec": "Lưu dữ liệu bằng file txt và «ghi cập nhật» file sau mỗi thay đổi; so username không phân biệt hoa thường (quyết định của nhóm).",
       "uses": [],
       "invariants": [],
@@ -127,7 +127,7 @@
           "returns": "bool",
           "summary": "Ghi đè toàn bộ file bằng các dòng trong `lines` (tạo mới nếu chưa có).",
           "role": "Cách duy nhất chương trình ghi file. Mọi lần «ghi cập nhật file» trong đề đều đi qua hàm này.",
-          "detail": "Ghi thẳng vào file (bản gọn bỏ bước ghi ra file tạm của bản đầy đủ). Nếu chương trình bị tắt đúng lúc đang ghi thì file có thể chỉ còn một nửa; với bài tập này rủi ro đó chấp nhận được.",
+          "detail": "Ghi thẳng vào file, không qua file tạm. Nếu chương trình bị tắt đúng lúc đang ghi thì file có thể chỉ còn một nửa; với bài tập này rủi ro đó chấp nhận được.",
           "pre": [
             "Thư mục chứa file đã tồn tại."
           ],
@@ -182,11 +182,10 @@
         }
       ],
       "impl": {
-        "cpp": "**Ngân sách khoảng 60 dòng**, chỉ file `Util.h`: `class Util { public: static std::string trim(std::string s) { ... } ... };`. Hàm viết thân ngay trong lớp nên không cần `Util.cpp`."
+        "cpp": "**Ước tính khoảng 60 dòng**, chỉ file `Util.h`: `class Util { public: static std::string trim(std::string s) { ... } ... };`. Hàm viết thân ngay trong lớp nên không cần `Util.cpp`."
       },
       "notes": [
-        "Đường dẫn tương đối như `data/Employees.txt` tính từ thư mục làm việc lúc chạy (Visual Studio: thư mục dự án; bấm đúp .exe: thư mục chứa .exe). Nhóm nên thống nhất một cách chạy khi quay video.",
-        "Những gì bản gọn bỏ so với bản đầy đủ: ghi file qua file tạm, `fitWidth` (căn cột), `textLength` (độ dài khi có chữ có dấu), `tryParseInt`."
+        "Đường dẫn tương đối như `data/Employees.txt` tính từ thư mục làm việc lúc chạy (Visual Studio: thư mục dự án; bấm đúp .exe: thư mục chứa .exe). Nhóm nên thống nhất một cách chạy khi quay video."
       ],
       "read": 1,
       "stage": 1,

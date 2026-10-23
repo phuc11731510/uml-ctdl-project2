@@ -41,7 +41,7 @@
       return;
     }
     const D = U.D;
-    document.title = 'UML Quản lý nhân sự (bản gọn)';
+    document.title = 'UML Quản lý nhân sự';
     U.tip.init();
     U.initDiagram();
     U.fitAll();

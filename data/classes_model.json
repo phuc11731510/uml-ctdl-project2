@@ -195,7 +195,7 @@
         }
       ],
       "impl": {
-        "cpp": "**Ngân sách khoảng 30 dòng**, chỉ file `Account.h` (gồm cả `enum class Role`). Thân các hàm viết ngay trong lớp. Nhớ `virtual ~Account() {}`."
+        "cpp": "**Ước tính khoảng 30 dòng**, chỉ file `Account.h` (gồm cả `enum class Role`). Thân các hàm viết ngay trong lớp. Nhớ `virtual ~Account() {}`."
       },
       "notes": [
         "`fromLine` không nằm ở đây vì nó là hàm static tạo đối tượng mới, mà hàm static không thể ảo. Mỗi lớp con có `fromLine` riêng và `AccountList<T>` gọi `T::fromLine`: lý do cần template."
@@ -299,7 +299,7 @@
         }
       ],
       "impl": {
-        "cpp": "**Ngân sách khoảng 18 dòng**, chỉ file `Admin.h`: `class Admin : public Account { ... };`."
+        "cpp": "**Ước tính khoảng 18 dòng**, chỉ file `Admin.h`: `class Admin : public Account { ... };`."
       },
       "notes": [
         "Admin không có file hồ sơ và không có chức năng đổi mật khẩu; admin chỉ quản lý nhân viên."
@@ -413,7 +413,7 @@
             "Trả true: `out` mang dữ liệu đọc được.",
             "Trả false: `out` không đổi."
           ],
-          "example": "`\"nva 111111 1\"` → true, cờ bật. `\"nva abc 2\"` → false. `\"nva 111111\"` → false (bản gọn không đọc dạng 2 cột).",
+          "example": "`\"nva 111111 1\"` → true, cờ bật. `\"nva abc 2\"` → false. `\"nva 111111\"` → false (thiếu cột cờ).",
           "cpp": "Giống `Admin::fromLine` nhưng đọc 3 từ; từ thứ ba phải là `0` hoặc `1`."
         },
         {
@@ -486,7 +486,7 @@
         }
       ],
       "impl": {
-        "cpp": "**Ngân sách khoảng 32 dòng**, chỉ file `Employee.h`: `class Employee : public Account { ... };`."
+        "cpp": "**Ước tính khoảng 32 dòng**, chỉ file `Employee.h`: `class Employee : public Account { ... };`."
       },
       "notes": [
         "Cột 3 là phần nhóm thêm so với đề; nên ghi rõ trong báo cáo Word.",
@@ -506,7 +506,7 @@
       "package": "model",
       "status": "core",
       "summary": "Tên của 4 thông tin trong hồ sơ nhân viên; giá trị cũng là chỉ số trong mảng của `UserProfile`.",
-      "role": "Cho phép duyệt 4 thông tin bằng một vòng `for` (thêm nhân viên, menu cập nhật, in hồ sơ) thay vì viết 4 đoạn gần giống nhau. Đây là một trong những chỗ giúp bản gọn ngắn. Khai báo trong `UserProfile.h`.",
+      "role": "Cho phép duyệt 4 thông tin bằng một vòng `for` (thêm nhân viên, menu cập nhật, in hồ sơ) thay vì viết 4 đoạn gần giống nhau. Khai báo trong `UserProfile.h`.",
       "spec": "«Cập nhật lại thông tin của employee (họ tên, địa chỉ, số điện thoại và địa chỉ email). Cho người dùng tùy chọn muốn update bất kỳ thuộc tính nào.»",
       "uses": [],
       "invariants": [],
@@ -674,7 +674,7 @@
         }
       ],
       "impl": {
-        "cpp": "**Ngân sách khoảng 38 dòng**, chỉ file `UserProfile.h` (gồm cả `enum class ProfileField`). Không cần hàm dựng: mảng `std::string` tự khởi tạo rỗng."
+        "cpp": "**Ước tính khoảng 38 dòng**, chỉ file `UserProfile.h` (gồm cả `enum class ProfileField`). Không cần hàm dựng: mảng `std::string` tự khởi tạo rỗng."
       },
       "notes": [],
       "read": 7,

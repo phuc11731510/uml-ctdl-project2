@@ -118,9 +118,19 @@ a { color: var(--accent); }
   background: var(--panel);
   border-bottom: 1px solid var(--border);
   flex-wrap: wrap;
+  position: relative;
+  z-index: 50;
 }
 #topbar h1 { font-size: 16px; margin: 0; white-space: nowrap; }
 #topbar .right { display: flex; gap: 6px; margin-left: auto; }
+
+/* ---------- ô tìm kiếm trên thanh trên ---------- */
+#search-box { position: relative; flex: 1 1 320px; max-width: 520px; }
+#search-box input[type="search"] { width: 100%; padding: 5px 10px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); }
+#search-results { position: absolute; left: 0; right: 0; top: calc(100% + 4px); max-height: min(60vh, 420px); overflow: auto; padding: 4px; background: var(--panel); border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28); }
+#search-results button { display: block; width: 100%; text-align: left; border: 0; border-radius: 4px; padding: 4px 8px; background: transparent; font-family: var(--mono); font-size: 12.5px; }
+#search-results button:hover { background: var(--accent-soft); }
+#search-results .sr-note { padding: 4px 8px; font-size: 12px; color: var(--muted); }
 
 #main { flex: 1 1 auto; position: relative; min-height: 0; }
 .view { display: none; position: absolute; inset: 0; overflow: auto; }
@@ -143,11 +153,7 @@ a { color: var(--accent); }
 }
 #side h4 { margin: 14px 0 6px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); }
 #side .row { display: flex; gap: 6px; align-items: center; margin: 4px 0; flex-wrap: wrap; }
-#side input[type="search"] { width: 100%; padding: 5px 8px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); }
 #side select { width: 100%; padding: 4px 6px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); }
-#search-results { margin-top: 4px; max-height: 190px; overflow: auto; }
-#search-results button { display: block; width: 100%; text-align: left; border: 0; border-radius: 4px; padding: 3px 6px; background: transparent; font-family: var(--mono); font-size: 12px; }
-#search-results button:hover { background: var(--accent-soft); }
 .pk-line { display: flex; gap: 6px; align-items: center; margin: 3px 0; }
 .pk-dot { width: 12px; height: 12px; border-radius: 3px; flex: 0 0 auto; }
 .stage-h { margin: 12px 0 2px; font-weight: 700; font-size: 12.5px; }
@@ -369,6 +375,7 @@ pre.example, .ex {
   .canvas-controls .zinfo { min-width: 0; padding: 0 4px; font-size: 11px; }
   .canvas-hint { left: 8px; right: 8px; bottom: 8px; max-width: none; }
   #topbar { padding: 4px 10px; gap: 8px; }
+  #search-box { order: 3; flex: 1 1 100%; max-width: none; }
   #view-diagram.active #detail { height: 52%; overscroll-behavior: contain; }
   .detail-bar { position: sticky; top: -12px; z-index: 2; background: var(--panel); padding: 6px 0; margin: -12px 0 6px; }
   .mtable td:first-child { white-space: normal; word-break: break-word; }
@@ -382,8 +389,8 @@ pre.example, .ex {
 @media (pointer: coarse) {
   button { min-height: 36px; }
   .canvas-controls button { min-width: 40px; min-height: 40px; font-size: 16px; }
-  #side input[type="search"], #side select { font-size: 16px; padding: 8px 10px; }
-  #search-results button { padding: 8px 6px; font-size: 13px; }
+  #search-box input[type="search"], #side select { font-size: 16px; padding: 8px 10px; }
+  #search-results button { padding: 9px 8px; font-size: 13px; }
   .read-list button { padding: 7px 6px; font-size: 13px; }
   .pk-line { margin: 8px 0; min-height: 28px; }
   .pk-line input { width: 20px; height: 20px; }

@@ -851,10 +851,12 @@
     // tìm kiếm
     const input = $('#search');
     const results = $('#search-results');
+    const closeResults = () => { results.hidden = true; };
     input.addEventListener('input', () => {
       S.search = input.value;
       results.replaceChildren();
       const q = S.search.trim().toLowerCase();
+      results.hidden = !q;
       if (q) {
         const found = [];
         D.classes.forEach(c => {
@@ -864,9 +866,13 @@
           (c.values || []).forEach(v => { if (v.name.toLowerCase().includes(q)) found.push({ label: c.id + '.' + v.name, cls: c.id }); });
         });
         found.slice(0, 14).forEach(f => results.append(el('button', {
-          onclick: () => { if (f.kind) U.selectMember(f.cls, f.kind, f.name, { focus: true }); else U.selectClass(f.cls, { focus: true }); }
+          onclick: () => {
+            closeResults();
+            if (f.kind) U.selectMember(f.cls, f.kind, f.name, { focus: true }); else U.selectClass(f.cls, { focus: true });
+          }
         }, f.label)));
-        if (found.length > 14) results.append(el('div', { class: 'lead', style: { fontSize: '12px' } }, '... còn ' + (found.length - 14) + ' kết quả'));
+        if (!found.length) results.append(el('div', { class: 'sr-note' }, 'Không tìm thấy'));
+        if (found.length > 14) results.append(el('div', { class: 'sr-note' }, '... còn ' + (found.length - 14) + ' kết quả, gõ thêm để thu hẹp'));
       }
       U.applySelection();
     });
@@ -874,6 +880,8 @@
       if (e.key === 'Escape') { input.value = ''; input.dispatchEvent(new Event('input')); }
       if (e.key === 'Enter') { const b = results.querySelector('button'); if (b) b.click(); }
     });
+    input.addEventListener('focus', () => { if (input.value.trim()) results.hidden = false; });
+    document.addEventListener('click', (e) => { if (!e.target.closest('#search-box')) closeResults(); });
 
     $('#chk-deps').addEventListener('change', (e) => { S.showDeps = e.target.checked; layout(); });
     $('#lod-select').addEventListener('change', (e) => {
@@ -965,7 +973,7 @@
     });
     // màn hình hẹp: chọn một lớp trong thanh bên xong thì đóng thanh bên để thấy kết quả
     $('#side').addEventListener('click', (e) => {
-      if (NARROW.matches && e.target.closest('#read-list button, #search-results button')) $('#view-diagram').classList.remove('showside');
+      if (NARROW.matches && e.target.closest('#read-list button')) $('#view-diagram').classList.remove('showside');
     });
     // mũi tên trái và phải: sang lớp trước hoặc sau theo thứ tự đọc
     document.addEventListener('keydown', (e) => {

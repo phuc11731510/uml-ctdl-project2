@@ -82,7 +82,7 @@
           ],
           "returns": "bool",
           "summary": "Trả true khi `s` không rỗng và mọi ký tự đều là chữ số 0–9; có chữ cái, dấu cách hay dấu `-` là false.",
-          "role": "Kiểm số điện thoại (`Validator.checkPhone`) và kiểm lựa chọn menu trước khi đổi sang số (`Console.readChoice`).",
+          "role": "Kiểm số điện thoại (`Validator.checkPhone`).",
           "pre": [
             "Không có."
           ],

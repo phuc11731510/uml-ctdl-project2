@@ -5,15 +5,15 @@
       "stereotype": "utility",
       "package": "ui",
       "status": "core",
-      "summary": "Lớp duy nhất đọc bàn phím và in ra màn hình: in có màu, khung tiêu đề, đọc dòng, đọc mật khẩu che `*`, đọc lựa chọn menu, hỏi y/n.",
-      "role": "Gom mọi thứ phụ thuộc console của Windows (`SetConsoleTextAttribute`, `_getch`, xóa màn hình). Màu chữ là 5 hằng số ngay trong lớp.",
+      "summary": "Lớp duy nhất đọc bàn phím và in ra màn hình: in có màu, khung tiêu đề, đọc dòng, đọc mật khẩu che `*`, chọn một mục trong menu bằng phím mũi tên, hỏi y/n.",
+      "role": "Gom mọi thứ phụ thuộc console của Windows (`SetConsoleTextAttribute`, `_getch`, đặt vị trí con trỏ, xóa màn hình). Màu chữ là 6 hằng số ngay trong lớp.",
       "spec": "«Mã hóa pass thành dấu * khi đăng nhập»; «Dùng màu để thiết kế giao diện dễ nhìn»; «thông báo thông tin lỗi đến user».",
       "uses": [
-        "`Util.trim(s)`: bỏ khoảng trắng đầu cuối.",
-        "`Util.isAllDigits(s)`: chuỗi không rỗng, toàn chữ số."
+        "`Util.trim(s)`: bỏ khoảng trắng đầu cuối."
       ],
       "invariants": [
-        "K1. Mỗi hàm in xong đều trả màu chữ về `COLOR_NORMAL`."
+        "K1. Mỗi hàm in xong đều trả màu chữ về `COLOR_NORMAL`.",
+        "K2. `chooseOption` xong thì con trỏ nhấp nháy đã hiện lại và nằm ở dòng ngay dưới danh sách."
       ],
       "attributes": [
         {
@@ -42,9 +42,9 @@
           "vis": "+",
           "static": true,
           "readonly": true,
-          "summary": "Mã màu 10 (xanh lá): dùng cho lời nhắc trước ô nhập.",
+          "summary": "Mã màu 10 (xanh lá): dùng cho lời nhắc trước ô nhập và dòng hướng dẫn phím của `chooseOption`.",
           "role": "Giống ảnh mẫu trong đề (chữ `User:` xanh lá).",
-          "example": "`User: `, `Pass: `, `Chon: `."
+          "example": "`User: `, `Pass: `, `(Mui ten len/xuong de chon, Enter de xac nhan)`."
         },
         {
           "name": "COLOR_SUCCESS",
@@ -65,6 +65,16 @@
           "summary": "Mã màu 12 (đỏ): dùng cho câu báo lỗi.",
           "role": "`printError` dùng.",
           "example": "«Username da ton tai»."
+        },
+        {
+          "name": "COLOR_SELECTED",
+          "type": "int = 112",
+          "vis": "+",
+          "static": true,
+          "readonly": true,
+          "summary": "Mã màu 112 (chữ đen trên nền xám nhạt, tức màu nền 7 nhân 16): dùng tô sáng mục đang được chọn trong menu.",
+          "role": "`chooseOption` dùng cho đúng một mục tại mỗi thời điểm.",
+          "example": "Mục `> Xoa Employee` đang chọn thì chỉ dòng đó có nền sáng."
         }
       ],
       "methods": [
@@ -174,7 +184,7 @@
           ],
           "returns": "string",
           "summary": "In `prompt` màu xanh lá (không xuống dòng), đọc cả dòng người dùng gõ, trả về chuỗi đã bỏ khoảng trắng đầu cuối.",
-          "role": "Mọi ô nhập thường (username, họ tên, lựa chọn menu...).",
+          "role": "Mọi ô nhập thường (username, họ tên, địa chỉ, giá trị mới...).",
           "detail": "Đọc cả dòng bằng `std::getline` nên địa chỉ có dấu cách vẫn đọc trọn. `std::cin` hỏng (Ctrl+Z) thì `clear()` và trả chuỗi rỗng để vòng lặp không chạy mãi.",
           "pre": [
             "Không có."
@@ -206,23 +216,28 @@
           "cpp": "Vòng lặp đọc từng phím bằng `_getch()` (`<conio.h>`) và xử lý từng mã phím như phần mô tả; xóa một dấu `*` trên màn hình bằng cách in `\\b \\b`."
         },
         {
-          "name": "readChoice",
+          "name": "chooseOption",
           "static": true,
           "vis": "+",
           "params": [
-            "maxChoice: int"
+            "items: vector<string>",
+            "startAt: int = 1"
           ],
           "returns": "int",
-          "summary": "Đọc một dòng và đổi thành số; trả số đó nếu nằm trong 1..`maxChoice`, còn gõ chữ, để trống hay số ngoài khoảng thì trả −1.",
-          "role": "`Menu.run` và menu cập nhật dùng.",
+          "summary": "In một dòng hướng dẫn rồi mỗi mục của `items` một dòng. Người dùng nhấn mũi tên lên hoặc xuống để dời mục đang chọn (có dấu `> ` và nền sáng), nhấn Enter để chốt; trả số thứ tự của mục đã chốt, đếm từ 1.",
+          "role": "Cách duy nhất để chọn trong menu: `Menu.run` dùng cho menu chính, `AdminMenu.updateEmployee` dùng cho menu cập nhật.",
+          "detail": "Mục `startAt` được chọn đầu tiên. Mũi tên xuống ở mục cuối thì về mục đầu; mũi tên lên ở mục đầu thì xuống mục cuối. Mọi phím khác (kể cả chữ và số) bị bỏ qua. Khi dời mục chọn chỉ các dòng của danh sách được vẽ lại đúng chỗ cũ, không xóa cả màn hình, nên không bị chớp. Con trỏ nhấp nháy bị ẩn trong lúc chọn. Mục dài hơn 70 ký tự bị cắt bớt để mỗi mục luôn chiếm đúng một dòng.",
           "pre": [
-            "1 ≤ `maxChoice` ≤ 99."
+            "1 ≤ số mục ≤ 15.",
+            "1 ≤ `startAt` ≤ số mục.",
+            "Con trỏ đang ở đầu một dòng."
           ],
           "post": [
-            "Kết quả là −1 hoặc nằm trong 1..`maxChoice`."
+            "Kết quả nằm trong 1..số mục.",
+            "Con trỏ đã hiện lại, nằm ở dòng ngay dưới danh sách; màu chữ là thường."
           ],
-          "example": "`maxChoice` = 6: `3` → 3; `7`, `1abc`, để trống → −1.",
-          "cpp": "Đọc bằng `readLine`; chỉ đổi sang số (`std::stoi`) sau khi đã chắc chuỗi toàn chữ số và tối đa 2 ký tự; ngoài khoảng thì trả −1."
+          "example": "`items` = `[\"Them Employee\", \"Xoa Employee\", \"Thoat\"]`, `startAt` = 1. Màn hình:\n(Mui ten len/xuong de chon, Enter de xac nhan)\n> Them Employee\n  Xoa Employee\n  Thoat\nNhấn mũi tên xuống rồi Enter: dấu `> ` chuyển xuống dòng `Xoa Employee` và hàm trả 2.",
+          "cpp": "Lấy handle bằng `GetStdHandle`, ẩn con trỏ bằng `SetConsoleCursorInfo` (cất thông tin cũ để trả lại cuối hàm). In dòng hướng dẫn, rồi in sẵn bấy nhiêu dòng trống bằng số mục và lấy vị trí con trỏ (`GetConsoleScreenBufferInfo`) lùi lên bấy nhiêu dòng để biết dòng đầu của danh sách; làm vậy thì cửa sổ có phải cuộn xuống vị trí vẫn đúng. Vòng lặp: `SetConsoleCursorPosition` về dòng đầu, vẽ các mục (mục đang chọn dùng `COLOR_SELECTED` và tiền tố `> `, các mục khác hai dấu cách), rồi đọc phím bằng `_getch()`: 13 là Enter; mã 0 hoặc 224 báo còn một mã nữa, đọc tiếp: 72 là mũi tên lên, 80 là mũi tên xuống. Trả màu thường trước khi xuống dòng để nền sáng không tràn hết dòng. Mỗi lần vẽ xong, con trỏ đã nằm ngay dưới danh sách (vì mỗi mục kết thúc bằng xuống dòng); khi nhấn Enter chỉ cần hiện lại con trỏ nhấp nháy."
         },
         {
           "name": "confirm",
@@ -258,7 +273,7 @@
             "Đã có một phím được nhấn."
           ],
           "example": "Sau khi in bảng nhân viên.",
-          "cpp": "In lời nhắc rồi chờ một phím bằng `_getch()`."
+          "cpp": "In lời nhắc rồi chờ một phím bằng `_getch()`. Nếu mã đọc được là 0 hoặc 224 (phím mũi tên, F1...) thì đọc bỏ thêm một mã, để mã thừa không lọt sang lần đọc phím sau."
         },
         {
           "name": "clearScreen",
@@ -280,7 +295,7 @@
         }
       ],
       "impl": {
-        "cpp": "**Ước tính khoảng 105 dòng**: `Console.h` khoảng 20, `Console.cpp` khoảng 85. Chỉ include `<windows.h>` và `<conio.h>` trong file .cpp."
+        "cpp": "**Ước tính khoảng 132 dòng**: `Console.h` khoảng 22 (include `<string>` và `<vector>`), `Console.cpp` khoảng 110. Chỉ include `<windows.h>` và `<conio.h>` trong file .cpp."
       },
       "read": 11,
       "stage": 5,
@@ -295,11 +310,11 @@
       "stereotype": "abstract",
       "package": "ui",
       "status": "support",
-      "summary": "Khung chung của menu: in tiêu đề và các mục, đọc lựa chọn, giao cho lớp con xử lý, lặp tới khi chọn mục thoát.",
+      "summary": "Khung chung của menu: in tiêu đề, cho chọn một mục bằng phím mũi tên, giao cho lớp con xử lý, lặp tới khi chọn mục thoát.",
       "role": "`run()` viết một lần (mẫu Template Method); lớp con chỉ viết `getOptions` và `handleChoice`. Nhờ vậy hai menu không phải tự viết vòng lặp, và đây là chỗ thể hiện kế thừa, đa hình ở phần giao diện.",
       "spec": "«Người dùng có thể lựa chọn thực hiện chức năng khác hoặc kết thúc chương trình sau khi hoàn thành mỗi thao tác/chức năng»; các màn hình MENU trong đề.",
       "uses": [
-        "`Console`: `clearScreen()`, `printTitle(title)`, `printLine(text)`, `readChoice(max)` (số đã chọn hoặc −1), `printError(message)`, `pause()`.",
+        "`Console`: `clearScreen()`, `printTitle(title)`, `chooseOption(items, startAt)` (số thứ tự mục đã chọn, đếm từ 1), `printLine(text)`, `pause()`.",
         "`UserProfile`: `get(field)`, `labelOf(field)`, `FIELD_COUNT` (cho `printProfile`)."
       ],
       "invariants": [],
@@ -316,7 +331,7 @@
           "name": "m_exitLabel",
           "type": "string",
           "vis": "-",
-          "summary": "Chữ của mục thoát; `run` luôn in nó ở số cuối cùng, ví dụ `Thoat (dang xuat)`.",
+          "summary": "Chữ của mục thoát; `run` luôn thêm nó làm mục cuối cùng của danh sách chọn, ví dụ `Thoat (dang xuat)`.",
           "role": "Để người dùng biết chọn mục này sẽ về đâu.",
           "example": "`\"Thoat (dang xuat)\"`."
         }
@@ -346,17 +361,17 @@
           "vis": "+",
           "params": [],
           "returns": "void",
-          "summary": "Vòng lặp menu: hiện, đọc lựa chọn, xử lý, lặp lại cho tới khi chọn mục thoát.",
+          "summary": "Vòng lặp menu: hiện tiêu đề và danh sách mục, cho người dùng chọn một mục bằng mũi tên và Enter, xử lý, lặp lại cho tới khi chọn mục thoát.",
           "role": "Nơi duy nhất viết vòng lặp menu.",
-          "detail": "Mỗi vòng: xóa màn hình, in tiêu đề, in các mục `1. ...` và mục thoát ở số cuối, đọc lựa chọn. −1 thì báo «Lua chon khong hop le» và chờ phím. Mục thoát thì kết thúc. Mục khác thì `handleChoice(choice)` rồi chờ phím.",
+          "detail": "Giữ biến `selected` (ban đầu 1) là mục đang chọn. Mỗi vòng: xóa màn hình, in tiêu đề, lấy các mục từ `getOptions()` rồi thêm mục thoát ở cuối, gọi `Console.chooseOption(items, selected)` và gán kết quả vào `selected`. Nếu `selected` bằng số mục (tức mục thoát) thì kết thúc. Mục khác thì `handleChoice(selected)` rồi chờ phím. Menu hiện lại ở vòng sau với dấu `>` vẫn nằm ở mục vừa dùng.",
           "pre": [
             "Không có."
           ],
           "post": [
             "Trả về khi người dùng chọn mục thoát."
           ],
-          "example": "**************************************\n*        MENU ADMIN (admin1)         *\n**************************************\n1. Them Employee\n2. Xoa Employee\n3. Tim Employee\n4. Cap nhat Employee\n5. Hien thi thong tin Employee\n6. Thoat (dang xuat)\nChon: ",
-          "cpp": "Một vòng `while (true)` làm đúng các bước ở phần mô tả; số thứ tự của mục ghép bằng `std::to_string`."
+          "example": "**************************************\n*        MENU ADMIN (admin1)         *\n**************************************\n(Mui ten len/xuong de chon, Enter de xac nhan)\n  Them Employee\n> Xoa Employee\n  Tim Employee\n  Cap nhat Employee\n  Hien thi thong tin Employee\n  Thoat (dang xuat)",
+          "cpp": "Một vòng `while (true)` làm đúng các bước ở phần mô tả; thêm mục thoát vào cuối danh sách bằng `push_back`."
         },
         {
           "name": "getOptions",
@@ -416,7 +431,7 @@
         }
       ],
       "impl": {
-        "cpp": "**Ước tính khoảng 42 dòng**: `Menu.h` khoảng 20 (gồm `virtual ~Menu() {}`), `Menu.cpp` khoảng 22. Hàm dựng, `run` và `printProfile` ở phần `public:`; thuộc tính và hai hàm thuần ảo ở phần `private:`."
+        "cpp": "**Ước tính khoảng 38 dòng**: `Menu.h` khoảng 20 (gồm `virtual ~Menu() {}`), `Menu.cpp` khoảng 18. Hàm dựng, `run` và `printProfile` ở phần `public:`; thuộc tính và hai hàm thuần ảo ở phần `private:`."
       },
       "notes": [],
       "read": 12,
@@ -439,7 +454,7 @@
         "`Menu`: lớp cha; hàm dựng `Menu(title, exitLabel)`; viết `getOptions()` và `handleChoice(choice)` (private, override); có sẵn hàm static public `printProfile(username, profile)`.",
         "`HrSystem`: `checkNewUsername(u)`, `addEmployee(u, profile)`, `removeEmployee(u)`, `findEmployee(u, profile)`, `updateField(u, field, value)` (đều trả `\"\"` khi thành công, ngược lại là câu lỗi), `listEmployees(usernames)` (danh sách đã sắp xếp).",
         "`Validator.checkField(field, value)`: `\"\"` hoặc câu lỗi.",
-        "`Console`: `readLine`, `readChoice`, `confirm`, `printLine`, `printSuccess`, `printError`, `printTitle`, `clearScreen`, `pause`.",
+        "`Console`: `readLine`, `chooseOption`, `confirm`, `printLine`, `printSuccess`, `printError`, `printTitle`, `clearScreen`, `pause`.",
         "`UserProfile`: `get`, `set`, `labelOf`, `FIELD_COUNT`; `ProfileField`."
       ],
       "invariants": [],
@@ -563,17 +578,17 @@
           "vis": "-",
           "params": [],
           "returns": "void",
-          "summary": "Hỏi username rồi chạy vòng lặp con: hiện 4 thông tin kèm giá trị, chọn một mục để sửa, mục 5 «Xong» để về.",
+          "summary": "Hỏi username rồi chạy vòng lặp con: hiện 4 thông tin kèm giá trị và mục «Xong», chọn một thông tin bằng mũi tên để sửa, chọn «Xong» để về.",
           "role": "Chức năng d của admin: «cho người dùng tùy chọn muốn update bất kỳ thuộc tính nào».",
-          "detail": "Mỗi vòng: đọc hồ sơ (`HrSystem.findEmployee`, lỗi thì in và dừng), xóa màn hình, in tiêu đề `CAP NHAT: nva`, in 4 mục `i. <tên>: <giá trị>` và `5. Xong`, đọc lựa chọn. 5 thì về menu admin. −1 thì báo lỗi. 1–4 thì hỏi giá trị mới và gọi `HrSystem.updateField` (file được ghi ngay); in kết quả rồi chờ phím.",
+          "detail": "Mỗi vòng: đọc hồ sơ (`HrSystem.findEmployee`, lỗi thì in và dừng), xóa màn hình, in tiêu đề `CAP NHAT: nva`, rồi gọi `Console.chooseOption` với 5 mục: 4 mục dạng `<tên>: <giá trị>` và mục cuối `Xong`, truyền mục vừa chọn ở vòng trước làm `startAt` để dấu `>` không nhảy về đầu. Chọn mục 5 (`Xong`) thì về menu admin. Chọn 1–4 thì hỏi giá trị mới và gọi `HrSystem.updateField` (file được ghi ngay); in kết quả rồi chờ phím. Dòng giá trị dài hơn 70 ký tự bị cắt trên màn hình menu, giá trị lưu trong file vẫn đủ.",
           "pre": [
             "Không có."
           ],
           "post": [
             "Mọi thay đổi đã được ghi file ngay."
           ],
-          "example": "**************************************\n*           CAP NHAT: nva            *\n**************************************\n1. Ho ten: Nguyen Van A\n2. Dia chi: 12 Le Loi, Q1\n3. So dien thoai: 0912345678\n4. Email: nva@gmail.com\n5. Xong\nChon: 3\nGia tri moi: 0987654321\nDa cap nhat",
-          "cpp": "Một vòng `while (true)` nhỏ, giống `Menu::run`: mỗi vòng đọc lại hồ sơ, in 4 mục kèm giá trị và mục «Xong», đọc lựa chọn. Mục 1–4 đổi sang `ProfileField` bằng `static_cast` rồi gọi `HrSystem::updateField`."
+          "example": "**************************************\n*           CAP NHAT: nva            *\n**************************************\n(Mui ten len/xuong de chon, Enter de xac nhan)\n  Ho ten: Nguyen Van A\n  Dia chi: 12 Le Loi, Q1\n> So dien thoai: 0912345678\n  Email: nva@gmail.com\n  Xong\n(Enter ở dòng So dien thoai)\nGia tri moi: 0987654321\nDa cap nhat",
+          "cpp": "Một vòng `while (true)` nhỏ, giống `Menu::run`: mỗi vòng đọc lại hồ sơ, dựng một vector gồm 4 chuỗi `tên: giá trị` và chuỗi `Xong`, rồi gọi `Console::chooseOption`. Số 5 thì thoát vòng; số 1–4 đổi sang `ProfileField` bằng `static_cast` (trừ 1 vì số mục đếm từ 1) rồi gọi `HrSystem::updateField`."
         },
         {
           "name": "showAllEmployees",
@@ -593,7 +608,7 @@
         }
       ],
       "impl": {
-        "cpp": "**Ước tính khoảng 123 dòng**: `AdminMenu.h` khoảng 18, `AdminMenu.cpp` khoảng 105. `class AdminMenu : public Menu { ... };`."
+        "cpp": "**Ước tính khoảng 120 dòng**: `AdminMenu.h` khoảng 18, `AdminMenu.cpp` khoảng 102. `class AdminMenu : public Menu { ... };`."
       },
       "notes": [],
       "read": 13,

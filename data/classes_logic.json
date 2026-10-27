@@ -570,7 +570,7 @@
           "returns": "bool",
           "summary": "Thêm admin mặc định cho tới khi đủ 3: thử lần lượt tên `admin1`, `admin2`... (bỏ tên đã có), mật khẩu `123456`. Mỗi admin thêm xong thì ghi ngay `Administrators.txt` rồi thêm một câu «Da tao admin mac dinh: admin2 / 123456» vào `messages`. Trả false, kèm câu lỗi trong `messages`, nếu ghi lỗi.",
           "role": "Bước cuối của `initialize`: bù cho đủ 3 admin sau khi hai file đã được nạp.",
-          "detail": "Một biến đếm bắt đầu từ 1; mỗi vòng ghép tên `admin` + số rồi tăng số. Chỉ khi `isUsernameTaken` báo tên còn trống (không có ở admin lẫn nhân viên) mới làm tiếp: `add`, rồi `save()` ngay (giống mọi thay đổi khác của chương trình: đổi là ghi file) và thêm câu thông báo; `save()` lỗi thì báo và trả false. Tên đã dùng thì không làm gì, vòng sau thử số kế tiếp. Vòng lặp luôn kết thúc vì số luôn tăng.",
+          "detail": "Một biến đếm bắt đầu từ 1; mỗi vòng ghép tên `admin` + số rồi tăng số. Tên mà `isUsernameTaken` báo đã dùng (ở admin hoặc nhân viên) thì bỏ qua. Tên còn trống thì `add`, `save()` ngay (giống mọi thay đổi khác của chương trình: đổi là ghi file); `save()` lỗi thì báo và trả false. Vòng lặp luôn kết thúc vì số luôn tăng.",
           "pre": [
             "Đã gọi `loadFiles` và `removeDuplicateEmployees`."
           ],
@@ -579,7 +579,7 @@
           ],
           "complexity": "O(n²)",
           "example": "Lần chạy đầu: tạo `admin1`, `admin2`, `admin3`, ghi file sau mỗi admin, `messages` thêm 3 câu. Đã đủ 3 admin: không làm gì, không ghi file, `messages` không đổi.",
-          "cpp": "Vòng `while` chạy khi `size()` còn nhỏ hơn 3; ghép tên bằng `to_string`. Một `if (!isUsernameTaken(name))` bao quanh phần thêm admin, và bên trong có một `if` nữa kiểm `save()`; ghi file ngay sau mỗi `add` nên không cần biến cờ.",
+          "cpp": "Vòng `while` chạy khi `size()` còn nhỏ hơn 3; ghép tên bằng `to_string`; `isUsernameTaken` để bỏ qua tên đã dùng. Sau mỗi `add` gọi `save()` ngay trong vòng lặp, nên không cần biến cờ.",
           "implNote": "Kiểm tên bằng `isUsernameTaken`, không so `==`: đã có `Admin2` thì không tạo `admin2`."
         }
       ],

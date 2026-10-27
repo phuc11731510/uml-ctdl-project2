@@ -542,18 +542,18 @@
             "messages: vector<string>&"
           ],
           "returns": "bool",
-          "summary": "Xóa khỏi danh sách nhân viên mọi người có username trùng (không phân biệt hoa thường) với một admin, giữ lại admin; có xóa thì ghi lại `Employees.txt`. Trả false, kèm câu lỗi trong `messages`, nếu ghi lỗi.",
-          "role": "Giữ bất biến H1. Chỉ có tác dụng khi file bị sửa tay, vì chương trình tự ghi file thì không tạo ra username trùng.",
-          "detail": "Duyệt nhân viên từ cuối về đầu: `removeAt` dồn các phần tử sau lên một ô, nên duyệt xuôi sẽ bỏ sót phần tử vừa dồn lên. Mỗi nhân viên tra `m_admins.indexOf(username)`; khác −1 thì xóa. Một biến `bool` nhớ đã xóa ai chưa để chỉ ghi file khi cần.",
+          "summary": "Xóa khỏi danh sách nhân viên mọi người có username trùng (không phân biệt hoa thường) với một admin, hoặc trùng với một nhân viên đứng trước trong cùng danh sách; giữ lại admin và người đứng trước. Có xóa thì ghi lại `Employees.txt`. Trả false, kèm câu lỗi trong `messages`, nếu ghi lỗi.",
+          "role": "Giữ bất biến H1 và bảo đảm hai nhân viên không trùng username, kể cả khi `AccountList.load` không tự bỏ dòng trùng. Chỉ có tác dụng khi file bị sửa tay, vì chương trình tự ghi file thì không tạo ra username trùng.",
+          "detail": "Duyệt nhân viên từ cuối về đầu: `removeAt` dồn các phần tử sau lên một ô, nên duyệt xuôi sẽ bỏ sót phần tử vừa dồn lên. Với nhân viên thứ i, xóa nếu một trong hai điều đúng: `m_admins.indexOf(username)` khác −1 (trùng admin); hoặc `m_employees.indexOf(username)` khác i (`indexOf` trả vị trí đầu tiên, nên khác i nghĩa là có người trùng đứng trước). Một biến `bool` nhớ đã xóa ai chưa để chỉ ghi file khi cần.",
           "pre": [
             "Đã gọi `loadFiles`."
           ],
           "post": [
-            "Trả true: không username nào nằm trong cả hai danh sách; nếu đã xóa ai thì `Employees.txt` đã được ghi lại."
+            "Trả true: không username nào nằm trong cả hai danh sách và không hai nhân viên nào trùng username; nếu đã xóa ai thì `Employees.txt` đã được ghi lại."
           ],
-          "complexity": "O(n·m), n nhân viên, m admin",
-          "example": "`Administrators.txt` có `admin2`; `Employees.txt` có `nva` và `admin2` → `admin2` bị bỏ khỏi nhân viên, file ghi lại chỉ còn `nva`.",
-          "cpp": "Vòng `for` đếm lùi từ `size() - 1` về 0, dùng `indexOf` của danh sách admin; `removeAt(i)` khi trùng.",
+          "complexity": "O(n·(n + m)), n nhân viên, m admin",
+          "example": "`Administrators.txt` có `admin2`; `Employees.txt` có `nva`, `admin2`, `NVA` → `admin2` (trùng admin) và `NVA` (trùng `nva` đứng trước) bị bỏ, file ghi lại chỉ còn `nva`.",
+          "cpp": "Vòng `for` đếm lùi từ `size() - 1` về 0. Mỗi vòng lấy username, rồi hai biến `bool`: trùng admin (`indexOf` của danh sách admin khác −1) và trùng người đứng trước (`indexOf` của danh sách nhân viên khác `i`). Một trong hai đúng thì `removeAt(i)`.",
           "implNote": "So bằng `indexOf`, không so `==`: `NVA` và `nva` là một."
         },
         {
@@ -579,7 +579,7 @@
         }
       ],
       "impl": {
-        "cpp": "**Ước tính khoảng 166 dòng**: `HrSystem.h` khoảng 33, `HrSystem.cpp` khoảng 133. Câu lỗi dùng nhiều lần đặt thành hằng ở đầu file .cpp: `const std::string FILE_ERROR = \"Khong ghi duoc file du lieu\";`."
+        "cpp": "**Ước tính khoảng 169 dòng**: `HrSystem.h` khoảng 33, `HrSystem.cpp` khoảng 136. Câu lỗi dùng nhiều lần đặt thành hằng ở đầu file .cpp: `const std::string FILE_ERROR = \"Khong ghi duoc file du lieu\";`."
       },
       "notes": [
         "Không có hoàn tác: nếu ghi file lỗi giữa chừng, dữ liệu trong bộ nhớ có thể khác file cho tới lần chạy sau. Ghi file trên máy cá nhân hầu như không lỗi nên chấp nhận được.",

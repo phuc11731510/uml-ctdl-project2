@@ -533,7 +533,7 @@
           "complexity": "O(n)",
           "example": "Lần chạy đầu: tạo `data` và `data/users`, tạo hai file rỗng, hai danh sách rỗng, trả true.",
           "cpp": "Gọi `Util::ensureFolder`, rồi với mỗi danh sách: `load()` trả false thì gọi `save()` để tạo file. Hai danh sách xử lý giống hệt nhau. Không cần đọc lại sau khi `save()`, vì danh sách rỗng đã khớp với file rỗng.",
-          "implNote": "Chỉ nên tạo file khi chắc là chưa có file: nếu file đã có mà `load()` không đọc được thì `save()` sẽ ghi đè bằng danh sách rỗng. Kiểm bằng `filesystem::exists` nếu muốn chặn trường hợp hiếm này."
+          "implNote": "Khi `load()` trả false thì không cần kiểm thêm file có tồn tại không: trên Windows, file mà không mở được để đọc (bị khóa, không có quyền, hoặc là một thư mục) thì cũng không mở được để ghi, nên `save()` sẽ báo lỗi chứ không ghi đè mất dữ liệu."
         },
         {
           "name": "removeDuplicateEmployees",

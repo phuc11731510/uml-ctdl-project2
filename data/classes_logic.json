@@ -518,22 +518,21 @@
             "messages: vector<string>&"
           ],
           "returns": "bool",
-          "summary": "Tạo thư mục `data/users` (kèm `data`), đọc `Administrators.txt` và `Employees.txt` vào hai danh sách; chưa có `Employees.txt` thì tạo file rỗng. Trả false, kèm một câu lỗi trong `messages`, nếu không tạo được thư mục hoặc file.",
+          "summary": "Tạo thư mục `data/users` (kèm `data`), đọc `Administrators.txt` và `Employees.txt` vào hai danh sách; file nào chưa có thì tạo file rỗng. Trả false, kèm một câu lỗi trong `messages`, nếu không tạo được thư mục hoặc file.",
           "role": "Bước đầu của `initialize`.",
           "detail": [
             "`Util.ensureFolder(\"data/users\")` (tạo luôn `data`); lỗi thì thêm câu vào `messages` và trả false.",
-            "`m_admins.load()`: không cần kiểm kết quả, vì chưa có file admin thì `createDefaultAdmins` sẽ tự tạo file.",
-            "`m_employees.load()` trả false (chưa có file) thì `m_employees.save()` để tạo file rỗng; ghi lỗi thì thêm câu vào `messages` và trả false."
+            "Với từng danh sách (admin rồi nhân viên): `load()` trả false (chưa có file) thì `save()` để tạo file rỗng; ghi lỗi thì thêm câu vào `messages` và trả false."
           ],
           "pre": [
             "Gọi một lần, trước hai hàm còn lại."
           ],
           "post": [
-            "Trả true: `data/users` và `Employees.txt` tồn tại; hai danh sách chứa dữ liệu đọc được (rỗng nếu chưa có file)."
+            "Trả true: `data/users`, `Administrators.txt` và `Employees.txt` đều tồn tại; hai danh sách chứa dữ liệu đọc được (rỗng nếu chưa có file)."
           ],
           "complexity": "O(n)",
-          "example": "Lần chạy đầu: tạo `data` và `data/users`, tạo `Employees.txt` rỗng, hai danh sách rỗng, trả true.",
-          "cpp": "Gọi `Util::ensureFolder`, rồi `load()` của từng danh sách. `load()` của nhân viên trả false thì gọi `save()` để tạo file; không cần đọc lại vì danh sách rỗng đã khớp với file rỗng.",
+          "example": "Lần chạy đầu: tạo `data` và `data/users`, tạo hai file rỗng, hai danh sách rỗng, trả true.",
+          "cpp": "Gọi `Util::ensureFolder`, rồi với mỗi danh sách: `load()` trả false thì gọi `save()` để tạo file. Hai danh sách xử lý giống hệt nhau. Không cần đọc lại sau khi `save()`, vì danh sách rỗng đã khớp với file rỗng.",
           "implNote": "Chỉ nên tạo file khi chắc là chưa có file: nếu file đã có mà `load()` không đọc được thì `save()` sẽ ghi đè bằng danh sách rỗng. Kiểm bằng `filesystem::exists` nếu muốn chặn trường hợp hiếm này."
         },
         {
@@ -565,13 +564,13 @@
           ],
           "returns": "bool",
           "summary": "Thêm admin mặc định cho tới khi đủ 3: thử lần lượt tên `admin1`, `admin2`... (bỏ tên đã có), mật khẩu `123456`, mỗi admin thêm một câu «Da tao admin mac dinh: admin2 / 123456» vào `messages`; có tạo thì ghi `Administrators.txt`. Trả false, kèm câu lỗi trong `messages`, nếu ghi lỗi.",
-          "role": "Bước cuối của `initialize`; cũng là chỗ tạo file `Administrators.txt` ở lần chạy đầu.",
+          "role": "Bước cuối của `initialize`: bù cho đủ 3 admin sau khi hai file đã được nạp.",
           "detail": "Một biến đếm bắt đầu từ 1; mỗi vòng ghép tên `admin` + số rồi tăng số. Tên mà `isUsernameTaken` báo đã dùng (ở admin hoặc nhân viên) thì bỏ qua. Vòng lặp luôn kết thúc vì số luôn tăng.",
           "pre": [
             "Đã gọi `loadFiles` và `removeDuplicateEmployees`."
           ],
           "post": [
-            "Trả true: có ít nhất 3 admin và `Administrators.txt` tồn tại."
+            "Trả true: có ít nhất 3 admin; nếu đã tạo thêm thì `Administrators.txt` đã được ghi lại."
           ],
           "complexity": "O(n²)",
           "example": "Lần chạy đầu: tạo `admin1`, `admin2`, `admin3`, `messages` thêm 3 câu. Đã đủ 3 admin: không làm gì, `messages` không đổi.",
@@ -580,7 +579,7 @@
         }
       ],
       "impl": {
-        "cpp": "**Ước tính khoảng 162 dòng**: `HrSystem.h` khoảng 33, `HrSystem.cpp` khoảng 129. Câu lỗi dùng nhiều lần đặt thành hằng ở đầu file .cpp: `const std::string FILE_ERROR = \"Khong ghi duoc file du lieu\";`."
+        "cpp": "**Ước tính khoảng 166 dòng**: `HrSystem.h` khoảng 33, `HrSystem.cpp` khoảng 133. Câu lỗi dùng nhiều lần đặt thành hằng ở đầu file .cpp: `const std::string FILE_ERROR = \"Khong ghi duoc file du lieu\";`."
       },
       "notes": [
         "Không có hoàn tác: nếu ghi file lỗi giữa chừng, dữ liệu trong bộ nhớ có thể khác file cho tới lần chạy sau. Ghi file trên máy cá nhân hầu như không lỗi nên chấp nhận được.",

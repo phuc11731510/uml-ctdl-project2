@@ -579,12 +579,12 @@
           ],
           "complexity": "O(n²)",
           "example": "Lần chạy đầu: tạo `admin1`, `admin2`, `admin3`, `messages` thêm 3 câu. Đã đủ 3 admin: không làm gì, `messages` không đổi.",
-          "cpp": "Vòng `while` chạy khi `size()` còn nhỏ hơn 3; ghép tên bằng `to_string`; một biến `bool` cho biết đã tạo admin nào chưa, để chỉ gọi `save()` khi cần.",
+          "cpp": "Vòng `while` chạy khi `size()` còn nhỏ hơn 3; ghép tên bằng `to_string`; một biến `bool` cho biết đã tạo admin nào chưa. Sau vòng lặp viết `if` lồng: `if (đã tạo) { if (save() lỗi) { báo lỗi và return false; } }`.",
           "implNote": "Kiểm tên bằng `isUsernameTaken`, không so `==`: đã có `Admin2` thì không tạo `admin2`."
         }
       ],
       "impl": {
-        "cpp": "**Ước tính khoảng 173 dòng**: `HrSystem.h` khoảng 33, `HrSystem.cpp` khoảng 140. Câu lỗi dùng nhiều lần đặt thành hằng ở đầu file .cpp: `const std::string FILE_ERROR = \"Khong ghi duoc file du lieu\";`."
+        "cpp": "**Ước tính khoảng 175 dòng**: `HrSystem.h` khoảng 33, `HrSystem.cpp` khoảng 142. Câu lỗi dùng nhiều lần đặt thành hằng ở đầu file .cpp: `const std::string FILE_ERROR = \"Khong ghi duoc file du lieu\";`."
       },
       "notes": [
         "Không có hoàn tác: nếu ghi file lỗi giữa chừng, dữ liệu trong bộ nhớ có thể khác file cho tới lần chạy sau. Ghi file trên máy cá nhân hầu như không lỗi nên chấp nhận được.",

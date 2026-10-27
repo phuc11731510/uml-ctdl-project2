@@ -78,7 +78,7 @@
       "notes": [
         "Dấu `&` sau kiểu trong chữ ký (ví dụ `out: Admin&`) là tham chiếu: hàm ghi kết quả thẳng vào biến của nơi gọi.",
         "Trong sơ đồ, `Lớp.hàm` nghĩa là hàm `hàm` của lớp `Lớp`. Trong C++ viết `Lop::ham(...)` với hàm static, hoặc `doiTuong.ham(...)` với hàm thường.",
-        "Ước tính số dòng (đã tính dòng trống) có ở README và ở mục «Cài đặt C++» của từng lớp; tổng khoảng 921 dòng."
+        "Ước tính số dòng (đã tính dòng trống) có ở README và ở mục «Cài đặt C++» của từng lớp; tổng khoảng 923 dòng."
       ],
       "pos": [
         0,

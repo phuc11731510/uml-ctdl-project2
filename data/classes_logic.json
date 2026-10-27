@@ -568,23 +568,23 @@
             "messages: vector<string>&"
           ],
           "returns": "bool",
-          "summary": "Thêm admin mặc định cho tới khi đủ 3: thử lần lượt tên `admin1`, `admin2`... (bỏ tên đã có), mật khẩu `123456`. Mỗi admin thêm xong thì ghi ngay `Administrators.txt` rồi thêm một câu «Da tao admin mac dinh: admin2 / 123456» vào `messages`. Trả false, kèm câu lỗi trong `messages`, nếu ghi lỗi.",
+          "summary": "Thêm admin mặc định cho tới khi đủ 3: thử lần lượt tên `admin1`, `admin2`... (bỏ tên đã có), mật khẩu `123456`, mỗi admin thêm một câu «Da tao admin mac dinh: admin2 / 123456» vào `messages`; có tạo thì ghi `Administrators.txt`. Trả false, kèm câu lỗi trong `messages`, nếu ghi lỗi.",
           "role": "Bước cuối của `initialize`: bù cho đủ 3 admin sau khi hai file đã được nạp.",
-          "detail": "Một biến đếm bắt đầu từ 1; mỗi vòng ghép tên `admin` + số rồi tăng số. Tên mà `isUsernameTaken` báo đã dùng (ở admin hoặc nhân viên) thì bỏ qua. Tên còn trống thì `add`, `save()` ngay (giống mọi thay đổi khác của chương trình: đổi là ghi file); `save()` lỗi thì báo và trả false. Vòng lặp luôn kết thúc vì số luôn tăng.",
+          "detail": "Một biến đếm bắt đầu từ 1; mỗi vòng ghép tên `admin` + số rồi tăng số. Tên mà `isUsernameTaken` báo đã dùng (ở admin hoặc nhân viên) thì bỏ qua. Vòng lặp luôn kết thúc vì số luôn tăng.",
           "pre": [
             "Đã gọi `loadFiles` và `removeDuplicateEmployees`."
           ],
           "post": [
-            "Trả true: có ít nhất 3 admin, và mỗi admin vừa tạo đã được ghi vào `Administrators.txt`."
+            "Trả true: có ít nhất 3 admin; nếu đã tạo thêm thì `Administrators.txt` đã được ghi lại."
           ],
           "complexity": "O(n²)",
-          "example": "Lần chạy đầu: tạo `admin1`, `admin2`, `admin3`, ghi file sau mỗi admin, `messages` thêm 3 câu. Đã đủ 3 admin: không làm gì, không ghi file, `messages` không đổi.",
-          "cpp": "Vòng `while` chạy khi `size()` còn nhỏ hơn 3; ghép tên bằng `to_string`; `isUsernameTaken` để bỏ qua tên đã dùng. Sau mỗi `add` gọi `save()` ngay trong vòng lặp, nên không cần biến cờ.",
+          "example": "Lần chạy đầu: tạo `admin1`, `admin2`, `admin3`, `messages` thêm 3 câu. Đã đủ 3 admin: không làm gì, `messages` không đổi.",
+          "cpp": "Vòng `while` chạy khi `size()` còn nhỏ hơn 3; ghép tên bằng `to_string`; một biến `bool` cho biết đã tạo admin nào chưa, để chỉ gọi `save()` khi cần.",
           "implNote": "Kiểm tên bằng `isUsernameTaken`, không so `==`: đã có `Admin2` thì không tạo `admin2`."
         }
       ],
       "impl": {
-        "cpp": "**Ước tính khoảng 171 dòng**: `HrSystem.h` khoảng 33, `HrSystem.cpp` khoảng 138. Câu lỗi dùng nhiều lần đặt thành hằng ở đầu file .cpp: `const std::string FILE_ERROR = \"Khong ghi duoc file du lieu\";`."
+        "cpp": "**Ước tính khoảng 173 dòng**: `HrSystem.h` khoảng 33, `HrSystem.cpp` khoảng 140. Câu lỗi dùng nhiều lần đặt thành hằng ở đầu file .cpp: `const std::string FILE_ERROR = \"Khong ghi duoc file du lieu\";`."
       },
       "notes": [
         "Không có hoàn tác: nếu ghi file lỗi giữa chừng, dữ liệu trong bộ nhớ có thể khác file cho tới lần chạy sau. Ghi file trên máy cá nhân hầu như không lỗi nên chấp nhận được.",

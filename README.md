@@ -37,14 +37,14 @@ Nếu sau khi các file được sửa mà trang vẫn hiện bản cũ, nhấn 
 | `UserProfile.h` (gồm `ProfileField`) | 38 |
 | `AccountList.h` | 65 |
 | `Validator.h` | 65 |
-| `HrSystem.h` + `HrSystem.cpp` | 33 + 140 |
+| `HrSystem.h` + `HrSystem.cpp` | 33 + 138 |
 | `Console.h` + `Console.cpp` | 22 + 110 |
 | `Menu.h` + `Menu.cpp` | 20 + 18 |
 | `AdminMenu.h` + `AdminMenu.cpp` | 18 + 102 |
 | `EmployeeMenu.h` + `EmployeeMenu.cpp` | 16 + 60 |
 | `Application.h` + `Application.cpp` | 16 + 50 |
 | `main.cpp` | 6 |
-| **Tổng** | **khoảng 921** |
+| **Tổng** | **khoảng 919** |
 
 Đây là ước tính theo từng hàm, giả định: dấu `{` cùng dòng với câu lệnh, một dòng trống giữa hai hàm, một dòng chú thích cho mỗi lớp (không chú thích từng hàm), các số giới hạn viết thẳng trong mã. Nếu Coding Standard của lớp bắt chú thích từng hàm, tách mọi lớp thành `.h`/`.cpp` hoặc cấm «số ma thuật», tổng sẽ nhiều hơn.
 

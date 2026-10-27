@@ -11,7 +11,7 @@
     { "id": "r09", "from": "Validator", "to": "ProfileField", "kind": "dependency", "label": "checkField", "explain": "`checkField` chọn hàm kiểm theo tên thông tin." },
     { "id": "r10", "from": "HrSystem", "to": "AccountList", "kind": "composition", "label": "m_admins, m_employees", "fromMult": "1", "toMult": "2", "explain": "HrSystem sở hữu `AccountList<Admin>` và `AccountList<Employee>`." },
     { "id": "r11", "from": "HrSystem", "to": "Validator", "kind": "dependency", "label": "kiểm dữ liệu", "explain": "Kiểm username, mật khẩu và thông tin hồ sơ trước khi ghi." },
-    { "id": "r12", "from": "HrSystem", "to": "Admin", "kind": "dependency", "label": "tạo admin mặc định", "explain": "`initialize` tạo `Admin(tên, \"123456\")` khi chưa đủ 3 admin." },
+    { "id": "r12", "from": "HrSystem", "to": "Admin", "kind": "dependency", "label": "tạo admin mặc định", "explain": "`createDefaultAdmins` tạo `Admin(tên, \"123456\")` khi chưa đủ 3 admin." },
     { "id": "r13", "from": "HrSystem", "to": "Employee", "kind": "dependency", "label": "createNew, đổi mật khẩu", "explain": "Thêm nhân viên bằng `Employee::createNew`; đổi mật khẩu bằng `setPassword` và `setNeedsPasswordChange`." },
     { "id": "r14", "from": "HrSystem", "to": "UserProfile", "kind": "dependency", "label": "đọc, ghi hồ sơ", "explain": "`HrSystem` đọc và ghi `data/users/<username>.txt` qua `toLines` và `fromLines`." },
     { "id": "r15", "from": "HrSystem", "to": "Util", "kind": "dependency", "label": "file, thư mục", "explain": "Đọc, ghi, xóa file hồ sơ; tạo thư mục lúc khởi động." },

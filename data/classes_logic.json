@@ -235,13 +235,12 @@
             "messages: vector<string>&"
           ],
           "returns": "bool",
-          "summary": "Chuẩn bị lúc khởi động: tạo thư mục, đọc hai file, bỏ nhân viên trùng tên admin, tạo đủ 3 admin.",
+          "summary": "Chuẩn bị lúc khởi động bằng cách gọi lần lượt ba hàm private: `loadFiles` (tạo thư mục, đọc hai file), `removeDuplicateEmployees` (bỏ nhân viên trùng tên admin), `createDefaultAdmins` (tạo đủ 3 admin). Trả false ngay khi một hàm báo lỗi.",
           "role": "Gọi một lần, trước màn hình đăng nhập.",
           "detail": [
-            "Tạo `data/users` bằng `Util.ensureFolder` (tạo luôn `data`); lỗi thì thêm câu vào `messages` và trả false.",
-            "`m_admins.load()`, `m_employees.load()`. Chưa có Employees.txt thì `m_employees.save()` để tạo file rỗng.",
-            "Nhân viên trùng username với admin thì bỏ (duyệt từ cuối về đầu để chỉ số không lệch).",
-            "Thử lần lượt `admin1`, `admin2`... (bỏ qua tên đã có) cho tới khi đủ 3 admin, mật khẩu `123456`; mỗi admin tạo thêm thì thêm câu «Da tao admin mac dinh: admin2 / 123456» vào `messages`. Có tạo thì `m_admins.save()`."
+            "Chỉ có một câu `return` nối ba lời gọi `loadFiles(messages)`, `removeDuplicateEmployees(messages)`, `createDefaultAdmins(messages)`.",
+            "Hàm nào trả false thì hàm sau không chạy nữa và `initialize` trả false; câu lỗi đã nằm sẵn trong `messages`.",
+            "Mọi việc cụ thể (thư mục, đọc file, duyệt trùng, tạo admin) nằm trong ba hàm đó, mỗi hàm một việc."
           ],
           "pre": [
             "Gọi một lần."
@@ -251,8 +250,7 @@
           ],
           "complexity": "O(n²)",
           "example": "Lần chạy đầu, thư mục trống: tạo `data`, `data/users`, Employees.txt rỗng, Administrators.txt có `admin1`, `admin2`, `admin3`; `messages` có 3 câu.",
-          "cpp": "Làm lần lượt các bước ở phần mô tả. Phần tạo admin là một vòng `while` thử tên `admin1`, `admin2`... (ghép số bằng `std::to_string`) cho tới khi đủ 3.",
-          "implNote": "Kiểm nhân viên trùng admin và tên admin mặc định đã có bằng `indexOf` / `isUsernameTaken`, không so `==`."
+          "cpp": "Một câu `return` nối ba lời gọi bằng `&&`: `&&` dừng ở lời gọi đầu tiên trả false và vẫn gọi đúng thứ tự."
         },
         {
           "name": "login",
@@ -512,10 +510,77 @@
           "example": "`profilePath(\"NVA\")` = `\"data/users/nva.txt\"`.",
           "cpp": "Ghép `data/users/`, username đã đổi chữ thường, và `.txt`.",
           "implNote": "Luôn đổi username về chữ thường, vì Windows coi `NVA.txt` và `nva.txt` là một file."
+        },
+        {
+          "name": "loadFiles",
+          "vis": "-",
+          "params": [
+            "messages: vector<string>&"
+          ],
+          "returns": "bool",
+          "summary": "Tạo thư mục `data/users` (kèm `data`), đọc `Administrators.txt` và `Employees.txt` vào hai danh sách; chưa có `Employees.txt` thì tạo file rỗng. Trả false, kèm một câu lỗi trong `messages`, nếu không tạo được thư mục hoặc file.",
+          "role": "Bước đầu của `initialize`.",
+          "detail": [
+            "`Util.ensureFolder(\"data/users\")` (tạo luôn `data`); lỗi thì thêm câu vào `messages` và trả false.",
+            "`m_admins.load()`: không cần kiểm kết quả, vì chưa có file admin thì `createDefaultAdmins` sẽ tự tạo file.",
+            "`m_employees.load()` trả false (chưa có file) thì `m_employees.save()` để tạo file rỗng; ghi lỗi thì thêm câu vào `messages` và trả false."
+          ],
+          "pre": [
+            "Gọi một lần, trước hai hàm còn lại."
+          ],
+          "post": [
+            "Trả true: `data/users` và `Employees.txt` tồn tại; hai danh sách chứa dữ liệu đọc được (rỗng nếu chưa có file)."
+          ],
+          "complexity": "O(n)",
+          "example": "Lần chạy đầu: tạo `data` và `data/users`, tạo `Employees.txt` rỗng, hai danh sách rỗng, trả true.",
+          "cpp": "Gọi `Util::ensureFolder`, rồi `load()` của từng danh sách. `load()` của nhân viên trả false thì gọi `save()` để tạo file; không cần đọc lại vì danh sách rỗng đã khớp với file rỗng.",
+          "implNote": "Chỉ nên tạo file khi chắc là chưa có file: nếu file đã có mà `load()` không đọc được thì `save()` sẽ ghi đè bằng danh sách rỗng. Kiểm bằng `filesystem::exists` nếu muốn chặn trường hợp hiếm này."
+        },
+        {
+          "name": "removeDuplicateEmployees",
+          "vis": "-",
+          "params": [
+            "messages: vector<string>&"
+          ],
+          "returns": "bool",
+          "summary": "Xóa khỏi danh sách nhân viên mọi người có username trùng (không phân biệt hoa thường) với một admin, giữ lại admin; có xóa thì ghi lại `Employees.txt`. Trả false, kèm câu lỗi trong `messages`, nếu ghi lỗi.",
+          "role": "Giữ bất biến H1. Chỉ có tác dụng khi file bị sửa tay, vì chương trình tự ghi file thì không tạo ra username trùng.",
+          "detail": "Duyệt nhân viên từ cuối về đầu: `removeAt` dồn các phần tử sau lên một ô, nên duyệt xuôi sẽ bỏ sót phần tử vừa dồn lên. Mỗi nhân viên tra `m_admins.indexOf(username)`; khác −1 thì xóa. Một biến `bool` nhớ đã xóa ai chưa để chỉ ghi file khi cần.",
+          "pre": [
+            "Đã gọi `loadFiles`."
+          ],
+          "post": [
+            "Trả true: không username nào nằm trong cả hai danh sách; nếu đã xóa ai thì `Employees.txt` đã được ghi lại."
+          ],
+          "complexity": "O(n·m), n nhân viên, m admin",
+          "example": "`Administrators.txt` có `admin2`; `Employees.txt` có `nva` và `admin2` → `admin2` bị bỏ khỏi nhân viên, file ghi lại chỉ còn `nva`.",
+          "cpp": "Vòng `for` đếm lùi từ `size() - 1` về 0, dùng `indexOf` của danh sách admin; `removeAt(i)` khi trùng.",
+          "implNote": "So bằng `indexOf`, không so `==`: `NVA` và `nva` là một."
+        },
+        {
+          "name": "createDefaultAdmins",
+          "vis": "-",
+          "params": [
+            "messages: vector<string>&"
+          ],
+          "returns": "bool",
+          "summary": "Thêm admin mặc định cho tới khi đủ 3: thử lần lượt tên `admin1`, `admin2`... (bỏ tên đã có), mật khẩu `123456`, mỗi admin thêm một câu «Da tao admin mac dinh: admin2 / 123456» vào `messages`; có tạo thì ghi `Administrators.txt`. Trả false, kèm câu lỗi trong `messages`, nếu ghi lỗi.",
+          "role": "Bước cuối của `initialize`; cũng là chỗ tạo file `Administrators.txt` ở lần chạy đầu.",
+          "detail": "Một biến đếm bắt đầu từ 1; mỗi vòng ghép tên `admin` + số rồi tăng số. Tên mà `isUsernameTaken` báo đã dùng (ở admin hoặc nhân viên) thì bỏ qua. Vòng lặp luôn kết thúc vì số luôn tăng.",
+          "pre": [
+            "Đã gọi `loadFiles` và `removeDuplicateEmployees`."
+          ],
+          "post": [
+            "Trả true: có ít nhất 3 admin và `Administrators.txt` tồn tại."
+          ],
+          "complexity": "O(n²)",
+          "example": "Lần chạy đầu: tạo `admin1`, `admin2`, `admin3`, `messages` thêm 3 câu. Đã đủ 3 admin: không làm gì, `messages` không đổi.",
+          "cpp": "Vòng `while` chạy khi `size()` còn nhỏ hơn 3; ghép tên bằng `to_string`; một biến `bool` cho biết đã tạo admin nào chưa, để chỉ gọi `save()` khi cần.",
+          "implNote": "Kiểm tên bằng `isUsernameTaken`, không so `==`: đã có `Admin2` thì không tạo `admin2`."
         }
       ],
       "impl": {
-        "cpp": "**Ước tính khoảng 150 dòng**: `HrSystem.h` khoảng 30, `HrSystem.cpp` khoảng 120. Câu lỗi dùng nhiều lần đặt thành hằng ở đầu file .cpp: `const std::string FILE_ERROR = \"Khong ghi duoc file du lieu\";`."
+        "cpp": "**Ước tính khoảng 162 dòng**: `HrSystem.h` khoảng 33, `HrSystem.cpp` khoảng 129. Câu lỗi dùng nhiều lần đặt thành hằng ở đầu file .cpp: `const std::string FILE_ERROR = \"Khong ghi duoc file du lieu\";`."
       },
       "notes": [
         "Không có hoàn tác: nếu ghi file lỗi giữa chừng, dữ liệu trong bộ nhớ có thể khác file cho tới lần chạy sau. Ghi file trên máy cá nhân hầu như không lỗi nên chấp nhận được.",

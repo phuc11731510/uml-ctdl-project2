@@ -588,7 +588,7 @@
             "Mọi thay đổi đã được ghi file ngay."
           ],
           "example": "**************************************\n*           CAP NHAT: nva            *\n**************************************\n(Mui ten len/xuong de chon, Enter de xac nhan)\n  Ho ten: Nguyen Van A\n  Dia chi: 12 Le Loi, Q1\n> So dien thoai: 0912345678\n  Email: nva@gmail.com\n  Xong\n(Enter ở dòng So dien thoai)\nGia tri moi: 0987654321\nDa cap nhat",
-          "cpp": "Một vòng `while (true)` nhỏ, giống `Menu::run`: mỗi vòng đọc lại hồ sơ, dựng một vector gồm 4 chuỗi `tên: giá trị` và chuỗi `Xong`, rồi gọi `Console::chooseOption`. Số 5 thì thoát vòng; số 1–4 đổi sang `ProfileField` bằng `static_cast` (trừ 1 vì số mục đếm từ 1) rồi gọi `HrSystem::updateField`."
+          "cpp": "Một vòng `while (true)` nhỏ, giống `Menu::run`: mỗi vòng đọc lại hồ sơ, dựng một vector gồm 4 chuỗi `tên: giá trị` và chuỗi `Xong`, rồi gọi `Console::chooseOption`. Số 5 thì thoát vòng; số 1–4 đổi sang `ProfileField` bằng `static_cast` (trừ 1 vì số mục đếm từ 1) rồi gọi `HrSystem::updateField`. In kết quả rồi gọi `Console::pause`, để câu báo còn đọc được trước khi vòng sau xóa màn hình."
         },
         {
           "name": "showAllEmployees",
@@ -832,7 +832,7 @@
           "returns": "int",
           "summary": "Chạy toàn bộ chương trình; trả 0 khi kết thúc bình thường, 1 khi không chuẩn bị được dữ liệu.",
           "role": "Toàn bộ luồng chương trình; `main` chỉ gọi hàm này.",
-          "detail": "`m_system.initialize(messages)`, in từng câu (màu vàng), lỗi thì trả 1. Lặp: `login(name, role)` false thì thoát vòng lặp. Admin: `AdminMenu(m_system, name).run()`. Nhân viên: tạo `EmployeeMenu`; nếu cần thì `forcePasswordChange()`, false thì quay lại đăng nhập; xong `run()`. Ra khỏi vòng lặp in «Tam biet!» và trả 0.",
+          "detail": "`m_system.initialize(messages)`, in từng câu (màu vàng), lỗi thì trả 1. Lặp: `login(name, role)` false thì thoát vòng lặp. Admin: `AdminMenu(m_system, name).run()`. Nhân viên: tạo `EmployeeMenu`; nếu cần thì `forcePasswordChange()` rồi `Console::pause` để đọc kết quả, false thì quay lại đăng nhập; xong `run()`. Ra khỏi vòng lặp in «Tam biet!» và trả 0.",
           "pre": [
             "Gọi một lần."
           ],
@@ -852,7 +852,7 @@
           "returns": "bool",
           "summary": "Màn hình đăng nhập chung: hỏi User và Pass cho tới khi đúng, người dùng thoát, hoặc sai đủ 3 lần.",
           "role": "Mở đầu mỗi phiên làm việc; `run` gọi lại sau mỗi lần đăng xuất.",
-          "detail": "Bộ đếm số lần sai là biến cục bộ, đếm các lần sai liên tiếp trong một lần ở màn hình đăng nhập. Mỗi vòng: xóa màn hình, in khung «DANG NHAP» và dòng nhắc «(De trong User de thoat)». User rỗng thì trả false. Đúng thì trả true. Sai thì tăng bộ đếm, báo «Sai tai khoan hoac mat khau. Con N lan thu.»; tới 3 thì báo «Sai 3 lan, chuong trinh ket thuc.» và trả false.",
+          "detail": "Bộ đếm số lần sai là biến cục bộ, đếm các lần sai liên tiếp trong một lần ở màn hình đăng nhập. Trước vòng lặp: xóa màn hình một lần, in khung «DANG NHAP» và dòng nhắc «(De trong User de thoat)» (không xóa lại mỗi vòng, để câu báo sai còn nằm trên màn hình). Mỗi vòng: User rỗng thì trả false. Đúng thì trả true. Sai thì tăng bộ đếm, báo «Sai tai khoan hoac mat khau. Con N lan thu.»; tới 3 thì báo «Sai 3 lan, chuong trinh ket thuc.», gọi `Console::pause` rồi trả false.",
           "pre": [
             "Không có."
           ],

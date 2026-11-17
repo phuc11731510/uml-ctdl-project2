@@ -15,7 +15,7 @@
       "id": "model",
       "name": "Tài khoản và hồ sơ",
       "color": "#3b82f6",
-      "description": "Account, Admin, Employee và hồ sơ 4 thông tin. Đều viết gọn trong file .h."
+      "description": "Account, Admin, Employee và hồ sơ 4 thông tin. Mỗi lớp có file .h (khai báo) và file .cpp (cài đặt)."
     },
     {
       "id": "storage",

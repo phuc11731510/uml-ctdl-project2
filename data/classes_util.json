@@ -6,7 +6,7 @@
       "package": "util",
       "status": "support",
       "summary": "Các hàm tĩnh dùng chung: bỏ khoảng trắng, đổi chữ thường, so sánh không phân biệt hoa thường, kiểm chuỗi toàn chữ số, đọc và ghi file, xóa file, tạo thư mục.",
-      "role": "Các hàm xử lý chuỗi và đọc ghi file gom chung một lớp, chỉ có file .h. Mọi lớp khác gọi tới đây thay vì tự viết lại vòng lặp xử lý chuỗi hay tự mở file.",
+      "role": "Các hàm xử lý chuỗi và đọc ghi file gom chung một lớp, viết thành `Util.h` và `Util.cpp`. Mọi lớp khác gọi tới đây thay vì tự viết lại vòng lặp xử lý chuỗi hay tự mở file.",
       "spec": "Lưu dữ liệu bằng file txt và «ghi cập nhật» file sau mỗi thay đổi; so username không phân biệt hoa thường.",
       "uses": [],
       "invariants": [],
@@ -17,10 +17,10 @@
           "static": true,
           "vis": "+",
           "params": [
-            "s: string"
+            "text: string"
           ],
           "returns": "string",
-          "summary": "Trả bản sao của `s` đã bỏ mọi khoảng trắng (dấu cách, tab, `\\r`, `\\n`) ở đầu và cuối; khoảng trắng ở giữa giữ nguyên. Chuỗi toàn khoảng trắng thành chuỗi rỗng.",
+          "summary": "Trả bản sao của `text` đã bỏ mọi khoảng trắng (dấu cách, tab, `\\r`, `\\n`) ở đầu và cuối; khoảng trắng ở giữa giữ nguyên. Chuỗi toàn khoảng trắng thành chuỗi rỗng.",
           "role": "Gọi ngay sau khi đọc một dòng từ bàn phím (`Console.readLine`) hoặc từ file, để `\" nva\"` và `\"nva\"` được coi là một.",
           "pre": [
             "Không có."
@@ -37,10 +37,10 @@
           "static": true,
           "vis": "+",
           "params": [
-            "s: string"
+            "text: string"
           ],
           "returns": "string",
-          "summary": "Trả bản sao của `s` với mỗi chữ A–Z đổi thành a–z; số, `_` và các ký tự khác giữ nguyên.",
+          "summary": "Trả bản sao của `text` với mỗi chữ A–Z đổi thành a–z; số, `_` và các ký tự khác giữ nguyên.",
           "role": "So sánh không phân biệt hoa thường, và đặt tên file hồ sơ luôn viết thường.",
           "pre": [
             "Không có."
@@ -57,8 +57,8 @@
           "static": true,
           "vis": "+",
           "params": [
-            "a: string",
-            "b: string"
+            "first: string",
+            "second: string"
           ],
           "returns": "bool",
           "summary": "Đổi cả hai chuỗi về chữ thường rồi so: trả true khi chúng giống nhau từng ký tự (kể cả độ dài).",
@@ -67,7 +67,7 @@
             "Không có."
           ],
           "post": [
-            "Bằng `toLower(a) == toLower(b)`."
+            "Bằng `toLower(first) == toLower(second)`."
           ],
           "complexity": "O(n)",
           "example": "`equalsIgnoreCase(\"NVA\", \"nva\")` trả true; `equalsIgnoreCase(\"nva\", \"nva1\")` trả false.",
@@ -78,10 +78,10 @@
           "static": true,
           "vis": "+",
           "params": [
-            "s: string"
+            "text: string"
           ],
           "returns": "bool",
-          "summary": "Trả true khi `s` không rỗng và mọi ký tự đều là chữ số 0–9; có chữ cái, dấu cách hay dấu `-` là false.",
+          "summary": "Trả true khi `text` không rỗng và mọi ký tự đều là chữ số 0–9; có chữ cái, dấu cách hay dấu `-` là false.",
           "role": "Kiểm số điện thoại (`Validator.checkPhone`).",
           "pre": [
             "Không có."
@@ -182,7 +182,7 @@
         }
       ],
       "impl": {
-        "cpp": "**Ước tính khoảng 60 dòng**, chỉ file `Util.h`: `class Util { public: static std::string trim(std::string s) { ... } ... };`. Hàm viết thân ngay trong lớp nên không cần `Util.cpp`. `<filesystem>` cần C++17: trong Visual Studio vào Project → Properties → C/C++ → Language → C++ Language Standard, chọn ISO C++17 (mặc định là C++14)."
+        "cpp": "**Thực tế 155 dòng**: `Util.h` 72 (khai báo kèm khối comment từng hàm), `Util.cpp` 83 (định nghĩa, có `using namespace std;`). Chuỗi các ký tự khoảng trắng đặt thành hằng `WHITESPACE` ở phần `private:`. `<filesystem>` cần C++17: trong Visual Studio vào Project → Properties → C/C++ → Language → C++ Language Standard, chọn ISO C++17 (mặc định là C++14)."
       },
       "notes": [
         "Đường dẫn tương đối như `data/Employees.txt` tính từ thư mục làm việc lúc chạy (Visual Studio: thư mục dự án; bấm đúp .exe: thư mục chứa .exe)."

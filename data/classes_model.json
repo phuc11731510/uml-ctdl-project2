@@ -47,11 +47,11 @@
         "`Role`: `ADMIN` hoặc `EMPLOYEE` (khai báo ngay đầu file này)."
       ],
       "invariants": [
-        "A1. `m_password` không rỗng và không chứa dấu cách, vì trong file các cột cách nhau bằng dấu cách."
+        "A1. `m_strPassword` không rỗng và không chứa dấu cách, vì trong file các cột cách nhau bằng dấu cách."
       ],
       "attributes": [
         {
-          "name": "m_username",
+          "name": "m_strUsername",
           "type": "string",
           "vis": "-",
           "summary": "Tên đăng nhập của tài khoản, lưu đúng chữ hoa, chữ thường như lúc tạo (`NVA` vẫn là `NVA`).",
@@ -60,7 +60,7 @@
           "detail": "Private: lớp con và lớp khác đọc qua `getUsername()`."
         },
         {
-          "name": "m_password",
+          "name": "m_strPassword",
           "type": "string",
           "vis": "-",
           "summary": "Mật khẩu hiện tại, lưu nguyên văn (không mã hóa), giống hệt cột mật khẩu trong file.",
@@ -78,7 +78,7 @@
             "username: string",
             "password: string"
           ],
-          "summary": "Gán `username` vào `m_username` và `password` vào `m_password`. Lớp con gọi trong danh sách khởi tạo.",
+          "summary": "Gán `username` vào `m_strUsername` và `password` vào `m_strPassword`. Lớp con gọi trong danh sách khởi tạo.",
           "role": "`Admin` và `Employee` gọi trong danh sách khởi tạo của hàm dựng của mình.",
           "pre": [
             "Không có."
@@ -94,7 +94,7 @@
           "vis": "+",
           "params": [],
           "returns": "string",
-          "summary": "Trả `m_username`, đúng chữ hoa, chữ thường như lúc tạo; không đổi gì.",
+          "summary": "Trả `m_strUsername`, đúng chữ hoa, chữ thường như lúc tạo; không đổi gì.",
           "role": "Ghi file, đặt tên file hồ sơ, hiển thị.",
           "pre": [
             "Không có."
@@ -103,15 +103,15 @@
             "Không đổi dữ liệu."
           ],
           "example": "Tài khoản tạo với `\"NVA\"` thì trả `\"NVA\"`.",
-          "cpp": "Trả `m_username`; khai báo `const`."
+          "cpp": "Trả `m_strUsername`; khai báo `const`."
         },
         {
           "name": "getPassword",
           "vis": "+",
           "params": [],
           "returns": "string",
-          "summary": "Trả `m_password` nguyên văn; không đổi gì.",
-          "role": "`toLine` của `Admin` và `Employee` cần ghi mật khẩu ra file, mà `m_password` là private nên lớp con phải đọc qua hàm này. Kiểm mật khẩu thì dùng `checkPassword`, không dùng hàm này.",
+          "summary": "Trả `m_strPassword` nguyên văn; không đổi gì.",
+          "role": "`toLine` của `Admin` và `Employee` cần ghi mật khẩu ra file, mà `m_strPassword` là private nên lớp con phải đọc qua hàm này. Kiểm mật khẩu thì dùng `checkPassword`, không dùng hàm này.",
           "pre": [
             "Không có."
           ],
@@ -119,7 +119,7 @@
             "Không đổi dữ liệu."
           ],
           "example": "Tài khoản mới tạo của nhân viên: `getPassword()` = `\"111111\"`.",
-          "cpp": "Trả `m_password`; khai báo `const`."
+          "cpp": "Trả `m_strPassword`; khai báo `const`."
         },
         {
           "name": "matchesUsername",
@@ -128,13 +128,13 @@
             "name: string"
           ],
           "returns": "bool",
-          "summary": "So `name` với `m_username` sau khi đổi cả hai về chữ thường; trả true khi giống nhau.",
+          "summary": "So `name` với `m_strUsername` sau khi đổi cả hai về chữ thường; trả true khi giống nhau.",
           "role": "Mọi chỗ tìm tài khoản theo tên đều dùng hàm này, nên quy tắc «không phân biệt hoa thường» chỉ viết một lần.",
           "pre": [
             "Không có."
           ],
           "post": [
-            "Bằng `Util.equalsIgnoreCase(m_username, name)`."
+            "Bằng `Util.equalsIgnoreCase(m_strUsername, name)`."
           ],
           "example": "Tài khoản `nva`: `matchesUsername(\"NVA\")` = true; `matchesUsername(\"nva1\")` = false.",
           "cpp": "Gọi hàm so sánh không phân biệt hoa thường của lớp tiện ích; khai báo `const`.",
@@ -147,13 +147,13 @@
             "password: string"
           ],
           "returns": "bool",
-          "summary": "So `password` với `m_password` từng ký tự, có phân biệt hoa thường; trả true khi giống hệt.",
+          "summary": "So `password` với `m_strPassword` từng ký tự, có phân biệt hoa thường; trả true khi giống hệt.",
           "role": "Đăng nhập, xác nhận mật khẩu hiện tại khi đổi mật khẩu, và kiểm «mật khẩu mới khác mật khẩu cũ».",
           "pre": [
             "Không có."
           ],
           "post": [
-            "Bằng `m_password == password`."
+            "Bằng `m_strPassword == password`."
           ],
           "example": "Mật khẩu `Abc12345`: `checkPassword(\"abc12345\")` = false.",
           "cpp": "So sánh trực tiếp hai chuỗi bằng `==`; khai báo `const`."
@@ -165,7 +165,7 @@
             "newPassword: string"
           ],
           "returns": "void",
-          "summary": "Thay `m_password` bằng `newPassword`. Chỉ đổi trong bộ nhớ; muốn lưu thì nơi gọi phải ghi lại file.",
+          "summary": "Thay `m_strPassword` bằng `newPassword`. Chỉ đổi trong bộ nhớ; muốn lưu thì nơi gọi phải ghi lại file.",
           "role": "`HrSystem.changePassword` gọi rồi ghi file ngay sau đó.",
           "pre": [
             "Mật khẩu mới đã được kiểm tra."
@@ -212,7 +212,7 @@
         }
       ],
       "impl": {
-        "cpp": "**Ước tính khoảng 32 dòng**, chỉ file `Account.h` (gồm cả `enum class Role`). Thân các hàm viết ngay trong lớp. Nhớ `virtual ~Account() {}`. Thuộc tính đặt ở phần `private:`, các hàm ở phần `public:`."
+        "cpp": "**Thực tế 103 dòng**: `Account.h` 75 (gồm cả `enum class Role` và khối comment từng hàm), `Account.cpp` 28. Hàm dựng gán hai thuộc tính trong danh sách khởi tạo. Nhớ `virtual ~Account() = default;`. Các hàm ở phần `public:` đặt trước, thuộc tính `private:` đặt sau và tên thuộc tính là `m_` kèm tiền tố kiểu (`m_strUsername`, `m_strPassword`)."
       },
       "notes": [
         "`fromLine` không nằm ở đây vì nó là hàm static tạo đối tượng mới, mà hàm static không thể ảo. Mỗi lớp con có `fromLine` riêng và `AccountList<T>` gọi `T::fromLine`: lý do cần template."
@@ -316,7 +316,7 @@
         }
       ],
       "impl": {
-        "cpp": "**Ước tính khoảng 18 dòng**, chỉ file `Admin.h`: `class Admin : public Account { ... };`."
+        "cpp": "**Thực tế 71 dòng**: `Admin.h` 36, `Admin.cpp` 35. `class Admin : public Account { ... };`; `fromLine` đọc bằng `std::istringstream` (include trong `Admin.cpp`)."
       },
       "notes": [
         "Admin không có file hồ sơ và không có chức năng đổi mật khẩu; admin chỉ quản lý nhân viên."
@@ -346,7 +346,7 @@
       ],
       "attributes": [
         {
-          "name": "m_needsPasswordChange",
+          "name": "m_bNeedsPasswordChange",
           "type": "bool",
           "vis": "-",
           "summary": "Cờ ở cột 3 của Employees.txt: true (`1`) thì lần đăng nhập tới bắt buộc đổi mật khẩu; false (`0`) thì vào thẳng menu.",
@@ -383,7 +383,7 @@
           "returns": "string",
           "summary": "Trả chuỗi `\"111111\"`: mật khẩu mà mọi nhân viên mới được cấp.",
           "role": "Dùng ở `createNew` và ở luật «mật khẩu mới không được là 111111» (`HrSystem.checkNewPassword`).",
-          "detail": "Viết thành hàm thay vì hằng `static const std::string` vì hằng chuỗi static phải định nghĩa trong file .cpp, mà lớp này chỉ có file .h.",
+          "detail": "Mật khẩu mặc định là hằng `static const std::string DEFAULT_PASSWORD` ở phần `private:`, định nghĩa trong `Employee.cpp`; hàm này chỉ trả hằng đó ra để mọi nơi dùng cùng một giá trị.",
           "pre": [
             "Không có."
           ],
@@ -503,7 +503,7 @@
         }
       ],
       "impl": {
-        "cpp": "**Ước tính khoảng 32 dòng**, chỉ file `Employee.h`: `class Employee : public Account { ... };`."
+        "cpp": "**Thực tế 137 dòng**: `Employee.h` 75, `Employee.cpp` 62. `class Employee : public Account { ... };`; hai giá trị của cột cờ (`0` và `1`) đặt thành hằng `FLAG_NOT_NEEDED`, `FLAG_NEEDED`; `fromLine` và `toLine` dùng `m_bNeedsPasswordChange` ở dạng biểu thức, không viết `if` chỉ để đổi `true` thành `1`."
       },
       "notes": [
         "Cột 3 là phần thêm so với đề.",
@@ -580,13 +580,13 @@
           "vis": "+",
           "static": true,
           "readonly": true,
-          "summary": "Hằng số 4: số thông tin trong hồ sơ, cũng là kích thước mảng `m_values` và số vòng khi duyệt.",
+          "summary": "Hằng số 4: số thông tin trong hồ sơ, cũng là kích thước mảng `m_strValues` và số vòng khi duyệt.",
           "role": "Giới hạn của mọi vòng lặp qua 4 thông tin.",
           "example": "`for (int i = 0; i < UserProfile::FIELD_COUNT; i++)`.",
           "cpp": "Hằng `static const int` khai báo ngay trong lớp."
         },
         {
-          "name": "m_values",
+          "name": "m_strValues",
           "type": "string[4]",
           "vis": "-",
           "summary": "Mảng 4 chuỗi: phần tử 0 họ tên, 1 địa chỉ, 2 số điện thoại, 3 email (chỉ số theo `ProfileField`).",
@@ -603,7 +603,7 @@
             "field: ProfileField"
           ],
           "returns": "string",
-          "summary": "Trả giá trị của thông tin `field`, tức phần tử của `m_values` tại chỉ số của `field`; không đổi gì.",
+          "summary": "Trả giá trị của thông tin `field`, tức phần tử của `m_strValues` tại chỉ số của `field`; không đổi gì.",
           "role": "In hồ sơ, in bảng, hiện giá trị hiện tại ở menu cập nhật.",
           "pre": [
             "Không có."
@@ -691,7 +691,7 @@
         }
       ],
       "impl": {
-        "cpp": "**Ước tính khoảng 38 dòng**, chỉ file `UserProfile.h` (gồm cả `enum class ProfileField`). Không cần hàm dựng: mảng `std::string` tự khởi tạo rỗng."
+        "cpp": "**Thực tế 100 dòng**: `UserProfile.h` 51 (gồm cả `enum class ProfileField`), `UserProfile.cpp` 49. Không cần hàm dựng: mảng `m_strValues` (kích thước `FIELD_COUNT`) tự khởi tạo rỗng. `labelOf` dùng `switch` có nhánh `default`."
       },
       "notes": [],
       "read": 7,

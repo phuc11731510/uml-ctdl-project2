@@ -30,7 +30,7 @@
           "example": "`AccountList<Employee>`: `nva` (111111, cờ bật), `lthb` (abc12345, cờ tắt)."
         },
         {
-          "name": "m_filePath",
+          "name": "m_strFilePath",
           "type": "string",
           "vis": "-",
           "summary": "Đường dẫn file txt mà `load` đọc và `save` ghi, ví dụ `data/Employees.txt`.",
@@ -46,7 +46,7 @@
           "params": [
             "filePath: string"
           ],
-          "summary": "Lưu `filePath` vào `m_filePath`; danh sách bắt đầu rỗng, chưa đọc file.",
+          "summary": "Lưu `filePath` vào `m_strFilePath`; danh sách bắt đầu rỗng, chưa đọc file.",
           "role": "`HrSystem` tạo hai danh sách trong danh sách khởi tạo của hàm dựng của mình.",
           "pre": [
             "Không có."
@@ -55,7 +55,7 @@
             "`size()` = 0."
           ],
           "example": "`AccountList<Employee> employees(\"data/Employees.txt\");`",
-          "cpp": "Gán `m_filePath` trong danh sách khởi tạo."
+          "cpp": "Gán `m_strFilePath` trong danh sách khởi tạo."
         },
         {
           "name": "load",
@@ -224,7 +224,7 @@
         }
       ],
       "impl": {
-        "cpp": "**Ước tính khoảng 65 dòng**, chỉ file `AccountList.h` (template bắt buộc viết hết trong .h; tách ra .cpp sẽ lỗi liên kết). Khai báo: `template <typename T> class AccountList { ... };`."
+        "cpp": "**Thực tế 139 dòng** (kể cả khối comment từng hàm), chỉ file `AccountList.h` (template bắt buộc viết hết trong .h; tách ra .cpp sẽ lỗi liên kết). Khai báo: `template <typename T> class AccountList { ... };`. Viết `std::` đầy đủ vì đây là file .h. Hằng `static const int NOT_FOUND = -1` là giá trị `indexOf` trả về khi không tìm thấy."
       },
       "notes": [
         "Không có hàm `contains`: muốn biết có hay không thì dùng `indexOf(u) != -1`."

@@ -295,7 +295,7 @@
         }
       ],
       "impl": {
-        "cpp": "**Ước tính khoảng 132 dòng**: `Console.h` khoảng 22 (include `<string>` và `<vector>`), `Console.cpp` khoảng 110. Chỉ include `<windows.h>` và `<conio.h>` trong file .cpp."
+        "cpp": "**Thực tế 348 dòng**: `Console.h` 146 (include `<string>` và `<vector>`), `Console.cpp` 202. Chỉ include `<windows.h>` và `<conio.h>` trong file .cpp. Mã phím (13, 8, 72, 80, 224...), độ rộng khung tiêu đề và ký tự che mật khẩu đặt thành hằng `private:`. `chooseOption` và `readPassword` được tách thành các hàm phụ `private:` (`printOptions`, `readSelectionKey`, `moveSelection`, `applyPasswordKey`, `removeLastPasswordChar`) để không lồng nhiều điều kiện."
       },
       "read": 11,
       "stage": 5,
@@ -320,7 +320,7 @@
       "invariants": [],
       "attributes": [
         {
-          "name": "m_title",
+          "name": "m_strTitle",
           "type": "string",
           "vis": "-",
           "summary": "Chuỗi tiêu đề in trong khung sao ở đầu menu, ví dụ `MENU ADMIN (admin1)`.",
@@ -328,7 +328,7 @@
           "example": "`\"MENU ADMIN (admin1)\"`."
         },
         {
-          "name": "m_exitLabel",
+          "name": "m_strExitLabel",
           "type": "string",
           "vis": "-",
           "summary": "Chữ của mục thoát; `run` luôn thêm nó làm mục cuối cùng của danh sách chọn, ví dụ `Thoat (dang xuat)`.",
@@ -345,7 +345,7 @@
             "title: string",
             "exitLabel: string"
           ],
-          "summary": "Gán `title` vào `m_title` và `exitLabel` vào `m_exitLabel`. Lớp con gọi trong danh sách khởi tạo.",
+          "summary": "Gán `title` vào `m_strTitle` và `exitLabel` vào `m_strExitLabel`. Lớp con gọi trong danh sách khởi tạo.",
           "role": "Lớp con gọi trong danh sách khởi tạo.",
           "pre": [
             "Không có."
@@ -431,7 +431,7 @@
         }
       ],
       "impl": {
-        "cpp": "**Ước tính khoảng 38 dòng**: `Menu.h` khoảng 20 (gồm `virtual ~Menu() {}`), `Menu.cpp` khoảng 18. Hàm dựng, `run` và `printProfile` ở phần `public:`; thuộc tính và hai hàm thuần ảo ở phần `private:`."
+        "cpp": "**Thực tế 92 dòng**: `Menu.h` 56 (gồm `virtual ~Menu() = default;`), `Menu.cpp` 36. Hàm dựng, `run` và `printProfile` ở phần `public:`; thuộc tính và hai hàm thuần ảo ở phần `private:`. Chữ mục thoát dùng chung của hai menu đã đăng nhập là hằng `protected` `LOGOUT_LABEL`."
       },
       "notes": [],
       "read": 12,
@@ -608,7 +608,7 @@
         }
       ],
       "impl": {
-        "cpp": "**Ước tính khoảng 120 dòng**: `AdminMenu.h` khoảng 18, `AdminMenu.cpp` khoảng 102. `class AdminMenu : public Menu { ... };`."
+        "cpp": "**Thực tế 241 dòng**: `AdminMenu.h` 76, `AdminMenu.cpp` 165. `class AdminMenu : public Menu { ... };`. Số thứ tự các chức năng đặt thành `enum MenuChoice` ở phần `private:`; `handleChoice` dùng `switch` có nhánh `default`, mỗi `case` một lệnh trên một dòng."
       },
       "notes": [],
       "read": 13,
@@ -643,7 +643,7 @@
           "example": "`EmployeeMenu menu(m_system, name);` trong `Application`."
         },
         {
-          "name": "m_username",
+          "name": "m_strUsername",
           "type": "string",
           "vis": "-",
           "summary": "Username của nhân viên đang đăng nhập (như trong file); mọi chức năng chỉ làm trên tài khoản này.",
@@ -686,7 +686,7 @@
             "Trả true: mật khẩu đã đổi, cờ đã tắt trong file."
           ],
           "example": "Day la lan dang nhap dau tien, ban phai doi mat khau.\nMat khau moi: ******\nKhong duoc dung mat khau mac dinh 111111\nMat khau moi: ********\nNhap lai mat khau moi: ********\nDoi mat khau thanh cong",
-          "cpp": "In thông báo; lặp gọi `askNewPassword` cho tới khi true; rồi `HrSystem::changePassword` và in kết quả."
+          "cpp": "In thông báo; lặp gọi `askNewPassword` cho tới khi true; rồi `HrSystem::changePassword`, in kết quả và gọi `Console::pause` để người dùng kịp đọc."
         },
         {
           "name": "getOptions",
@@ -729,7 +729,7 @@
           "vis": "-",
           "params": [],
           "returns": "void",
-          "summary": "Đọc hồ sơ của `m_username` rồi in username cùng 4 thông tin; thiếu file hồ sơ thì báo lỗi.",
+          "summary": "Đọc hồ sơ của `m_strUsername` rồi in username cùng 4 thông tin; thiếu file hồ sơ thì báo lỗi.",
           "role": "Chức năng a của nhân viên: «Hiển thị thông tin của file [username].txt».",
           "pre": [
             "Không có."
@@ -738,7 +738,7 @@
             "Không thay đổi dữ liệu."
           ],
           "example": "Username: nva\nHo ten: Nguyen Van A\n...",
-          "cpp": "Gọi `findEmployee` cho chính `m_username`; thành công thì `printProfile`, lỗi thì in lỗi."
+          "cpp": "Gọi `findEmployee` cho chính `m_strUsername`; thành công thì `printProfile`, lỗi thì in lỗi."
         },
         {
           "name": "changePassword",
@@ -778,7 +778,7 @@
         }
       ],
       "impl": {
-        "cpp": "**Ước tính khoảng 76 dòng**: `EmployeeMenu.h` khoảng 16, `EmployeeMenu.cpp` khoảng 60."
+        "cpp": "**Thực tế 168 dòng**: `EmployeeMenu.h` 69, `EmployeeMenu.cpp` 99. Số thứ tự các chức năng đặt thành `enum MenuChoice` ở phần `private:`."
       },
       "notes": [],
       "read": 14,
@@ -832,7 +832,7 @@
           "returns": "int",
           "summary": "Chạy toàn bộ chương trình; trả 0 khi kết thúc bình thường, 1 khi không chuẩn bị được dữ liệu.",
           "role": "Toàn bộ luồng chương trình; `main` chỉ gọi hàm này.",
-          "detail": "`m_system.initialize(messages)`, in từng câu (màu vàng), lỗi thì trả 1. Lặp: `login(name, role)` false thì thoát vòng lặp. Admin: `AdminMenu(m_system, name).run()`. Nhân viên: tạo `EmployeeMenu`; nếu cần thì `forcePasswordChange()` rồi `Console::pause` để đọc kết quả, false thì quay lại đăng nhập; xong `run()`. Ra khỏi vòng lặp in «Tam biet!» và trả 0.",
+          "detail": "`m_system.initialize(messages)`, in từng câu (màu vàng), lỗi thì trả 1. Lặp: `login(name, role)` false thì thoát vòng lặp. Admin: `AdminMenu(m_system, name).run()`. Nhân viên: tạo `EmployeeMenu`; nếu cần thì `forcePasswordChange()` (hàm này tự chờ một phím ở cuối để đọc kết quả), false thì quay lại đăng nhập; xong `run()`. Ra khỏi vòng lặp in «Tam biet!» và trả 0.",
           "pre": [
             "Gọi một lần."
           ],
@@ -865,7 +865,7 @@
         }
       ],
       "impl": {
-        "cpp": "**Ước tính khoảng 66 dòng**: `Application.h` khoảng 16, `Application.cpp` khoảng 50. Thêm `main.cpp` khoảng 6 dòng: `int main() { Application app; return app.run(); }`."
+        "cpp": "**Thực tế 119 dòng**: `Application.h` 31, `Application.cpp` 82. Thêm `main.cpp` 6 dòng: `int main() { Application application; return application.run(); }`. Chọn menu theo vai trò bằng `switch` trên `Role` (có nhánh `default`)."
       },
       "notes": [
         "Bộ đếm sai làm lại từ 0 mỗi lần quay về màn hình đăng nhập (sau khi đăng xuất). Vì chỉ quay về được sau một lần đăng nhập đúng, điều này giống với «đếm các lần sai liên tiếp»."

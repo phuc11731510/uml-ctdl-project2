@@ -26,27 +26,37 @@ Nếu sau khi các file được sửa mà trang vẫn hiện bản cũ, nhấn 
 - **Mọi tên lớp và tên kiểu đều bấm được**: bấm `UserProfile` hay `string` để nhảy tới nơi nó được định nghĩa. Nút «← Quay lại» ở đầu khung đưa về lựa chọn trước.
 - Mặc định chỉ vẽ các quan hệ cấu trúc cho gọn; các quan hệ phụ thuộc của một lớp hiện khi chọn lớp đó, hoặc bật «Hiện mọi quan hệ phụ thuộc» ở thanh bên.
 
-## Ước tính số dòng code C++ (tính cả dòng trống)
+## Số dòng code C++ thực tế (tính cả dòng trống và comment)
 
 | File | Dòng |
 | --- | ---: |
-| `Util.h` | 60 |
-| `Account.h` (gồm `Role`) | 32 |
-| `Admin.h` | 18 |
-| `Employee.h` | 32 |
-| `UserProfile.h` (gồm `ProfileField`) | 38 |
-| `AccountList.h` | 65 |
-| `Validator.h` | 65 |
-| `HrSystem.h` + `HrSystem.cpp` | 33 + 142 |
-| `Console.h` + `Console.cpp` | 22 + 110 |
-| `Menu.h` + `Menu.cpp` | 20 + 18 |
-| `AdminMenu.h` + `AdminMenu.cpp` | 18 + 102 |
-| `EmployeeMenu.h` + `EmployeeMenu.cpp` | 16 + 60 |
-| `Application.h` + `Application.cpp` | 16 + 50 |
+| `Util.h` + `Util.cpp` | 72 + 83 |
+| `Account.h` (gồm `Role`) + `Account.cpp` | 75 + 28 |
+| `Admin.h` + `Admin.cpp` | 36 + 35 |
+| `Employee.h` + `Employee.cpp` | 75 + 62 |
+| `UserProfile.h` (gồm `ProfileField`) + `UserProfile.cpp` | 51 + 49 |
+| `AccountList.h` | 139 |
+| `Validator.h` + `Validator.cpp` | 128 + 159 |
+| `HrSystem.h` + `HrSystem.cpp` | 172 + 255 |
+| `Console.h` + `Console.cpp` | 146 + 202 |
+| `Menu.h` + `Menu.cpp` | 56 + 36 |
+| `AdminMenu.h` + `AdminMenu.cpp` | 76 + 165 |
+| `EmployeeMenu.h` + `EmployeeMenu.cpp` | 69 + 99 |
+| `Application.h` + `Application.cpp` | 31 + 82 |
 | `main.cpp` | 6 |
-| **Tổng** | **khoảng 923** |
+| **Tổng** | **2387** |
 
-Đây là ước tính theo từng hàm, giả định: dấu `{` cùng dòng với câu lệnh, một dòng trống giữa hai hàm, một dòng chú thích cho mỗi lớp (không chú thích từng hàm), các số giới hạn viết thẳng trong mã. Nếu Coding Standard của lớp bắt chú thích từng hàm, tách mọi lớp thành `.h`/`.cpp` hoặc cấm «số ma thuật», tổng sẽ nhiều hơn.
+Số trên là số dòng của mã đã viết xong. Mã theo C++ Coding Standard V2 nên dài hơn bản ước tính ban đầu (khoảng 923 dòng): mỗi hàm có khối chú thích `@Description`/`@return`/`@attention`, mọi lớp (trừ lớp mẫu `AccountList`) tách thành `.h` và `.cpp`, các số và chuỗi lặp lại được đặt thành hằng.
+
+## Quy ước viết mã (theo C++ Coding Standard V2)
+
+- Tên lớp `PascalCase`, tên hàm `camelCase` bắt đầu bằng động từ, tên hằng và giá trị enum `UPPERCASE`.
+- Biến cục bộ dùng Hungarian Notation: `bool` là `b` (`bReady`), số nguyên là `i` (`iIndex`), `char` là `c`, `string` là `str` (`strError`), enum là `e` (`eRole`). Biến thuộc tính có tiền tố `m_` rồi tiền tố kiểu (`m_strUsername`, `m_bNeedsPasswordChange`). Tham số hàm không thêm tiền tố nhưng phải đặt tên đầy đủ, không viết tắt.
+- File `.h` không có `using namespace std;` nên viết `std::string`; file `.cpp` đặt `using namespace std;` sau các `#include` và viết `string`.
+- Mỗi lớp có `.h` và `.cpp` cùng tên, thứ tự hàm trong hai file giống nhau; lớp mẫu `AccountList` được viết hết trong `.h`.
+- Mọi `switch` có nhánh `default`, mỗi câu lệnh một dòng, dùng `this->` khi gọi thành viên của chính lớp và `TenLop::` khi gọi hàm tĩnh.
+- Không dùng số hay chuỗi cứng lặp lại: đặt thành hằng `static const` của lớp; không dùng biến toàn cục.
+- Chú thích hàm viết trong file `.h` theo khung `/**** @Description ... @return ... @attention ... ****/`.
 
 ## Các file
 

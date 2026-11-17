@@ -21,17 +21,17 @@
           "static": true,
           "vis": "+",
           "params": [
-            "s: string"
+            "username: string"
           ],
           "returns": "string",
-          "summary": "Kiểm `s` có dùng được làm username không: 3–20 ký tự, chỉ chữ không dấu, số và `_`, bắt đầu bằng chữ, không trùng tên file Windows cấm. Trả `\"\"` nếu đạt, nếu không trả câu lỗi.",
+          "summary": "Kiểm `username` có dùng được làm username không: 3–20 ký tự, chỉ chữ không dấu, số và `_`, bắt đầu bằng chữ, không trùng tên file Windows cấm. Trả `\"\"` nếu đạt, nếu không trả câu lỗi.",
           "role": "Username còn là tên file hồ sơ, nên quy tắc này bảo vệ cả việc tạo file.",
           "detail": "Tên Windows cấm (so chữ thường): `con`, `prn`, `aux`, `nul`, `com1`…`com9`, `lpt1`…`lpt9`. Vì chỉ cho chữ, số và `_`, các ký tự cấm trong tên file (`\\ / : * ? \" < > |`, dấu cách) tự bị loại.",
           "pre": [
-            "`s` đã được trim."
+            "`username` đã được trim."
           ],
           "post": [
-            "Trả `\"\"` thì `s` dùng được làm tên file."
+            "Trả `\"\"` thì `username` dùng được làm tên file."
           ],
           "complexity": "O(n)",
           "example": "`nva`, `NVA01` → `\"\"`. `nv`, `1nva`, `nguyen van a` → `\"Username dai 3-20 ky tu, chi gom chu, so, _ va bat dau bang chu\"`. `con` → `\"Username trung ten danh rieng cua Windows\"`.",
@@ -42,10 +42,10 @@
           "static": true,
           "vis": "+",
           "params": [
-            "s: string"
+            "password: string"
           ],
           "returns": "string",
-          "summary": "Kiểm `s` làm mật khẩu: 6–20 ký tự, mỗi ký tự có mã 33–126 (không dấu cách, không chữ có dấu). Trả `\"\"` nếu đạt, nếu không trả câu lỗi.",
+          "summary": "Kiểm `password` làm mật khẩu: 6–20 ký tự, mỗi ký tự có mã 33–126 (không dấu cách, không chữ có dấu). Trả `\"\"` nếu đạt, nếu không trả câu lỗi.",
           "role": "Dấu cách bị cấm vì trong Employees.txt các cột cách nhau bằng dấu cách. Hai luật «khác 111111» và «khác mật khẩu cũ» nằm ở `HrSystem.checkNewPassword`.",
           "pre": [
             "Không có."
@@ -62,13 +62,13 @@
           "static": true,
           "vis": "+",
           "params": [
-            "s: string"
+            "fullName: string"
           ],
           "returns": "string",
           "summary": "Kiểm họ tên: không rỗng, tối đa 50 ký tự, chỉ gồm chữ cái không dấu và dấu cách. Trả `\"\"` nếu đạt, nếu không trả câu lỗi.",
           "role": "Hàm duy nhất quyết định ký tự nào được phép trong họ tên.",
           "pre": [
-            "`s` đã được trim (nên không thể chỉ gồm dấu cách)."
+            "`fullName` đã được trim (nên không thể chỉ gồm dấu cách)."
           ],
           "post": [
             "Trả `\"\"` thì ghi được thành một dòng của file hồ sơ."
@@ -82,13 +82,13 @@
           "static": true,
           "vis": "+",
           "params": [
-            "s: string"
+            "address: string"
           ],
           "returns": "string",
           "summary": "Kiểm địa chỉ: không rỗng, tối đa 100 ký tự in được (chữ không dấu, số, dấu câu, dấu cách). Trả `\"\"` nếu đạt, nếu không trả câu lỗi.",
           "role": "Địa chỉ nhập tự do nhất, nên chỉ chặn độ dài và ký tự lạ.",
           "pre": [
-            "`s` đã được trim."
+            "`address` đã được trim."
           ],
           "post": [
             "Trả `\"\"` thì ghi được thành một dòng của file hồ sơ."
@@ -102,16 +102,16 @@
           "static": true,
           "vis": "+",
           "params": [
-            "s: string"
+            "phone: string"
           ],
           "returns": "string",
           "summary": "Kiểm số điện thoại: đúng 10 chữ số và chữ số đầu là 0. Trả `\"\"` nếu đạt, nếu không trả câu lỗi.",
           "role": "Kiểm số di động Việt Nam ở dạng đơn giản nhất.",
           "pre": [
-            "`s` đã được trim."
+            "`phone` đã được trim."
           ],
           "post": [
-            "Trả `\"\"` thì `s` gồm đúng 10 chữ số, bắt đầu bằng 0."
+            "Trả `\"\"` thì `phone` gồm đúng 10 chữ số, bắt đầu bằng 0."
           ],
           "complexity": "O(n)",
           "example": "`0912345678` → `\"\"`. `912345678`, `0912-345-678`, `+84912345678` → `\"So dien thoai gom dung 10 chu so va bat dau bang 0\"`.",
@@ -122,14 +122,14 @@
           "static": true,
           "vis": "+",
           "params": [
-            "s: string"
+            "email: string"
           ],
           "returns": "string",
           "summary": "Kiểm email ở mức đơn giản: dạng `ten@ten-mien.duoi`, tối đa 50 ký tự, không dấu cách. Trả `\"\"` nếu đạt, nếu không trả câu lỗi.",
           "role": "Chặn các lỗi gõ thường gặp; không cố bắt mọi trường hợp của chuẩn email.",
           "detail": "Lỗi khi: rỗng hoặc dài hơn 50; có dấu cách; số `@` khác 1; trước `@` rỗng; sau `@` không có `.`, hoặc `.` nằm ngay sau `@` hay ở cuối.",
           "pre": [
-            "`s` đã được trim."
+            "`email` đã được trim."
           ],
           "post": [
             "Trả `\"\"` thì có đúng một `@` và tên miền có dấu chấm."
@@ -160,7 +160,7 @@
         }
       ],
       "impl": {
-        "cpp": "**Ước tính khoảng 65 dòng**, chỉ file `Validator.h`, hàm `static` viết thân trong lớp. Mỗi hàm đặt câu thông báo vào một hằng cục bộ `const std::string MSG = \"...\";` để không lặp lại."
+        "cpp": "**Thực tế 287 dòng**: `Validator.h` 128, `Validator.cpp` 159. Các giới hạn (độ dài, mã ký tự 32/33/126, số chữ số điện thoại) đặt thành hằng `static const` của lớp; các câu thông báo lỗi đặt thành hằng `static const std::string` định nghĩa ở đầu `Validator.cpp` để không lặp lại. Có thêm hàm phụ ở phần `private:` (`isAllCharsInRange`, `isAllUsernameChars`, `isAllLettersOrSpaces`, `isReservedName`) để mỗi hàm `check...` ngắn và không lồng nhiều điều kiện."
       },
       "notes": [
         "Các con số (3, 20, 6, 50, 100, 10) viết thẳng trong mã cho gọn. Nếu Coding Standard của lớp cấm «số ma thuật» thì thêm hằng, tốn khoảng 8 dòng."
@@ -371,7 +371,7 @@
             "Trả `\"\"`: Employees.txt có thêm dòng mới; có file `data/users/<username viết thường>.txt`."
           ],
           "example": "`addEmployee(\"nva\", p)` → `\"\"`; Employees.txt thêm `nva 111111 1`; tạo `data/users/nva.txt` 4 dòng.",
-          "cpp": "Ghi file hồ sơ trước, rồi thêm `Employee::createNew(...)` vào danh sách và `save`. Câu lỗi ghi file dùng nhiều lần nên đặt thành một hằng trong file .cpp."
+          "cpp": "Ghi file hồ sơ trước, rồi thêm `Employee::createNew(...)` vào danh sách và `save`. Câu lỗi ghi file dùng nhiều lần nên đặt thành hằng `FILE_ERROR` của lớp `HrSystem` (định nghĩa ở đầu `HrSystem.cpp`)."
         },
         {
           "name": "removeEmployee",
@@ -584,7 +584,7 @@
         }
       ],
       "impl": {
-        "cpp": "**Ước tính khoảng 175 dòng**: `HrSystem.h` khoảng 33, `HrSystem.cpp` khoảng 142. Câu lỗi dùng nhiều lần đặt thành hằng ở đầu file .cpp: `const std::string FILE_ERROR = \"Khong ghi duoc file du lieu\";`."
+        "cpp": "**Thực tế 427 dòng**: `HrSystem.h` 172 (kể cả khối comment từng hàm), `HrSystem.cpp` 255. Câu lỗi dùng nhiều lần, đường dẫn file, số admin tối thiểu và mật khẩu admin mặc định đặt thành hằng `static const` của lớp (`FILE_ERROR`, `EMPLOYEE_NOT_FOUND`, `ADMIN_FILE_PATH`, `EMPLOYEE_FILE_PATH`, `PROFILE_FOLDER`, `DEFAULT_ADMIN_COUNT`, `DEFAULT_ADMIN_PASSWORD`), định nghĩa ở đầu `HrSystem.cpp`; không dùng biến toàn cục."
       },
       "notes": [
         "Không có hoàn tác: nếu ghi file lỗi giữa chừng, dữ liệu trong bộ nhớ có thể khác file cho tới lần chạy sau. Ghi file trên máy cá nhân hầu như không lỗi nên chấp nhận được.",

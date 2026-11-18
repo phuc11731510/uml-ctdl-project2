@@ -1,0 +1,496 @@
+{
+  "classes": [
+    {
+      "id": "Node",
+      "stereotype": "template",
+      "tparams": [
+        "DataType"
+      ],
+      "package": "ds",
+      "status": "core",
+      "summary": "Một phần tử (node) của danh sách liên kết đơn: giữ một dữ liệu kiểu `DataType` và con trỏ tới node kế tiếp.",
+      "role": "Theo giáo trình chương 3, mục 3.4.1.1. Chỉ `LinkedList` sửa được con trỏ kế tiếp (khai báo `friend class LinkedList<DataType>`); bên ngoài chỉ đi qua danh sách bằng `getNext()` và đọc hay sửa dữ liệu bằng `getData()`.",
+      "spec": "Giáo trình «Cấu trúc dữ liệu», chương 3: danh sách liên kết đơn gồm các node, mỗi node có dữ liệu và con trỏ `pNext`.",
+      "uses": [],
+      "invariants": [
+        "N1. `m_pNext` của node cuối cùng trong danh sách là `nullptr`."
+      ],
+      "attributes": [
+        {
+          "name": "m_data",
+          "type": "DataType",
+          "vis": "-",
+          "summary": "Dữ liệu mà node chứa: một chuỗi, một `Admin`, một `Employee`...",
+          "role": "Đọc và sửa qua `getData()`.",
+          "example": "`Node<string>` chứa `\"nva 111111 1\"`."
+        },
+        {
+          "name": "m_pNext",
+          "type": "Node<DataType>*",
+          "vis": "-",
+          "summary": "Con trỏ tới node đứng ngay sau; `nullptr` nếu đây là node cuối.",
+          "role": "Chỉ `LinkedList` đổi giá trị này (lớp bạn); bên ngoài đọc qua `getNext()`.",
+          "example": "Danh sách `4 → 15 → 7`: `m_pNext` của node 4 trỏ tới node 15; của node 7 là `nullptr`."
+        }
+      ],
+      "methods": [
+        {
+          "name": "Node",
+          "ctor": true,
+          "vis": "+",
+          "params": [
+            "data: DataType"
+          ],
+          "summary": "Tạo một node mới chứa bản sao của `data`, chưa nối với node nào (`m_pNext` là `nullptr`).",
+          "role": "`LinkedList` gọi bằng `new Node<DataType>(data)` mỗi khi thêm một phần tử.",
+          "pre": [
+            "`DataType` sao chép được."
+          ],
+          "post": [
+            "`getData()` bằng `data`; `getNext()` là `nullptr`."
+          ],
+          "example": "`new Node<int>(15)` tạo node chứa 15.",
+          "cpp": "Gán `m_data` và `m_pNext` trong danh sách khởi tạo; hàm viết ngay dưới lớp trong `Node.h` vì là template."
+        },
+        {
+          "name": "getData",
+          "vis": "+",
+          "params": [],
+          "returns": "DataType&",
+          "summary": "Trả tham chiếu tới dữ liệu của node, nên sửa qua kết quả là sửa luôn dữ liệu trong node.",
+          "role": "`HrSystem` lấy tài khoản từ node rồi đổi mật khẩu; `AccountList::save` gọi `toLine()` qua đây.",
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "Sửa qua tham chiếu là sửa luôn dữ liệu trong danh sách."
+          ],
+          "complexity": "O(1)",
+          "example": "`pEmployee->getData().setPassword(\"Moi12345\");`",
+          "cpp": "Có hai bản: bản thường trả `DataType&`, bản `const` trả `const DataType&`."
+        },
+        {
+          "name": "getNext",
+          "vis": "+",
+          "params": [],
+          "returns": "Node<DataType>*",
+          "summary": "Trả con trỏ tới node đứng ngay sau; node cuối trả `nullptr`.",
+          "role": "Cách duy nhất để đi qua danh sách từ bên ngoài: `for (p = head; p != nullptr; p = p->getNext())`.",
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "Trả `nullptr` thì đã hết danh sách."
+          ],
+          "complexity": "O(1)",
+          "example": "Danh sách `4 → 15`: node 4 trả node 15; node 15 trả `nullptr`.",
+          "cpp": "Trả `m_pNext`."
+        }
+      ],
+      "impl": {
+        "cpp": "**Thực tế 67 dòng**, chỉ file `Node.h` (lớp template phải viết hết trong .h). Phải khai báo trước `template <class DataType> class LinkedList;` thì mới viết được `friend class LinkedList<DataType>;`. Giáo trình có thêm hàm `display()` in dữ liệu; mã này bỏ vì chương trình in qua `Console` và `DataType` không nhất thiết có `operator<<`."
+      },
+      "notes": [],
+      "read": 1,
+      "stage": 1,
+      "readWhy": "Đọc trước mọi lớp khác vì Util, UserProfile, AccountList, HrSystem và các menu đều dùng danh sách liên kết.",
+      "pos": [
+        0,
+        1450
+      ]
+    },
+    {
+      "id": "LinkedList",
+      "stereotype": "template",
+      "tparams": [
+        "DataType"
+      ],
+      "package": "ds",
+      "status": "core",
+      "summary": "Danh sách liên kết đơn theo giáo trình: giữ con trỏ tới node đầu (`m_pHead`), node cuối (`m_pTail`) và số phần tử (`m_iSize`).",
+      "role": "Cấu trúc dữ liệu chứa mọi dãy phần tử của chương trình: các dòng của file, các mục menu, các câu thông báo, danh sách username và (qua `AccountList`) danh sách tài khoản. Chương trình không dùng `std::vector`. Có đủ thao tác của giáo trình (thêm đầu, thêm cuối, thêm sau một node, tìm, tìm node đứng trước, xóa đầu, xóa cuối, xóa sau một node, xóa theo khóa, xóa hết, Selection Sort, lấy số phần tử) cộng thêm vài hàm hỗ trợ (`isEmpty`, `getHead`, sao chép sâu).",
+      "spec": "Giáo trình «Cấu trúc dữ liệu», chương 3, mục 3.4: danh sách liên kết đơn có `pHead`, `pTail`, `iSize`.",
+      "uses": [
+        "`Node<DataType>`: dữ liệu và con trỏ kế tiếp; `LinkedList` là bạn của `Node` nên sửa được `m_pNext`.",
+        "Kiểu `DataType` phải có hàm dựng sao chép, `operator==` (cho `search`, `remove`) và `operator<` (cho `selectionSort`). `std::string` có sẵn cả hai; `Admin` và `Employee` dùng `Account::operator==` và `Account::operator<` (so tên đăng nhập, không phân biệt hoa thường)."
+      ],
+      "invariants": [
+        "L1. `m_iSize` bằng số node nối được từ `m_pHead` đến hết danh sách.",
+        "L2. Danh sách rỗng thì `m_pHead` và `m_pTail` đều là `nullptr`; ngược lại `m_pTail` trỏ tới node cuối và `m_pTail->m_pNext` là `nullptr`."
+      ],
+      "attributes": [
+        {
+          "name": "m_pHead",
+          "type": "Node<DataType>*",
+          "vis": "-",
+          "summary": "Con trỏ tới node đầu danh sách; `nullptr` nếu danh sách rỗng.",
+          "role": "Điểm bắt đầu của mọi lần duyệt.",
+          "example": "Danh sách `4 → 15 → 7 → 40`: trỏ tới node 4."
+        },
+        {
+          "name": "m_pTail",
+          "type": "Node<DataType>*",
+          "vis": "-",
+          "summary": "Con trỏ tới node cuối danh sách; `nullptr` nếu danh sách rỗng.",
+          "role": "Giúp `addTail` chạy O(1) mà không phải duyệt cả danh sách.",
+          "example": "Danh sách `4 → 15 → 7 → 40`: trỏ tới node 40."
+        },
+        {
+          "name": "m_iSize",
+          "type": "int",
+          "vis": "-",
+          "summary": "Số phần tử hiện có.",
+          "role": "`getSize` trả giá trị này; mọi hàm thêm hay xóa phải cập nhật.",
+          "example": "Danh sách `4 → 15 → 7 → 40` có `m_iSize` = 4."
+        }
+      ],
+      "methods": [
+        {
+          "name": "LinkedList",
+          "vis": "+",
+          "params": [],
+          "summary": "Tạo danh sách rỗng: `m_pHead` và `m_pTail` là `nullptr`, `m_iSize` là 0.",
+          "role": "Mọi nơi cần một danh sách đều khai báo `LinkedList<string> lines;`.",
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "`isEmpty()` là true."
+          ],
+          "example": "`LinkedList<string> messages;`",
+          "cpp": "Gán ba thuộc tính trong danh sách khởi tạo.",
+          "ctor": true,
+          "detail": "Hàm hủy `~LinkedList()` gọi `clear()` để giải phóng mọi node khi danh sách ra khỏi phạm vi, nên không cần gọi tay."
+        },
+        {
+          "name": "operator=",
+          "vis": "+",
+          "params": [
+            "other: LinkedList<DataType>"
+          ],
+          "returns": "LinkedList<DataType>&",
+          "summary": "Gán danh sách `other` cho danh sách này bằng cách xóa hết phần tử cũ rồi sao chép sâu từng node của `other`. Cùng với hàm dựng sao chép (`LinkedList(const LinkedList&)`) giúp trả một danh sách theo giá trị từ hàm (ví dụ `getOptions`, `toLines`).",
+          "role": "Vì danh sách giữ con trỏ do `new` cấp, nếu sao chép mặc định thì hai danh sách dùng chung node và bị giải phóng hai lần.",
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "Hai danh sách bằng nhau từng phần tử nhưng không dùng chung node nào."
+          ],
+          "complexity": "O(n)",
+          "example": "`LinkedList<string> copy = lines;` rồi thêm vào `copy` thì `lines` không đổi.",
+          "cpp": "Bỏ qua nếu tự gán (`this == &other`); ngược lại `clear()` rồi `copyFrom(other)`. Hàm dựng sao chép khởi tạo rỗng rồi gọi `copyFrom`."
+        },
+        {
+          "name": "addHead",
+          "vis": "+",
+          "params": [
+            "data: DataType"
+          ],
+          "returns": "void",
+          "summary": "Thêm một phần tử mới có giá trị `data` vào đầu danh sách.",
+          "role": "Thêm một mục lên đầu.",
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "`m_iSize` tăng 1; phần tử đầu có giá trị `data`."
+          ],
+          "complexity": "O(1)",
+          "example": "`4 → 15`, `addHead(7)` còn `7 → 4 → 15`.",
+          "cpp": "Tạo node mới bằng `new`. Danh sách rỗng thì `m_pHead` và `m_pTail` cùng trỏ vào node mới; không thì đặt `m_pNext` của node mới trỏ vào `m_pHead` rồi cho `m_pHead` trỏ vào node mới (đúng thứ tự này)."
+        },
+        {
+          "name": "addTail",
+          "vis": "+",
+          "params": [
+            "data: DataType"
+          ],
+          "returns": "void",
+          "summary": "Thêm một phần tử mới có giá trị `data` vào cuối danh sách.",
+          "role": "Cách thêm thường dùng nhất: đọc file thêm từng dòng, thêm mục menu, thêm tài khoản.",
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "`m_iSize` tăng 1; phần tử cuối có giá trị `data`."
+          ],
+          "complexity": "O(1) nhờ `m_pTail`",
+          "example": "`4 → 15`, `addTail(7)` còn `4 → 15 → 7`.",
+          "cpp": "Tạo node mới bằng `new`. Danh sách rỗng thì giống `addHead`; không thì `m_pTail->m_pNext` trỏ vào node mới rồi `m_pTail` trỏ vào node mới."
+        },
+        {
+          "name": "addAfter",
+          "vis": "+",
+          "params": [
+            "node: Node<DataType>*",
+            "data: DataType"
+          ],
+          "returns": "void",
+          "summary": "Thêm một phần tử có giá trị `data` vào ngay sau `node`; `node` là `nullptr` thì thêm vào đầu danh sách.",
+          "role": "Chèn vào giữa danh sách (thao tác 3.4.2.2 của giáo trình).",
+          "pre": [
+            "`node` là `nullptr` hoặc là node của chính danh sách này."
+          ],
+          "post": [
+            "`m_iSize` tăng 1."
+          ],
+          "complexity": "O(1)",
+          "example": "`4 → 15 → 40`, `addAfter(node 15, 7)` còn `4 → 15 → 7 → 40`.",
+          "cpp": "Node mới trỏ vào node đứng sau `node`, rồi `node` trỏ vào node mới; nếu `node` là `m_pTail` thì cập nhật `m_pTail`.",
+          "implNote": "Bản trong giáo trình tăng `iSize` hai lần khi `node` là `nullptr` (vì gọi `addHead` rồi tăng tiếp). Mã này `return` ngay sau `addHead`."
+        },
+        {
+          "name": "search",
+          "vis": "+",
+          "params": [
+            "data: DataType"
+          ],
+          "returns": "Node<DataType>*",
+          "summary": "Duyệt từ đầu, trả con trỏ tới node đầu tiên có dữ liệu bằng `data`; không có thì trả `nullptr`.",
+          "role": "Tìm theo khóa (thao tác 3.4.2.3 của giáo trình).",
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "Trả `nullptr` thì không phần tử nào bằng `data`."
+          ],
+          "complexity": "O(n) tìm tuần tự",
+          "example": "`4 → 15 → 7`: `search(15)` trả node 15; `search(9)` trả `nullptr`.",
+          "cpp": "Con trỏ phụ `pWalker` đi từ `m_pHead`, dừng khi hết danh sách hoặc gặp dữ liệu bằng `data` (so bằng `==`)."
+        },
+        {
+          "name": "searchPre",
+          "vis": "+",
+          "params": [
+            "node: Node<DataType>*"
+          ],
+          "returns": "Node<DataType>*",
+          "summary": "Trả con trỏ tới node đứng ngay trước `node`; `node` là node đầu (hoặc không có trong danh sách) thì trả `nullptr`.",
+          "role": "Cần cho `removeTail` và cho `AccountList::remove` vì danh sách chỉ nối một chiều.",
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "Trả `nullptr` thì `node` là node đầu hoặc không thuộc danh sách."
+          ],
+          "complexity": "O(n)",
+          "example": "`4 → 15 → 7`: `searchPre(node 7)` trả node 15; `searchPre(node 4)` trả `nullptr`.",
+          "cpp": "Nếu `m_pHead` đã là `node` thì trả `nullptr`; ngược lại duyệt đến khi `m_pNext` của node đang xét bằng `node`."
+        },
+        {
+          "name": "removeHead",
+          "vis": "+",
+          "params": [],
+          "returns": "void",
+          "summary": "Xóa phần tử đầu danh sách; danh sách rỗng thì không làm gì.",
+          "role": "Cũng là bước lặp của `clear`.",
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "`m_iSize` giảm 1 nếu trước đó có phần tử."
+          ],
+          "complexity": "O(1)",
+          "example": "`4 → 15 → 7`, `removeHead()` còn `15 → 7`.",
+          "cpp": "Giữ node đầu trong `pTemp`, cho `m_pHead` trỏ sang node kế, `delete pTemp`; nếu danh sách thành rỗng thì `m_pTail` cũng về `nullptr`."
+        },
+        {
+          "name": "removeTail",
+          "vis": "+",
+          "params": [],
+          "returns": "void",
+          "summary": "Xóa phần tử cuối danh sách; danh sách rỗng thì không làm gì.",
+          "role": "Thao tác 3.4.2.4 của giáo trình.",
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "`m_iSize` giảm 1 nếu trước đó có phần tử."
+          ],
+          "complexity": "O(n) vì phải tìm node đứng trước node cuối",
+          "example": "`4 → 15 → 7`, `removeTail()` còn `4 → 15`.",
+          "cpp": "Dùng `searchPre(m_pTail)` để tìm node đứng trước node cuối, `delete` node cuối, rồi cho node đó (nếu có) trỏ `m_pNext` về `nullptr` và làm `m_pTail`; không có thì danh sách rỗng."
+        },
+        {
+          "name": "removeAfter",
+          "vis": "+",
+          "params": [
+            "node: Node<DataType>*"
+          ],
+          "returns": "void",
+          "summary": "Xóa phần tử đứng ngay sau `node`; `node` là `nullptr` thì xóa phần tử đầu; `node` là node cuối thì không làm gì.",
+          "role": "Là bước xóa thật sự của `remove` và `AccountList::remove`.",
+          "pre": [
+            "`node` là `nullptr` hoặc là node của chính danh sách này."
+          ],
+          "post": [
+            "`m_iSize` giảm 1 nếu có phần tử bị xóa."
+          ],
+          "complexity": "O(1)",
+          "example": "`4 → 15 → 7`, `removeAfter(node 4)` còn `4 → 7`.",
+          "cpp": "Giữ node cần xóa trong `pTemp`; nếu nó là `m_pTail` thì `m_pTail` lùi về `node`; nối `node` với node sau `pTemp` rồi `delete pTemp`.",
+          "implNote": "Bản trong giáo trình giảm `iSize` cả khi không xóa gì (node cuối). Mã này chỉ giảm khi đã xóa."
+        },
+        {
+          "name": "remove",
+          "vis": "+",
+          "params": [
+            "data: DataType"
+          ],
+          "returns": "void",
+          "summary": "Xóa phần tử đầu tiên có dữ liệu bằng `data`; không có thì không làm gì.",
+          "role": "Xóa theo khóa.",
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "`m_iSize` giảm 1 nếu tìm thấy."
+          ],
+          "complexity": "O(n)",
+          "example": "`4 → 15 → 7`, `remove(15)` còn `4 → 7`.",
+          "cpp": "Duyệt bằng hai con trỏ `pWalker` và `pPre` (node đứng trước); tìm thấy thì gọi `removeAfter(pPre)`.",
+          "implNote": "Bản trong giáo trình không xóa được khi phần tử cần xóa là node đầu. Mã này xử lý được vì `removeAfter(nullptr)` xóa node đầu."
+        },
+        {
+          "name": "clear",
+          "vis": "+",
+          "params": [],
+          "returns": "void",
+          "summary": "Xóa toàn bộ danh sách.",
+          "role": "Gọi trước khi nạp lại dữ liệu (`AccountList::load`) và trong hàm hủy.",
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "`isEmpty()` là true."
+          ],
+          "complexity": "O(n)",
+          "example": "`4 → 15 → 7`, `clear()` còn danh sách rỗng.",
+          "cpp": "Gọi `removeHead()` cho đến khi `m_pHead` là `nullptr`."
+        },
+        {
+          "name": "selectionSort",
+          "vis": "+",
+          "params": [],
+          "returns": "void",
+          "summary": "Sắp xếp danh sách tăng dần theo thuật toán Selection Sort (so bằng `<`).",
+          "role": "`AccountList::sortByUsername` dùng để in danh sách nhân viên theo username.",
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "Mỗi phần tử không lớn hơn phần tử đứng sau nó."
+          ],
+          "complexity": "O(n²)",
+          "example": "`7 → 4 → 15` thành `4 → 7 → 15`.",
+          "cpp": "Với mỗi node `pWalker`, gọi `findMin` để tìm node nhỏ nhất từ đó đến cuối rồi đổi chỗ **dữ liệu** của hai node bằng `std::swap`; không đổi chỗ node nên các con trỏ node bên ngoài vẫn hợp lệ.",
+          "implNote": "Bản trong giáo trình lỗi khi danh sách rỗng (dùng `p->pNext` khi `p` là `nullptr`). Mã này kiểm `pWalker != nullptr` trước."
+        },
+        {
+          "name": "getSize",
+          "vis": "+",
+          "params": [],
+          "returns": "int",
+          "summary": "Trả số phần tử đang có.",
+          "role": "Kiểm đủ 3 admin; đếm mục menu.",
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "≥ 0."
+          ],
+          "complexity": "O(1)",
+          "example": "`4 → 15 → 7` trả 3.",
+          "cpp": "Trả `m_iSize`."
+        },
+        {
+          "name": "isEmpty",
+          "vis": "+",
+          "params": [],
+          "returns": "bool",
+          "summary": "Trả true nếu danh sách không có phần tử nào.",
+          "role": "Kiểm danh sách thông báo hay danh sách nhân viên có rỗng không.",
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "true khi và chỉ khi `getSize()` bằng 0."
+          ],
+          "complexity": "O(1)",
+          "example": "Danh sách mới tạo trả true.",
+          "cpp": "So `m_iSize` với 0."
+        },
+        {
+          "name": "getHead",
+          "vis": "+",
+          "params": [],
+          "returns": "Node<DataType>*",
+          "summary": "Trả con trỏ tới node đầu để duyệt danh sách bằng `getNext()`; danh sách rỗng trả `nullptr`.",
+          "role": "Giáo trình duyệt bằng con trỏ phụ `pWalker` ngay trong lớp; vì các lớp khác không đọc được `m_pHead` nên cần hàm này để duyệt từ ngoài.",
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "Trả `nullptr` thì danh sách rỗng."
+          ],
+          "complexity": "O(1)",
+          "example": "`for (Node<string>* p = lines.getHead(); p != nullptr; p = p->getNext()) { ... }`",
+          "cpp": "Trả `m_pHead`."
+        },
+        {
+          "name": "findMin",
+          "vis": "-",
+          "params": [
+            "start: Node<DataType>*"
+          ],
+          "returns": "Node<DataType>*",
+          "summary": "Trả node có dữ liệu nhỏ nhất (theo `<`) trong đoạn từ `start` đến hết danh sách; không có node nào nhỏ hơn thì trả chính `start`.",
+          "role": "Hàm phụ của `selectionSort`, tách ra để `selectionSort` không bị lồng nhiều vòng lặp.",
+          "pre": [
+            "`start` khác `nullptr`."
+          ],
+          "post": [
+            "Kết quả là một node trong đoạn từ `start`."
+          ],
+          "complexity": "O(n)",
+          "example": "Từ node 7 của `7 → 4 → 15` trả node 4.",
+          "cpp": "Duyệt từ node sau `start`, giữ `pMin` là node nhỏ nhất đã gặp."
+        },
+        {
+          "name": "copyFrom",
+          "vis": "-",
+          "params": [
+            "other: LinkedList<DataType>"
+          ],
+          "returns": "void",
+          "summary": "Thêm lần lượt bản sao của từng phần tử của `other` vào cuối danh sách này.",
+          "role": "Hàm phụ cho hàm dựng sao chép và `operator=`.",
+          "pre": [
+            "Danh sách này đang rỗng (hoặc nơi gọi chấp nhận nối thêm)."
+          ],
+          "post": [
+            "`getSize()` tăng đúng bằng số phần tử của `other`."
+          ],
+          "complexity": "O(n)",
+          "example": "`other` là `4 → 15` thì thêm 4 rồi 15 vào cuối.",
+          "cpp": "Duyệt `other` bằng `pWalker` và gọi `addTail` cho từng dữ liệu."
+        }
+      ],
+      "impl": {
+        "cpp": "**Thực tế 361 dòng**, chỉ file `LinkedList.h` (lớp template phải viết hết trong .h; khối comment đặt ở khai báo trong lớp, phần định nghĩa nằm ngay dưới lớp). Đặt tên theo giáo trình: `pHead`, `pTail`, `iSize`, `pWalker`, `pTemp`, `pAdd`, thêm tiền tố `m_` cho thuộc tính. Dùng `nullptr` thay cho `NULL`. Cần `#include <utility>` cho `std::swap`."
+      },
+      "notes": [
+        "Giáo trình viết khai báo trong `LinkedList.cpp`, nhưng lớp template không tách ra .cpp được (lỗi liên kết), nên mọi định nghĩa đặt trong `LinkedList.h`.",
+        "Giáo trình có thêm `display()` in toàn bộ danh sách; mã này bỏ vì việc in do `Console` làm."
+      ],
+      "read": 2,
+      "stage": 1,
+      "readWhy": "Cấu trúc dữ liệu chính của chương trình, thay cho mảng động; đọc sau Node và trước mọi lớp dùng nó.",
+      "pos": [
+        450,
+        1450
+      ]
+    }
+  ]
+}

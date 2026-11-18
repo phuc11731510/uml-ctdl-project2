@@ -160,13 +160,13 @@
         }
       ],
       "impl": {
-        "cpp": "**Thực tế 287 dòng**: `Validator.h` 128, `Validator.cpp` 159. Các giới hạn (độ dài, mã ký tự 32/33/126, số chữ số điện thoại) đặt thành hằng `static const` của lớp; các câu thông báo lỗi đặt thành hằng `static const std::string` định nghĩa ở đầu `Validator.cpp` để không lặp lại. Có thêm hàm phụ ở phần `private:` (`isAllCharsInRange`, `isAllUsernameChars`, `isAllLettersOrSpaces`, `isReservedName`) để mỗi hàm `check...` ngắn và không lồng nhiều điều kiện."
+        "cpp": "**Thực tế 290 dòng**: `Validator.h` 132, `Validator.cpp` 158. Các giới hạn (độ dài, mã ký tự 32/33/126, số chữ số điện thoại) đặt thành hằng `static const` của lớp; các câu thông báo lỗi đặt thành hằng `static const std::string` định nghĩa ở đầu `Validator.cpp` để không lặp lại. Bốn tên Windows cấm (`con`, `prn`, `aux`, `nul`) đặt trong mảng hằng `RESERVED_NAMES` có `RESERVED_NAME_COUNT` phần tử (mảng, không dùng `vector`), định nghĩa ở `Validator.cpp`. Có thêm hàm phụ ở phần `private:` (`isAllCharsInRange`, `isAllUsernameChars`, `isAllLettersOrSpaces`, `isReservedName`) để mỗi hàm `check...` ngắn và không lồng nhiều điều kiện."
       },
       "notes": [
         "Các con số (3, 20, 6, 50, 100, 10) viết thẳng trong mã cho gọn. Nếu Coding Standard của lớp cấm «số ma thuật» thì thêm hằng, tốn khoảng 8 dòng."
       ],
-      "read": 9,
-      "stage": 4,
+      "read": 11,
+      "stage": 5,
       "readWhy": "Các ràng buộc dữ liệu; HrSystem và menu admin đều gọi.",
       "pos": [
         450,
@@ -182,10 +182,10 @@
       "role": "Các menu chỉ hỏi người dùng rồi gọi `HrSystem`. Hàm có thể lỗi trả về chuỗi: rỗng là thành công, khác rỗng là câu thông báo để menu in ra. Việc đọc và ghi file hồ sơ cũng làm ở đây.",
       "spec": "Mọi chức năng của đề: đăng nhập chung và nhận ra vai trò; thêm, xóa, tìm, cập nhật, hiển thị nhân viên; xem thông tin, đổi mật khẩu; buộc đổi mật khẩu lần đầu; «có tối thiểu 3 người quản lý».",
       "uses": [
-        "`AccountList<T>` (T là `Admin` hoặc `Employee`): `load()`, `save()` (trả false nếu ghi lỗi), `size()`, `at(i)` (sửa được), `indexOf(username)` (−1 nếu không có, không phân biệt hoa thường), `add(item)`, `removeAt(i)`, `sortByUsername()`.",
+        "`AccountList<T>` (T là `Admin` hoặc `Employee`): `load()`, `save()` (trả false nếu ghi lỗi), `getSize()`, `getHead()` (duyệt bằng `getNext()`), `search(username)` (trả con trỏ tới `Node`, `nullptr` nếu không có, không phân biệt hoa thường), `add(item)`, `remove(node)`, `sortByUsername()`. Tài khoản nằm trong node: `node->getData()`.",
         "`Validator`: `checkUsername(s)`, `checkPassword(s)`, `checkField(field, value)`; trả `\"\"` nếu hợp lệ.",
         "`Admin(username, password)`; `Employee::createNew(username)`; `Employee::defaultPassword()` là `\"111111\"`. Trên tài khoản: `checkPassword(p)`, `setPassword(p)`, `getUsername()`; trên nhân viên: `needsPasswordChange()`, `setNeedsPasswordChange(b)`.",
-        "`UserProfile`: `toLines()`, `fromLines(lines, out)` (false nếu ít hơn 4 dòng), `set(field, value)`.",
+        "`UserProfile`: `toLines()` (trả `LinkedList<string>`), `fromLines(lines, out)` (false nếu ít hơn 4 dòng), `set(field, value)`.",
         "`Util`: `readLines`, `writeLines`, `deleteFile`, `ensureFolder`, `toLower`.",
         "`Role`: `ADMIN`, `EMPLOYEE`."
       ],
@@ -232,7 +232,7 @@
           "name": "initialize",
           "vis": "+",
           "params": [
-            "messages: vector<string>&"
+            "messages: LinkedList<string>&"
           ],
           "returns": "bool",
           "summary": "Chuẩn bị lúc khởi động bằng cách gọi lần lượt ba hàm private: `loadFiles` (tạo thư mục, đọc hai file), `removeDuplicateEmployees` (bỏ nhân viên trùng tên admin), `createDefaultAdmins` (tạo đủ 3 admin). Trả false ngay khi một hàm báo lỗi.",
@@ -274,8 +274,8 @@
           ],
           "complexity": "O(n)",
           "example": "File có `nva 111111 1`: `login(\"NVA\", \"111111\", role, name)` trả true, `role` = `Role::EMPLOYEE`, `name` = `\"nva\"`. Sai mật khẩu hay username lạ → false.",
-          "cpp": "Tìm vị trí trong danh sách admin bằng `indexOf`; có và đúng mật khẩu thì ghi kết quả vào hai tham số rồi trả true. Không thì làm tương tự với danh sách nhân viên.",
-          "implNote": "Tìm tài khoản bằng `indexOf`, không tự viết vòng lặp so username bằng `==`, để `NVA` và `nva` được coi là một. Menu nhận username như trong file (`accountName`), không phải chữ người dùng gõ."
+          "cpp": "Tìm node trong danh sách admin bằng `search`; khác `nullptr` và đúng mật khẩu thì ghi kết quả vào hai tham số rồi trả true. Không thì làm tương tự với danh sách nhân viên.",
+          "implNote": "Tìm tài khoản bằng `search`, không tự viết vòng lặp so username bằng `==`, để `NVA` và `nva` được coi là một. Menu nhận username như trong file (`accountName`), không phải chữ người dùng gõ."
         },
         {
           "name": "needsPasswordChange",
@@ -293,8 +293,8 @@
             "Admin hoặc username lạ: false."
           ],
           "example": "Dòng `nva 111111 1` → true.",
-          "cpp": "Tìm vị trí bằng `indexOf`; không có thì false, có thì hỏi cờ của nhân viên đó.",
-          "implNote": "Tìm tài khoản bằng `indexOf`, không tự viết vòng lặp so username bằng `==`, để `NVA` và `nva` được coi là một."
+          "cpp": "Tìm node bằng `search`; `nullptr` thì false, có thì hỏi cờ của nhân viên đó.",
+          "implNote": "Tìm tài khoản bằng `search`, không tự viết vòng lặp so username bằng `==`, để `NVA` và `nva` được coi là một."
         },
         {
           "name": "verifyPassword",
@@ -313,8 +313,8 @@
             "Username không phải nhân viên: false."
           ],
           "example": "Dòng `lthb abc12345 0`: `verifyPassword(\"lthb\", \"abc12345\")` = true.",
-          "cpp": "Tìm vị trí bằng `indexOf`; không có thì false, có thì gọi `checkPassword` của nhân viên đó.",
-          "implNote": "Tìm tài khoản bằng `indexOf`, không tự viết vòng lặp so username bằng `==`, để `NVA` và `nva` được coi là một."
+          "cpp": "Tìm node bằng `search`; `nullptr` thì false, có thì gọi `checkPassword` của nhân viên đó.",
+          "implNote": "Tìm tài khoản bằng `search`, không tự viết vòng lặp so username bằng `==`, để `NVA` và `nva` được coi là một."
         },
         {
           "name": "checkNewUsername",
@@ -389,8 +389,8 @@
             "Trả `\"\"`: không còn dòng của nhân viên; file hồ sơ đã bị xóa."
           ],
           "example": "`removeEmployee(\"nva\")` → `\"\"`. `removeEmployee(\"admin1\")` → `\"Khong tim thay nhan vien\"` (admin không xóa được admin).",
-          "cpp": "Tìm vị trí, `removeAt`, `save`, rồi xóa file hồ sơ bằng `Util::deleteFile`.",
-          "implNote": "Tìm tài khoản bằng `indexOf`, không tự viết vòng lặp so username bằng `==`, để `NVA` và `nva` được coi là một."
+          "cpp": "Tìm node bằng `search`, `remove(node)`, `save`, rồi xóa file hồ sơ bằng `Util::deleteFile`.",
+          "implNote": "Tìm tài khoản bằng `search`, không tự viết vòng lặp so username bằng `==`, để `NVA` và `nva` được coi là một."
         },
         {
           "name": "findEmployee",
@@ -410,7 +410,7 @@
           ],
           "example": "`findEmployee(\"NVA\", p)` → `\"\"`. `findEmployee(\"admin1\", p)` → `\"Khong tim thay nhan vien\"`. Thiếu file hồ sơ → `\"Khong doc duoc file ho so\"`.",
           "cpp": "Kiểm có trong danh sách nhân viên; rồi đọc file hồ sơ bằng `Util::readLines` và đổi sang hồ sơ bằng `UserProfile::fromLines`.",
-          "implNote": "Tìm tài khoản bằng `indexOf`, không tự viết vòng lặp so username bằng `==`, để `NVA` và `nva` được coi là một."
+          "implNote": "Tìm tài khoản bằng `search`, không tự viết vòng lặp so username bằng `==`, để `NVA` và `nva` được coi là một."
         },
         {
           "name": "updateField",
@@ -436,7 +436,7 @@
           "name": "listEmployees",
           "vis": "+",
           "params": [
-            "usernames: vector<string>&"
+            "usernames: LinkedList<string>&"
           ],
           "returns": "void",
           "summary": "Sắp xếp danh sách nhân viên theo username rồi chép username của từng người vào `usernames` (xóa nội dung cũ trước).",
@@ -469,8 +469,8 @@
             "Trả `\"\"`: dòng của nhân viên có mật khẩu mới và cờ `0`."
           ],
           "example": "Dòng `nva 111111 1`: `changePassword(\"nva\", \"Moi12345\")` → `\"\"`; dòng thành `nva Moi12345 0`.",
-          "cpp": "Lấy tham chiếu tới nhân viên (`at` của `indexOf`), đặt mật khẩu mới, tắt cờ, rồi `save`.",
-          "implNote": "Tìm tài khoản bằng `indexOf`, không tự viết vòng lặp so username bằng `==`, để `NVA` và `nva` được coi là một."
+          "cpp": "Tìm node của nhân viên bằng `search`, rồi `getData()` để sửa thẳng nhân viên: đặt mật khẩu mới, tắt cờ, rồi `save`.",
+          "implNote": "Tìm tài khoản bằng `search`, không tự viết vòng lặp so username bằng `==`, để `NVA` và `nva` được coi là một."
         },
         {
           "name": "isUsernameTaken",
@@ -485,11 +485,11 @@
             "Không có."
           ],
           "post": [
-            "Bằng `m_admins.indexOf(u) != -1 || m_employees.indexOf(u) != -1`."
+            "Bằng `m_admins.search(u) != nullptr || m_employees.search(u) != nullptr`."
           ],
           "example": "Có admin `admin1`: `isUsernameTaken(\"ADMIN1\")` = true.",
-          "cpp": "`indexOf` khác −1 ở một trong hai danh sách.",
-          "implNote": "Dùng `indexOf` ở cả hai danh sách, không so `==`: đã có `nva` thì không cho tạo `NVA`."
+          "cpp": "`search` khác `nullptr` ở một trong hai danh sách.",
+          "implNote": "Dùng `search` ở cả hai danh sách, không so `==`: đã có `nva` thì không cho tạo `NVA`."
         },
         {
           "name": "profilePath",
@@ -515,7 +515,7 @@
           "name": "loadFiles",
           "vis": "-",
           "params": [
-            "messages: vector<string>&"
+            "messages: LinkedList<string>&"
           ],
           "returns": "bool",
           "summary": "Tạo thư mục `data/users` (kèm `data`), đọc `Administrators.txt` và `Employees.txt` vào hai danh sách; file nào chưa có thì tạo file rỗng. Trả false, kèm một câu lỗi trong `messages`, nếu không tạo được thư mục hoặc file.",
@@ -539,15 +539,14 @@
           "name": "removeDuplicateEmployees",
           "vis": "-",
           "params": [
-            "messages: vector<string>&"
+            "messages: LinkedList<string>&"
           ],
           "returns": "bool",
           "summary": "Xóa khỏi danh sách nhân viên mọi người có username trùng (không phân biệt hoa thường) với một admin, hoặc trùng với một nhân viên đứng trước trong cùng danh sách; giữ lại admin và người đứng trước. Có xóa thì ghi lại `Employees.txt`. Trả false, kèm câu lỗi trong `messages`, nếu ghi lỗi.",
           "role": "Giữ bất biến H1 và bảo đảm hai nhân viên không trùng username, kể cả khi `AccountList.load` không tự bỏ dòng trùng. Chỉ có tác dụng khi file bị sửa tay, vì chương trình tự ghi file thì không tạo ra username trùng.",
           "detail": [
-            "Hai vòng `for` đếm lùi (từ cuối về đầu): `removeAt` dồn các phần tử sau lên một ô, nên duyệt xuôi sẽ bỏ sót phần tử vừa dồn lên.",
-            "Vòng 1, trùng admin: với mỗi nhân viên, nếu `m_admins.indexOf(username)` khác −1 thì xóa.",
-            "Vòng 2, trùng nhân viên khác: với mỗi nhân viên thứ i, nếu `m_employees.indexOf(username)` khác i thì xóa. `indexOf` trả vị trí đầu tiên, nên khác i nghĩa là có người trùng đứng trước; người đứng trước được giữ.",
+            "Một vòng `while` đi qua từng node nhân viên. Trước khi xóa, lưu node kế tiếp vào `pNext` vì node hiện tại sắp bị `delete`.",
+            "Một nhân viên bị xóa khi trùng admin (`m_admins.search(username)` khác `nullptr`) hoặc khi có người trùng đứng trước (`m_employees.search(username)` trả node khác chính nó). `search` trả node đầu tiên khớp, nên người đứng trước được giữ.",
             "Một biến `bool` nhớ đã xóa ai chưa; chỉ khi có xóa mới `m_employees.save()`."
           ],
           "pre": [
@@ -558,14 +557,14 @@
           ],
           "complexity": "O(n·m + n²), n nhân viên, m admin",
           "example": "`Administrators.txt` có `admin2`; `Employees.txt` có `nva`, `admin2`, `NVA` → `admin2` (trùng admin) và `NVA` (trùng `nva` đứng trước) bị bỏ, file ghi lại chỉ còn `nva`.",
-          "cpp": "Hai vòng `for` đếm lùi từ `size() - 1` về 0, mỗi vòng một điều kiện: vòng đầu `indexOf` của danh sách admin khác −1, vòng sau `indexOf` của danh sách nhân viên khác `i`. Điều kiện đúng thì `removeAt(i)` và đặt cờ `removed`.",
-          "implNote": "So bằng `indexOf`, không so `==`: `NVA` và `nva` là một."
+          "cpp": "Vòng `while` đi từ `getHead()`; mỗi nhân viên tính một biến `bDuplicate` từ hai lần `search`; đúng thì `m_employees.remove(pEmployee)` và đặt cờ `bRemoved`; rồi sang node đã lưu trong `pNext`.",
+          "implNote": "So bằng `search`, không so `==`: `NVA` và `nva` là một."
         },
         {
           "name": "createDefaultAdmins",
           "vis": "-",
           "params": [
-            "messages: vector<string>&"
+            "messages: LinkedList<string>&"
           ],
           "returns": "bool",
           "summary": "Thêm admin mặc định cho tới khi đủ 3: thử lần lượt tên `admin1`, `admin2`... (bỏ tên đã có), mật khẩu `123456`, mỗi admin thêm một câu «Da tao admin mac dinh: admin2 / 123456» vào `messages`; có tạo thì ghi `Administrators.txt`. Trả false, kèm câu lỗi trong `messages`, nếu ghi lỗi.",
@@ -579,7 +578,7 @@
           ],
           "complexity": "O(n²)",
           "example": "Lần chạy đầu: tạo `admin1`, `admin2`, `admin3`, `messages` thêm 3 câu. Đã đủ 3 admin: không làm gì, `messages` không đổi.",
-          "cpp": "Vòng `while` chạy khi `size()` còn nhỏ hơn 3; ghép tên bằng `to_string`; một biến `bool` cho biết đã tạo admin nào chưa. Sau vòng lặp viết `if` lồng: `if (đã tạo) { if (save() lỗi) { báo lỗi và return false; } }`.",
+          "cpp": "Vòng `while` chạy khi `getSize()` còn nhỏ hơn 3; ghép tên bằng `to_string`; một biến `bool` cho biết đã tạo admin nào chưa. Sau vòng lặp viết `if` lồng: `if (đã tạo) { if (save() lỗi) { báo lỗi và return false; } }`.",
           "implNote": "Kiểm tên bằng `isUsernameTaken`, không so `==`: đã có `Admin2` thì không tạo `admin2`."
         }
       ],
@@ -590,8 +589,8 @@
         "Không có hoàn tác: nếu ghi file lỗi giữa chừng, dữ liệu trong bộ nhớ có thể khác file cho tới lần chạy sau. Ghi file trên máy cá nhân hầu như không lỗi nên chấp nhận được.",
         "`changePassword` dùng cho cả lần đổi bắt buộc ở lần đăng nhập đầu và lần đổi từ menu nhân viên."
       ],
-      "read": 10,
-      "stage": 4,
+      "read": 12,
+      "stage": 5,
       "readWhy": "Trung tâm của chương trình; đọc xong là hiểu mọi chức năng của đề.",
       "pos": [
         1125,

@@ -99,22 +99,22 @@
           "vis": "+",
           "params": [
             "path: string",
-            "lines: vector<string>&"
+            "lines: LinkedList<string>&"
           ],
           "returns": "bool",
           "summary": "Mở file `path`, đọc từng dòng (đã bỏ khoảng trắng đầu cuối) vào `lines`; trả false nếu không mở được file.",
           "role": "Cách duy nhất chương trình đọc file: danh sách tài khoản lúc khởi động, file hồ sơ mỗi khi cần hiển thị hoặc sửa.",
-          "detail": "Xóa nội dung cũ của `lines` trước khi đọc. Mỗi dòng thành một phần tử, đã qua `trim`. Dòng trống vẫn được giữ; nơi gọi tự bỏ qua.",
+          "detail": "Xóa nội dung cũ của `lines` trước khi đọc. Mỗi dòng thành một node ở cuối danh sách, đã qua `trim`. Dòng trống vẫn được giữ; nơi gọi tự bỏ qua.",
           "pre": [
             "Không có."
           ],
           "post": [
             "Trả false (thường do chưa có file): `lines` rỗng.",
-            "Trả true: `lines[i]` là dòng thứ i + 1 của file."
+            "Trả true: node thứ i của `lines` là dòng thứ i của file."
           ],
           "complexity": "O(kích thước file)",
-          "example": "File `data/users/nva.txt` có 4 dòng thì `readLines(\"data/users/nva.txt\", lines)` trả true và `lines` = `[\"Nguyen Van A\", \"12 Le Loi, Q1\", \"0912345678\", \"nva@gmail.com\"]`.",
-          "cpp": "Mở bằng `std::ifstream`; không mở được thì trả false. Đọc từng dòng bằng `std::getline`, bỏ khoảng trắng đầu cuối rồi thêm vào `lines`."
+          "example": "File `data/users/nva.txt` có 4 dòng thì `readLines(\"data/users/nva.txt\", lines)` trả true và `lines` = `\"Nguyen Van A\" → \"12 Le Loi, Q1\" → \"0912345678\" → \"nva@gmail.com\"`.",
+          "cpp": "Mở bằng `std::ifstream`; không mở được thì trả false. Đọc từng dòng bằng `std::getline`, bỏ khoảng trắng đầu cuối rồi `addTail` vào `lines`."
         },
         {
           "name": "writeLines",
@@ -122,7 +122,7 @@
           "vis": "+",
           "params": [
             "path: string",
-            "lines: vector<string>"
+            "lines: LinkedList<string>"
           ],
           "returns": "bool",
           "summary": "Mở file `path` để ghi đè (chưa có thì tạo mới), ghi mỗi phần tử của `lines` thành một dòng; trả false nếu không mở được file.",
@@ -136,8 +136,8 @@
             "Trả false: không mở được file để ghi."
           ],
           "complexity": "O(tổng độ dài)",
-          "example": "`writeLines(\"data/Employees.txt\", lines)` với `lines` = `[\"nva 111111 1\", \"lthb abc12345 0\"]` cho file 2 dòng.",
-          "cpp": "Mở bằng `std::ofstream` (mặc định ghi đè) và ghi từng dòng kèm xuống dòng; không mở được thì trả false."
+          "example": "`writeLines(\"data/Employees.txt\", lines)` với `lines` = `\"nva 111111 1\" → \"lthb abc12345 0\"` cho file 2 dòng.",
+          "cpp": "Mở bằng `std::ofstream` (mặc định ghi đè); không mở được thì trả false. Duyệt `lines` từ `getHead()` bằng `getNext()` và ghi từng dòng kèm xuống dòng."
         },
         {
           "name": "deleteFile",
@@ -182,13 +182,13 @@
         }
       ],
       "impl": {
-        "cpp": "**Thực tế 155 dòng**: `Util.h` 72 (khai báo kèm khối comment từng hàm), `Util.cpp` 83 (định nghĩa, có `using namespace std;`). Chuỗi các ký tự khoảng trắng đặt thành hằng `WHITESPACE` ở phần `private:`. `<filesystem>` cần C++17: trong Visual Studio vào Project → Properties → C/C++ → Language → C++ Language Standard, chọn ISO C++17 (mặc định là C++14)."
+        "cpp": "**Thực tế 155 dòng**: `Util.h` 72 (khai báo kèm khối comment từng hàm, include `LinkedList.h`), `Util.cpp` 83 (định nghĩa, có `using namespace std;`). Chuỗi các ký tự khoảng trắng đặt thành hằng `WHITESPACE` ở phần `private:`. `<filesystem>` cần C++17: trong Visual Studio vào Project → Properties → C/C++ → Language → C++ Language Standard, chọn ISO C++17 (mặc định là C++14)."
       },
       "notes": [
         "Đường dẫn tương đối như `data/Employees.txt` tính từ thư mục làm việc lúc chạy (Visual Studio: thư mục dự án; bấm đúp .exe: thư mục chứa .exe)."
       ],
-      "read": 1,
-      "stage": 1,
+      "read": 3,
+      "stage": 2,
       "readWhy": "Đọc đầu tiên vì gần như lớp nào cũng gọi tới; không phụ thuộc lớp nào khác.",
       "pos": [
         0,

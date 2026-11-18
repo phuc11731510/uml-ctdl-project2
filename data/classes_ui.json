@@ -220,7 +220,7 @@
           "static": true,
           "vis": "+",
           "params": [
-            "items: vector<string>",
+            "items: LinkedList<string>",
             "startAt: int = 1"
           ],
           "returns": "int",
@@ -237,7 +237,7 @@
             "Con trỏ đã hiện lại, nằm ở dòng ngay dưới danh sách; màu chữ là thường."
           ],
           "example": "`items` = `[\"Them Employee\", \"Xoa Employee\", \"Thoat\"]`, `startAt` = 1. Màn hình:\n(Mui ten len/xuong de chon, Enter de xac nhan)\n> Them Employee\n  Xoa Employee\n  Thoat\nNhấn mũi tên xuống rồi Enter: dấu `> ` chuyển xuống dòng `Xoa Employee` và hàm trả 2.",
-          "cpp": "Lấy handle bằng `GetStdHandle`, ẩn con trỏ bằng `SetConsoleCursorInfo` (cất thông tin cũ để trả lại cuối hàm). In dòng hướng dẫn, rồi in sẵn bấy nhiêu dòng trống bằng số mục và lấy vị trí con trỏ (`GetConsoleScreenBufferInfo`) lùi lên bấy nhiêu dòng để biết dòng đầu của danh sách; làm vậy thì cửa sổ có phải cuộn xuống vị trí vẫn đúng. Vòng lặp: `SetConsoleCursorPosition` về dòng đầu, vẽ các mục (mục đang chọn dùng `COLOR_SELECTED` và tiền tố `> `, các mục khác hai dấu cách), rồi đọc phím bằng `_getch()`: 13 là Enter; mã 0 hoặc 224 báo còn một mã nữa, đọc tiếp: 72 là mũi tên lên, 80 là mũi tên xuống. Trả màu thường trước khi xuống dòng để nền sáng không tràn hết dòng. Mỗi lần vẽ xong, con trỏ đã nằm ngay dưới danh sách (vì mỗi mục kết thúc bằng xuống dòng); khi nhấn Enter chỉ cần hiện lại con trỏ nhấp nháy."
+          "cpp": "Lấy handle bằng `GetStdHandle`, ẩn con trỏ bằng `SetConsoleCursorInfo` (cất thông tin cũ để trả lại cuối hàm). Số mục lấy bằng `items.getSize()`; các mục được vẽ bằng cách duyệt `getHead()` và `getNext()`. In dòng hướng dẫn, rồi in sẵn bấy nhiêu dòng trống bằng số mục và lấy vị trí con trỏ (`GetConsoleScreenBufferInfo`) lùi lên bấy nhiêu dòng để biết dòng đầu của danh sách; làm vậy thì cửa sổ có phải cuộn xuống vị trí vẫn đúng. Vòng lặp: `SetConsoleCursorPosition` về dòng đầu, vẽ các mục (mục đang chọn dùng `COLOR_SELECTED` và tiền tố `> `, các mục khác hai dấu cách), rồi đọc phím bằng `_getch()`: 13 là Enter; mã 0 hoặc 224 báo còn một mã nữa, đọc tiếp: 72 là mũi tên lên, 80 là mũi tên xuống. Trả màu thường trước khi xuống dòng để nền sáng không tràn hết dòng. Mỗi lần vẽ xong, con trỏ đã nằm ngay dưới danh sách (vì mỗi mục kết thúc bằng xuống dòng); khi nhấn Enter chỉ cần hiện lại con trỏ nhấp nháy."
         },
         {
           "name": "confirm",
@@ -295,10 +295,10 @@
         }
       ],
       "impl": {
-        "cpp": "**Thực tế 348 dòng**: `Console.h` 146 (include `<string>` và `<vector>`), `Console.cpp` 202. Chỉ include `<windows.h>` và `<conio.h>` trong file .cpp. Mã phím (13, 8, 72, 80, 224...), độ rộng khung tiêu đề và ký tự che mật khẩu đặt thành hằng `private:`. `chooseOption` và `readPassword` được tách thành các hàm phụ `private:` (`printOptions`, `readSelectionKey`, `moveSelection`, `applyPasswordKey`, `removeLastPasswordChar`) để không lồng nhiều điều kiện."
+        "cpp": "**Thực tế 349 dòng**: `Console.h` 146 (include `<string>` và `LinkedList.h`), `Console.cpp` 203. Chỉ include `<windows.h>` và `<conio.h>` trong file .cpp. Mã phím (13, 8, 72, 80, 224...), độ rộng khung tiêu đề và ký tự che mật khẩu đặt thành hằng `private:`. `chooseOption` và `readPassword` được tách thành các hàm phụ `private:` (`printOptions`, `readSelectionKey`, `moveSelection`, `applyPasswordKey`, `removeLastPasswordChar`) để không lồng nhiều điều kiện."
       },
-      "read": 11,
-      "stage": 5,
+      "read": 13,
+      "stage": 6,
       "readWhy": "Mọi màn hình đều in và đọc qua lớp này.",
       "pos": [
         450,
@@ -371,14 +371,14 @@
             "Trả về khi người dùng chọn mục thoát."
           ],
           "example": "**************************************\n*        MENU ADMIN (admin1)         *\n**************************************\n(Mui ten len/xuong de chon, Enter de xac nhan)\n  Them Employee\n> Xoa Employee\n  Tim Employee\n  Cap nhat Employee\n  Hien thi thong tin Employee\n  Thoat (dang xuat)",
-          "cpp": "Một vòng `while (true)` làm đúng các bước ở phần mô tả; thêm mục thoát vào cuối danh sách bằng `push_back`."
+          "cpp": "Một vòng `while (true)` làm đúng các bước ở phần mô tả; thêm mục thoát vào cuối danh sách bằng `addTail`."
         },
         {
           "name": "getOptions",
           "abstract": true,
           "vis": "-",
           "params": [],
-          "returns": "vector<string>",
+          "returns": "LinkedList<string>",
           "summary": "Hàm thuần ảo: lớp con trả tên các mục chức năng theo thứ tự hiện, không gồm mục thoát.",
           "role": "Lớp con trả nội dung riêng.",
           "pre": [
@@ -434,8 +434,8 @@
         "cpp": "**Thực tế 92 dòng**: `Menu.h` 56 (gồm `virtual ~Menu() = default;`), `Menu.cpp` 36. Hàm dựng, `run` và `printProfile` ở phần `public:`; thuộc tính và hai hàm thuần ảo ở phần `private:`. Chữ mục thoát dùng chung của hai menu đã đăng nhập là hằng `protected` `LOGOUT_LABEL`."
       },
       "notes": [],
-      "read": 12,
-      "stage": 5,
+      "read": 14,
+      "stage": 6,
       "readWhy": "Lớp cha của hai menu.",
       "pos": [
         900,
@@ -493,7 +493,7 @@
           "vis": "-",
           "override": true,
           "params": [],
-          "returns": "vector<string>",
+          "returns": "LinkedList<string>",
           "summary": "Trả 5 tên mục theo thứ tự: Thêm, Xóa, Tìm, Cập nhật, Hiển thị thông tin Employee.",
           "role": "Nội dung menu admin theo ảnh mẫu của đề.",
           "pre": [
@@ -503,7 +503,7 @@
             "Đúng 5 phần tử."
           ],
           "example": "`[\"Them Employee\", \"Xoa Employee\", \"Tim Employee\", \"Cap nhat Employee\", \"Hien thi thong tin Employee\"]`.",
-          "cpp": "Trả một vector gồm 5 chuỗi tên mục; đặt ở phần `private:` như ở `Menu`, khai báo `override`."
+          "cpp": "Dựng một `LinkedList<string>` gồm 5 chuỗi tên mục bằng `addTail`, rồi trả về; đặt ở phần `private:` như ở `Menu`, khai báo `override`."
         },
         {
           "name": "handleChoice",
@@ -588,7 +588,7 @@
             "Mọi thay đổi đã được ghi file ngay."
           ],
           "example": "**************************************\n*           CAP NHAT: nva            *\n**************************************\n(Mui ten len/xuong de chon, Enter de xac nhan)\n  Ho ten: Nguyen Van A\n  Dia chi: 12 Le Loi, Q1\n> So dien thoai: 0912345678\n  Email: nva@gmail.com\n  Xong\n(Enter ở dòng So dien thoai)\nGia tri moi: 0987654321\nDa cap nhat",
-          "cpp": "Một vòng `while (true)` nhỏ, giống `Menu::run`: mỗi vòng đọc lại hồ sơ, dựng một vector gồm 4 chuỗi `tên: giá trị` và chuỗi `Xong`, rồi gọi `Console::chooseOption`. Số 5 thì thoát vòng; số 1–4 đổi sang `ProfileField` bằng `static_cast` (trừ 1 vì số mục đếm từ 1) rồi gọi `HrSystem::updateField`. In kết quả rồi gọi `Console::pause`, để câu báo còn đọc được trước khi vòng sau xóa màn hình."
+          "cpp": "Một vòng `while (true)` nhỏ, giống `Menu::run`: mỗi vòng đọc lại hồ sơ, dựng một `LinkedList<string>` gồm 4 chuỗi `tên: giá trị` và chuỗi `Xong`, rồi gọi `Console::chooseOption`. Số 5 thì thoát vòng; số 1–4 đổi sang `ProfileField` bằng `static_cast` (trừ 1 vì số mục đếm từ 1) rồi gọi `HrSystem::updateField`. In kết quả rồi gọi `Console::pause`, để câu báo còn đọc được trước khi vòng sau xóa màn hình."
         },
         {
           "name": "showAllEmployees",
@@ -608,11 +608,11 @@
         }
       ],
       "impl": {
-        "cpp": "**Thực tế 241 dòng**: `AdminMenu.h` 76, `AdminMenu.cpp` 165. `class AdminMenu : public Menu { ... };`. Số thứ tự các chức năng đặt thành `enum MenuChoice` ở phần `private:`; `handleChoice` dùng `switch` có nhánh `default`, mỗi `case` một lệnh trên một dòng."
+        "cpp": "**Thực tế 244 dòng**: `AdminMenu.h` 76, `AdminMenu.cpp` 168. `class AdminMenu : public Menu { ... };`. Số thứ tự các chức năng đặt thành `enum MenuChoice` ở phần `private:`; `handleChoice` dùng `switch` có nhánh `default`, mỗi `case` một lệnh trên một dòng."
       },
       "notes": [],
-      "read": 13,
-      "stage": 5,
+      "read": 15,
+      "stage": 6,
       "readWhy": "Menu admin, gồm 5 chức năng a–e của đề.",
       "pos": [
         675,
@@ -693,7 +693,7 @@
           "vis": "-",
           "override": true,
           "params": [],
-          "returns": "vector<string>",
+          "returns": "LinkedList<string>",
           "summary": "Trả 2 tên mục theo thứ tự: Xem thông tin tài khoản, Đổi password.",
           "role": "Nội dung menu nhân viên theo ảnh mẫu của đề.",
           "pre": [
@@ -703,7 +703,7 @@
             "Đúng 2 phần tử."
           ],
           "example": "`[\"Xem thong tin tai khoan\", \"Doi password\"]`.",
-          "cpp": "Trả một vector gồm 2 chuỗi tên mục; đặt ở phần `private:` như ở `Menu`, khai báo `override`."
+          "cpp": "Dựng một `LinkedList<string>` gồm 2 chuỗi tên mục bằng `addTail`, rồi trả về; đặt ở phần `private:` như ở `Menu`, khai báo `override`."
         },
         {
           "name": "handleChoice",
@@ -781,8 +781,8 @@
         "cpp": "**Thực tế 168 dòng**: `EmployeeMenu.h` 69, `EmployeeMenu.cpp` 99. Số thứ tự các chức năng đặt thành `enum MenuChoice` ở phần `private:`."
       },
       "notes": [],
-      "read": 14,
-      "stage": 5,
+      "read": 16,
+      "stage": 6,
       "readWhy": "Menu nhân viên và lần đổi mật khẩu bắt buộc.",
       "pos": [
         1125,
@@ -870,8 +870,8 @@
       "notes": [
         "Bộ đếm sai làm lại từ 0 mỗi lần quay về màn hình đăng nhập (sau khi đăng xuất). Vì chỉ quay về được sau một lần đăng nhập đúng, điều này giống với «đếm các lần sai liên tiếp»."
       ],
-      "read": 15,
-      "stage": 5,
+      "read": 17,
+      "stage": 6,
       "readWhy": "Đọc cuối cùng: nối mọi lớp lại thành chương trình.",
       "pos": [
         1575,

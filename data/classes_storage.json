@@ -9,25 +9,25 @@
       "package": "storage",
       "status": "core",
       "summary": "Lớp template: danh sách tài khoản kiểu T trong bộ nhớ, gắn với một file txt. Dùng hai lần: `AccountList<Admin>` và `AccountList<Employee>`.",
-      "role": "Viết một lần, dùng cho cả hai file tài khoản. Bên trong là một `vector<T>`. Lớp lo việc đọc file lúc khởi động, tìm theo username, thêm, xóa, sắp xếp, và ghi lại toàn bộ file. Nó chỉ cần kiểu T có đủ 5 thứ ghi ở mục «Cần biết từ lớp khác»; `Admin` và `Employee` đều có.",
+      "role": "Viết một lần, dùng cho cả hai file tài khoản. Bên trong là một `LinkedList<T>` (danh sách liên kết đơn). Lớp lo việc đọc file lúc khởi động, tìm theo username, thêm, xóa, sắp xếp, và ghi lại toàn bộ file. Nó chỉ cần kiểu T có đủ 6 thứ ghi ở mục «Cần biết từ lớp khác»; `Admin` và `Employee` đều có.",
       "spec": "Yêu cầu chấm điểm «cài đặt theo hướng đối tượng và template (2đ)»; lưu danh sách admin và employee.",
       "uses": [
-        "`Util.readLines(path, lines)`: đọc mọi dòng (đã trim) vào `lines`; trả false nếu chưa có file.",
+        "`Util.readLines(path, lines)`: đọc mọi dòng (đã trim) vào `lines` (một `LinkedList<string>`); trả false nếu chưa có file.",
         "`Util.writeLines(path, lines)`: ghi đè cả file; trả false nếu lỗi.",
-        "`Util.toLower(s)`: đổi chữ thường.",
-        "Kiểu `T` phải có: (1) hàm dựng không tham số; (2) `static bool fromLine(const std::string& line, T& out)`; (3) `std::string toLine() const`; (4) `std::string getUsername() const`; (5) `bool matchesUsername(const std::string& name) const` (không phân biệt hoa thường)."
+        "`LinkedList<T>`: `addTail(item)`, `clear()`, `getSize()`, `getHead()`, `searchPre(node)`, `removeAfter(node)`, `selectionSort()`. `Node<T>`: `getData()`, `getNext()`.",
+        "Kiểu `T` phải có: (1) hàm dựng không tham số; (2) `static bool fromLine(const std::string& line, T& out)`; (3) `std::string toLine() const`; (4) `std::string getUsername() const`; (5) `bool matchesUsername(const std::string& name) const` (không phân biệt hoa thường); (6) `bool operator<(const Account&) const` để `selectionSort` xếp theo username."
       ],
       "invariants": [
         "L1. Không có hai phần tử trùng username (không phân biệt hoa thường): `load` bỏ dòng trùng, còn nơi gọi `add` phải kiểm trước."
       ],
       "attributes": [
         {
-          "name": "m_items",
-          "type": "vector<T>",
+          "name": "m_list",
+          "type": "LinkedList<T>",
           "vis": "-",
-          "summary": "Vector chứa mọi tài khoản đọc từ file, theo thứ tự dòng trong file (hoặc theo username sau khi sắp xếp).",
-          "role": "Mọi thao tác tìm, thêm, xóa, sắp xếp làm trên vector này; xong thì ghi lại file.",
-          "example": "`AccountList<Employee>`: `nva` (111111, cờ bật), `lthb` (abc12345, cờ tắt)."
+          "summary": "Danh sách liên kết chứa mọi tài khoản đọc từ file, theo thứ tự dòng trong file (hoặc theo username sau khi sắp xếp).",
+          "role": "Mọi thao tác tìm, thêm, xóa, sắp xếp làm trên danh sách này; xong thì ghi lại file.",
+          "example": "`AccountList<Employee>`: `nva` (111111, cờ bật) → `lthb` (abc12345, cờ tắt)."
         },
         {
           "name": "m_strFilePath",
@@ -52,7 +52,7 @@
             "Không có."
           ],
           "post": [
-            "`size()` = 0."
+            "`getSize()` = 0."
           ],
           "example": "`AccountList<Employee> employees(\"data/Employees.txt\");`",
           "cpp": "Gán `m_strFilePath` trong danh sách khởi tạo."
@@ -74,8 +74,8 @@
           ],
           "complexity": "O(n²) do kiểm trùng tuần tự",
           "example": "File có `nva 111111 1`, một dòng trống, `NVA abc 0` → danh sách chỉ có `nva`.",
-          "cpp": "Xóa danh sách cũ, đọc file bằng `Util::readLines`. Với mỗi dòng không rỗng: tạo một `T` rỗng, gọi `T::fromLine`, chỉ thêm khi đọc được và `indexOf` trả −1.",
-          "implNote": "Kiểm dòng trùng bằng `indexOf`, không so `==`: file có cả `NVA` và `nva` thì chỉ giữ dòng đầu."
+          "cpp": "Xóa danh sách cũ, đọc file bằng `Util::readLines` vào một `LinkedList<string>`. Duyệt các dòng bằng `getHead()` và `getNext()`; với mỗi dòng không rỗng: tạo một `T` rỗng, gọi `T::fromLine`, chỉ `addTail` khi đọc được và `search` trả `nullptr`.",
+          "implNote": "Kiểm dòng trùng bằng `search`, không so `==`: file có cả `NVA` và `nva` thì chỉ giữ dòng đầu."
         },
         {
           "name": "save",
@@ -88,14 +88,14 @@
             "Thư mục chứa file đã tồn tại."
           ],
           "post": [
-            "Trả true: file có đúng `size()` dòng, dòng i + 1 là `at(i).toLine()`."
+            "Trả true: file có đúng `getSize()` dòng, dòng i + 1 là `toLine()` của tài khoản thứ i trong danh sách."
           ],
           "complexity": "O(n)",
           "example": "`[nva (cờ bật), lthb (cờ tắt)]` → file:\nnva 111111 1\nlthb abc12345 0",
-          "cpp": "Gom `toLine()` của từng phần tử vào một vector rồi gọi `Util::writeLines`."
+          "cpp": "Duyệt danh sách, `addTail` `toLine()` của từng tài khoản vào một `LinkedList<string>` rồi gọi `Util::writeLines`."
         },
         {
-          "name": "size",
+          "name": "getSize",
           "vis": "+",
           "params": [],
           "returns": "int",
@@ -108,44 +108,43 @@
             "≥ 0."
           ],
           "example": "File admin có 3 dòng hợp lệ → 3.",
-          "cpp": "Trả kích thước của vector, ép sang `int`."
+          "cpp": "Trả `m_list.getSize()`."
         },
         {
-          "name": "at",
+          "name": "getHead",
           "vis": "+",
-          "params": [
-            "index: int"
-          ],
-          "returns": "T&",
-          "summary": "Trả tham chiếu tới tài khoản ở vị trí `index` (đếm từ 0), nên sửa qua kết quả là sửa luôn trong danh sách.",
-          "role": "Sau `indexOf`, lấy tài khoản để kiểm hoặc đổi mật khẩu.",
-          "pre": [
-            "0 ≤ `index` < `size()`; hàm không kiểm."
-          ],
-          "post": [
-            "Sửa qua tham chiếu là sửa luôn phần tử trong danh sách."
-          ],
-          "example": "`employees.at(employees.indexOf(\"nva\")).setPassword(\"Moi12345\");`",
-          "cpp": "Trả tham chiếu tới phần tử của vector; không kiểm chỉ số."
-        },
-        {
-          "name": "indexOf",
-          "vis": "+",
-          "params": [
-            "username: string"
-          ],
-          "returns": "int",
-          "summary": "Duyệt từ đầu, trả vị trí của tài khoản đầu tiên có username khớp `username` (không phân biệt hoa thường); không có thì trả −1.",
-          "role": "Cách tìm duy nhất; kiểm trùng là `indexOf(u) != -1`.",
+          "params": [],
+          "returns": "Node<T>*",
+          "summary": "Trả con trỏ tới node đầu của danh sách để duyệt các tài khoản bằng `getNext()`; danh sách rỗng trả `nullptr`.",
+          "role": "`HrSystem` duyệt qua nhân viên để lấy username (`listEmployees`) và để loại bỏ tài khoản trùng.",
           "pre": [
             "Không có."
           ],
           "post": [
-            "Trả −1 thì không phần tử nào khớp."
+            "Trả `nullptr` thì danh sách rỗng."
+          ],
+          "complexity": "O(1)",
+          "example": "`for (Node<Employee>* p = employees.getHead(); p != nullptr; p = p->getNext()) { p->getData().getUsername(); }`",
+          "cpp": "Trả `m_list.getHead()`."
+        },
+        {
+          "name": "search",
+          "vis": "+",
+          "params": [
+            "username: string"
+          ],
+          "returns": "Node<T>*",
+          "summary": "Duyệt từ đầu, trả con trỏ tới node của tài khoản đầu tiên có username khớp `username` (không phân biệt hoa thường); không có thì trả `nullptr`.",
+          "role": "Cách tìm duy nhất; kiểm trùng là `search(u) != nullptr`. Sửa qua `node->getData()` là sửa luôn tài khoản trong danh sách.",
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "Trả `nullptr` thì không phần tử nào khớp."
           ],
           "complexity": "O(n) tìm tuần tự",
-          "example": "`[nva, lthb]`: `indexOf(\"LTHB\")` = 1; `indexOf(\"ttc\")` = −1.",
-          "cpp": "Tìm tuần tự, so bằng `matchesUsername` của từng phần tử.",
+          "example": "`nva → lthb`: `search(\"LTHB\")` trả node `lthb`; `search(\"ttc\")` trả `nullptr`.",
+          "cpp": "Con trỏ phụ đi từ `getHead()`, dừng khi hết danh sách hoặc gặp tài khoản có `matchesUsername(username)`.",
           "implNote": "So bằng `matchesUsername` của từng phần tử, không dùng `getUsername() == username`. Mọi chức năng tìm theo username đều dựa vào hàm này."
         },
         {
@@ -161,29 +160,30 @@
             "Username của `item` chưa có trong danh sách."
           ],
           "post": [
-            "`size()` tăng 1."
+            "`getSize()` tăng 1."
           ],
           "example": "`employees.add(Employee::createNew(\"ttc\")); employees.save();`",
-          "cpp": "Thêm vào cuối vector bằng `push_back`."
+          "cpp": "Gọi `m_list.addTail(item)` (O(1) nhờ `m_pTail`)."
         },
         {
-          "name": "removeAt",
+          "name": "remove",
           "vis": "+",
           "params": [
-            "index: int"
+            "node: Node<T>*"
           ],
           "returns": "void",
-          "summary": "Xóa tài khoản ở vị trí `index`, các phần tử sau dồn lên một ô. Chỉ đổi trong bộ nhớ; muốn lưu thì gọi `save`.",
+          "summary": "Xóa tài khoản trong node `node` (lấy từ `search` hoặc `getHead`) khỏi danh sách. Chỉ đổi trong bộ nhớ; muốn lưu thì gọi `save`.",
           "role": "Xóa nhân viên; bỏ nhân viên trùng tên với admin lúc khởi động.",
           "pre": [
-            "0 ≤ `index` < `size()`."
+            "`node` là `nullptr` (không làm gì) hoặc là node của chính danh sách này."
           ],
           "post": [
-            "`size()` giảm 1."
+            "`getSize()` giảm 1 nếu `node` khác `nullptr`."
           ],
-          "complexity": "O(n)",
-          "example": "`[nva, lthb, ttc]`: `removeAt(1)` còn `[nva, ttc]`.",
-          "cpp": "Xóa bằng `erase` tại vị trí `begin() + index`."
+          "complexity": "O(n) vì phải tìm node đứng trước",
+          "example": "`nva → lthb → ttc`: `remove(search(\"lthb\"))` còn `nva → ttc`.",
+          "cpp": "Tìm node đứng trước bằng `m_list.searchPre(node)` rồi gọi `m_list.removeAfter(pPre)`; `searchPre` trả `nullptr` khi `node` là node đầu, và `removeAfter(nullptr)` xóa node đầu.",
+          "implNote": "Nếu `node` không thuộc danh sách thì `searchPre` cũng trả `nullptr` và hàm xóa nhầm node đầu; vì vậy nơi gọi chỉ truyền node lấy từ chính danh sách này."
         },
         {
           "name": "sortByUsername",
@@ -198,40 +198,21 @@
           "post": [
             "Username tăng dần theo chữ thường."
           ],
-          "complexity": "O(n log n)",
+          "complexity": "O(n²)",
           "example": "`[nva, lthb, Ttc]` → `[lthb, nva, Ttc]`.",
-          "cpp": "`std::sort` (`<algorithm>`) với hàm so sánh `lessByUsername`."
-        },
-        {
-          "name": "lessByUsername",
-          "static": true,
-          "vis": "-",
-          "params": [
-            "a: T",
-            "b: T"
-          ],
-          "returns": "bool",
-          "summary": "Trả true khi username của `a` (đổi chữ thường) đứng trước username của `b` theo thứ tự từ điển; `std::sort` dùng hàm này để so hai phần tử.",
-          "role": "Chỉ `sortByUsername` dùng.",
-          "pre": [
-            "Không có."
-          ],
-          "post": [
-            "Bằng `Util.toLower(a.getUsername()) < Util.toLower(b.getUsername())`."
-          ],
-          "example": "`lessByUsername(lthb, nva)` = true.",
-          "cpp": "Hàm static: đổi hai username về chữ thường rồi so bằng `<`."
+          "cpp": "Gọi `m_list.selectionSort()`; thứ tự do `Account::operator<` (so username đổi chữ thường)."
         }
       ],
       "impl": {
-        "cpp": "**Thực tế 139 dòng** (kể cả khối comment từng hàm), chỉ file `AccountList.h` (template bắt buộc viết hết trong .h; tách ra .cpp sẽ lỗi liên kết). Khai báo: `template <typename T> class AccountList { ... };`. Viết `std::` đầy đủ vì đây là file .h. Hằng `static const int NOT_FOUND = -1` là giá trị `indexOf` trả về khi không tìm thấy."
+        "cpp": "**Thực tế 154 dòng** (kể cả khối comment từng hàm), chỉ file `AccountList.h` (template bắt buộc viết hết trong .h; tách ra .cpp sẽ lỗi liên kết). Khai báo: `template <typename T> class AccountList { ... };`; khối comment đặt ở khai báo trong lớp, phần định nghĩa nằm ngay dưới lớp. Viết `std::` đầy đủ vì đây là file .h."
       },
       "notes": [
-        "Không có hàm `contains`: muốn biết có hay không thì dùng `indexOf(u) != -1`."
+        "Không có hàm `contains`: muốn biết có hay không thì dùng `search(u) != nullptr`.",
+        "Không còn chỉ số: tìm trả con trỏ `Node`, nên không cần `at(i)` và `removeAt(i)`."
       ],
-      "read": 8,
-      "stage": 3,
-      "readWhy": "Phần «template» của thang điểm; T chính là Admin và Employee vừa đọc.",
+      "read": 10,
+      "stage": 4,
+      "readWhy": "Phần «template» của thang điểm; T chính là Admin và Employee vừa đọc, và nó dựa trên LinkedList.",
       "pos": [
         900,
         1450

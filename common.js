@@ -76,7 +76,7 @@ window.UML = window.UML || {};
     enum: { label: 'kiểu liệt kê (enumeration)', text: 'Chỉ nhận một trong vài giá trị có tên cố định; các giá trị được liệt kê ngay trong thẻ.' },
     utility: { label: 'lớp tiện ích (utility)', text: 'Chỉ gồm các hàm tĩnh gọi thẳng qua tên lớp; không tạo đối tượng.' },
     immutable: { label: 'lớp bất biến (immutable)', text: 'Sau khi tạo thì nội dung không bao giờ đổi.' },
-    types: { label: 'bảng kiểu cơ bản', text: 'Không phải lớp: là bảng tra các kiểu có sẵn của C++ (string, vector, ...) dùng trong chữ ký.' },
+    types: { label: 'bảng kiểu cơ bản', text: 'Không phải lớp: là bảng tra các kiểu có sẵn của C++ (string, int, bool, ...) dùng trong chữ ký.' },
     template: { label: 'lớp template (lớp mẫu)', text: 'Viết một lần với tham số kiểu T (ô nét đứt ở góc thẻ); khi dùng thì thay T bằng một kiểu cụ thể, ví dụ AccountList<Employee>. Toàn bộ mã nằm trong file .h.' },
     exception: { label: 'ngoại lệ (exception)', text: 'Một lỗi được ném ra khi có chuyện sai, để nơi gọi xử lý.' }
   };
@@ -103,7 +103,7 @@ window.UML = window.UML || {};
     search: ''
   };
 
-  const FILES = ['meta', 'classes_types', 'classes_util', 'classes_model', 'classes_storage', 'classes_logic',
+  const FILES = ['meta', 'classes_types', 'classes_ds', 'classes_util', 'classes_model', 'classes_storage', 'classes_logic',
     'classes_ui', 'relations'];
 
   U.loadData = async function () {
@@ -118,7 +118,7 @@ window.UML = window.UML || {};
     D.packages = out.meta.packages;
     D.stages = out.meta.readingStages;
     D.layoutRef = out.meta.layoutRef || null;
-    D.classes = [].concat(out.classes_types.classes, out.classes_util.classes, out.classes_model.classes, out.classes_storage.classes,
+    D.classes = [].concat(out.classes_types.classes, out.classes_ds.classes, out.classes_util.classes, out.classes_model.classes, out.classes_storage.classes,
       out.classes_logic.classes, out.classes_ui.classes);
     D.byId = {};
     D.classes.forEach(c => { D.byId[c.id] = c; });

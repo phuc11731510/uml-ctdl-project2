@@ -5,8 +5,8 @@
     { "id": "r03", "from": "Account", "to": "Role", "kind": "dependency", "label": "getRole()", "explain": "Mỗi tài khoản trả vai trò của mình. `Role` khai báo ngay trong `Account.h`." },
     { "id": "r04", "from": "Account", "to": "Util", "kind": "dependency", "label": "equalsIgnoreCase", "explain": "`matchesUsername` so username không phân biệt hoa thường." },
     { "id": "r05", "from": "UserProfile", "to": "ProfileField", "kind": "dependency", "label": "chỉ số mảng", "explain": "`get`, `set`, `labelOf` nhận `ProfileField` và dùng nó làm chỉ số mảng. `ProfileField` khai báo trong `UserProfile.h`." },
-    { "id": "r06", "from": "AccountList", "to": "Account", "kind": "dependency", "label": "T = Admin hoặc Employee", "explain": "Tham số `T` được thay bằng `Admin` hoặc `Employee`; `AccountList` gọi `T::fromLine`, `toLine`, `getUsername`, `matchesUsername`." },
-    { "id": "r07", "from": "AccountList", "to": "Util", "kind": "dependency", "label": "readLines, writeLines", "explain": "`load` đọc file, `save` ghi lại cả file; `lessByUsername` dùng `toLower`." },
+    { "id": "r06", "from": "AccountList", "to": "Account", "kind": "dependency", "label": "T = Admin hoặc Employee", "explain": "Tham số `T` được thay bằng `Admin` hoặc `Employee`; `AccountList` gọi `T::fromLine`, `toLine`, `getUsername`, `matchesUsername`; `LinkedList` dùng `Account::operator==` và `operator<` để tìm và sắp xếp." },
+    { "id": "r07", "from": "AccountList", "to": "Util", "kind": "dependency", "label": "readLines, writeLines", "explain": "`load` đọc file, `save` ghi lại cả file." },
     { "id": "r08", "from": "Validator", "to": "Util", "kind": "dependency", "label": "isAllDigits, toLower", "explain": "Kiểm số điện thoại và so tên Windows cấm." },
     { "id": "r09", "from": "Validator", "to": "ProfileField", "kind": "dependency", "label": "checkField", "explain": "`checkField` chọn hàm kiểm theo tên thông tin." },
     { "id": "r10", "from": "HrSystem", "to": "AccountList", "kind": "composition", "label": "m_admins, m_employees", "fromMult": "1", "toMult": "2", "explain": "HrSystem sở hữu `AccountList<Admin>` và `AccountList<Employee>`." },
@@ -29,6 +29,16 @@
     { "id": "r27", "from": "Application", "to": "AdminMenu", "kind": "dependency", "label": "tạo khi admin đăng nhập", "explain": "Mỗi lần admin đăng nhập, `run` tạo một `AdminMenu` cục bộ." },
     { "id": "r28", "from": "Application", "to": "EmployeeMenu", "kind": "dependency", "label": "tạo khi nhân viên đăng nhập", "explain": "Mỗi lần nhân viên đăng nhập, `run` tạo một `EmployeeMenu`, gọi `forcePasswordChange()` nếu cần, rồi `run()`." },
     { "id": "r29", "from": "Application", "to": "Console", "kind": "dependency", "label": "màn hình đăng nhập", "explain": "`login` đọc User bằng `readLine` và Pass bằng `readPassword`." },
-    { "id": "r30", "from": "Application", "to": "Role", "kind": "dependency", "label": "chọn menu", "explain": "Dựa vào `Role` để mở menu admin hay menu nhân viên." }
+    { "id": "r30", "from": "Application", "to": "Role", "kind": "dependency", "label": "chọn menu", "explain": "Dựa vào `Role` để mở menu admin hay menu nhân viên." },
+    { "id": "r31", "from": "LinkedList", "to": "Node", "kind": "composition", "label": "m_pHead, m_pTail", "fromMult": "1", "toMult": "*", "explain": "Danh sách sở hữu các node nối với nhau bằng `m_pNext`; `m_pHead` trỏ node đầu, `m_pTail` trỏ node cuối." },
+    { "id": "r32", "from": "Node", "to": "LinkedList", "kind": "dependency", "label": "friend", "explain": "`LinkedList` là lớp bạn của `Node` để sửa được con trỏ `m_pNext`." },
+    { "id": "r33", "from": "AccountList", "to": "LinkedList", "kind": "composition", "label": "m_list", "fromMult": "1", "toMult": "1", "explain": "`AccountList<T>` giữ các tài khoản trong một `LinkedList<T>`; tìm, thêm, xóa, sắp xếp đều dựa trên danh sách liên kết này." },
+    { "id": "r34", "from": "Util", "to": "LinkedList", "kind": "dependency", "label": "readLines, writeLines", "explain": "`readLines` trả các dòng của file bằng `LinkedList<string>`; `writeLines` nhận một `LinkedList<string>` để ghi." },
+    { "id": "r35", "from": "UserProfile", "to": "LinkedList", "kind": "dependency", "label": "toLines, fromLines", "explain": "4 dòng của file hồ sơ được đưa vào và lấy ra bằng `LinkedList<string>`." },
+    { "id": "r36", "from": "HrSystem", "to": "LinkedList", "kind": "dependency", "label": "messages, usernames", "explain": "Các câu thông báo lúc khởi động và danh sách username trả về bằng `LinkedList<string>`." },
+    { "id": "r37", "from": "Console", "to": "LinkedList", "kind": "dependency", "label": "chooseOption", "explain": "Các mục của menu truyền vào `chooseOption` là một `LinkedList<string>`." },
+    { "id": "r38", "from": "Menu", "to": "LinkedList", "kind": "dependency", "label": "getOptions", "explain": "`getOptions` trả các tên mục bằng `LinkedList<string>`; `run` thêm mục thoát vào cuối." },
+    { "id": "r39", "from": "AdminMenu", "to": "LinkedList", "kind": "dependency", "label": "mục, username", "explain": "Dựng các mục menu và nhận danh sách username bằng `LinkedList<string>`." },
+    { "id": "r40", "from": "Application", "to": "LinkedList", "kind": "dependency", "label": "messages", "explain": "Nhận các câu thông báo của `HrSystem::initialize` bằng `LinkedList<string>` rồi in ra." }
   ]
 }

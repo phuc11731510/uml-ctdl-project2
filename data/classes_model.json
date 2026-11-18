@@ -26,8 +26,8 @@
         "cpp": "Một dòng ở đầu `Account.h`: `enum class Role { ADMIN, EMPLOYEE };`. Dùng: `Role::ADMIN`."
       },
       "notes": [],
-      "read": 2,
-      "stage": 2,
+      "read": 4,
+      "stage": 3,
       "readWhy": "Kiểu nhỏ nhất của phần dữ liệu; Account trả kiểu này.",
       "pos": [
         450,
@@ -138,7 +138,45 @@
           ],
           "example": "Tài khoản `nva`: `matchesUsername(\"NVA\")` = true; `matchesUsername(\"nva1\")` = false.",
           "cpp": "Gọi hàm so sánh không phân biệt hoa thường của lớp tiện ích; khai báo `const`.",
-          "implNote": "Đây là chỗ duy nhất so username. Đăng nhập, tìm, xóa, kiểm trùng đều đi qua hàm này (qua `AccountList.indexOf`); không nơi nào khác so username bằng `==`."
+          "implNote": "Đây là chỗ duy nhất so username. Đăng nhập, tìm, xóa, kiểm trùng đều đi qua hàm này (qua `AccountList.search`); không nơi nào khác so username bằng `==`."
+        },
+        {
+          "name": "operator==",
+          "vis": "+",
+          "params": [
+            "other: Account"
+          ],
+          "returns": "bool",
+          "summary": "So hai tài khoản theo khóa là tên đăng nhập, không phân biệt hoa thường.",
+          "role": "Để `LinkedList<T>::search` và `remove` tìm tài khoản theo khóa (đúng tinh thần «tìm khi biết khóa» của giáo trình).",
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "true khi và chỉ khi `matchesUsername(other.getUsername())`."
+          ],
+          "complexity": "O(độ dài username)",
+          "example": "`Admin(\"Bob\", \"1\") == Admin(\"bob\", \"2\")` là true (mật khẩu không tham gia).",
+          "cpp": "Gọi `matchesUsername` với username của `other`."
+        },
+        {
+          "name": "operator<",
+          "vis": "+",
+          "params": [
+            "other: Account"
+          ],
+          "returns": "bool",
+          "summary": "Xếp thứ tự hai tài khoản theo tên đăng nhập đổi chữ thường: true nếu tài khoản này đứng trước `other`.",
+          "role": "Để `LinkedList<T>::selectionSort` sắp xếp tài khoản tăng dần theo username.",
+          "pre": [
+            "Không có."
+          ],
+          "post": [
+            "true khi và chỉ khi `toLower(username) < toLower(other.username)`."
+          ],
+          "complexity": "O(độ dài username)",
+          "example": "`lthb < NVA` là true.",
+          "cpp": "Đổi hai username về chữ thường bằng `Util::toLower` rồi so bằng `<`."
         },
         {
           "name": "checkPassword",
@@ -212,13 +250,13 @@
         }
       ],
       "impl": {
-        "cpp": "**Thực tế 103 dòng**: `Account.h` 75 (gồm cả `enum class Role` và khối comment từng hàm), `Account.cpp` 28. Hàm dựng gán hai thuộc tính trong danh sách khởi tạo. Nhớ `virtual ~Account() = default;`. Các hàm ở phần `public:` đặt trước, thuộc tính `private:` đặt sau và tên thuộc tính là `m_` kèm tiền tố kiểu (`m_strUsername`, `m_strPassword`)."
+        "cpp": "**Thực tế 127 dòng**: `Account.h` 91 (gồm cả `enum class Role` và khối comment từng hàm), `Account.cpp` 36. Hàm dựng gán hai thuộc tính trong danh sách khởi tạo. Nhớ `virtual ~Account() = default;`. Các hàm ở phần `public:` đặt trước, thuộc tính `private:` đặt sau và tên thuộc tính là `m_` kèm tiền tố kiểu (`m_strUsername`, `m_strPassword`)."
       },
       "notes": [
         "`fromLine` không nằm ở đây vì nó là hàm static tạo đối tượng mới, mà hàm static không thể ảo. Mỗi lớp con có `fromLine` riêng và `AccountList<T>` gọi `T::fromLine`: lý do cần template."
       ],
-      "read": 3,
-      "stage": 2,
+      "read": 5,
+      "stage": 3,
       "readWhy": "Lớp cha của Admin và Employee.",
       "pos": [
         900,
@@ -249,7 +287,7 @@
             "password: string = \"\""
           ],
           "summary": "Gán username và mật khẩu (chuyển lên `Account`). Không truyền tham số thì được admin rỗng để `fromLine` điền sau.",
-          "role": "Bản rỗng cần cho `vector<Admin>` và cho `fromLine`; bản có tham số dùng khi tạo admin mặc định.",
+          "role": "Bản rỗng cần cho `AccountList<Admin>` (tạo `T item;` trong `load`) và cho `fromLine`; bản có tham số dùng khi tạo admin mặc định.",
           "pre": [
             "Không có."
           ],
@@ -321,8 +359,8 @@
       "notes": [
         "Admin không có file hồ sơ và không có chức năng đổi mật khẩu; admin chỉ quản lý nhân viên."
       ],
-      "read": 4,
-      "stage": 2,
+      "read": 6,
+      "stage": 3,
       "readWhy": "Lớp con đơn giản nhất của Account.",
       "pos": [
         675,
@@ -365,7 +403,7 @@
             "needsPasswordChange: bool = false"
           ],
           "summary": "Gán username, mật khẩu (chuyển lên `Account`) và cờ phải đổi mật khẩu. Không truyền tham số thì được nhân viên rỗng để `fromLine` điền sau.",
-          "role": "Bản rỗng cần cho `vector<Employee>` và cho `fromLine`.",
+          "role": "Bản rỗng cần cho `AccountList<Employee>` (tạo `T item;` trong `load`) và cho `fromLine`.",
           "pre": [
             "Không có."
           ],
@@ -509,8 +547,8 @@
         "Cột 3 là phần thêm so với đề.",
         "Hồ sơ (họ tên, địa chỉ...) không nằm trong lớp này mà ở file `data/users/<username>.txt`, do `HrSystem` đọc ghi."
       ],
-      "read": 5,
-      "stage": 2,
+      "read": 7,
+      "stage": 3,
       "readWhy": "Lớp con thứ hai của Account, thêm cờ «phải đổi mật khẩu».",
       "pos": [
         1125,
@@ -551,8 +589,8 @@
         "cpp": "`enum class ProfileField { FULL_NAME, ADDRESS, PHONE, EMAIL };` Duyệt: `for (int i = 0; i < UserProfile::FIELD_COUNT; i++) { ProfileField f = static_cast<ProfileField>(i); ... }`."
       },
       "notes": [],
-      "read": 6,
-      "stage": 2,
+      "read": 8,
+      "stage": 3,
       "readWhy": "Đọc ngay trước UserProfile.",
       "pos": [
         2025,
@@ -656,24 +694,24 @@
           "name": "toLines",
           "vis": "+",
           "params": [],
-          "returns": "vector<string>",
-          "summary": "Trả vector 4 chuỗi theo thứ tự họ tên, địa chỉ, số điện thoại, email: đúng 4 dòng của file hồ sơ.",
+          "returns": "LinkedList<string>",
+          "summary": "Trả một `LinkedList<string>` gồm 4 chuỗi theo thứ tự họ tên, địa chỉ, số điện thoại, email: đúng 4 dòng của file hồ sơ.",
           "role": "`HrSystem` dùng khi ghi file hồ sơ.",
           "pre": [
             "Không có."
           ],
           "post": [
-            "Đúng 4 phần tử, theo thứ tự của `ProfileField`."
+            "Đúng 4 node, theo thứ tự của `ProfileField`."
           ],
-          "example": "→ `[\"Nguyen Van A\", \"12 Le Loi, Q1\", \"0912345678\", \"nva@gmail.com\"]`.",
-          "cpp": "Tạo vector từ 4 phần tử của mảng."
+          "example": "→ `\"Nguyen Van A\" → \"12 Le Loi, Q1\" → \"0912345678\" → \"nva@gmail.com\"`.",
+          "cpp": "Tạo danh sách rỗng rồi `addTail` lần lượt 4 phần tử của mảng."
         },
         {
           "name": "fromLines",
           "static": true,
           "vis": "+",
           "params": [
-            "lines: vector<string>",
+            "lines: LinkedList<string>",
             "out: UserProfile&"
           ],
           "returns": "bool",
@@ -687,15 +725,15 @@
             "Đủ: lấy 4 dòng đầu, trả true."
           ],
           "example": "4 dòng → true; 2 dòng → false.",
-          "cpp": "Ít hơn `FIELD_COUNT` dòng thì trả false; ngược lại chép các dòng đầu vào mảng của `out`."
+          "cpp": "Ít hơn `FIELD_COUNT` dòng (`getSize()`) thì trả false; ngược lại đi từ `getHead()`, chép lần lượt các node đầu vào mảng của `out`."
         }
       ],
       "impl": {
-        "cpp": "**Thực tế 100 dòng**: `UserProfile.h` 51 (gồm cả `enum class ProfileField`), `UserProfile.cpp` 49. Không cần hàm dựng: mảng `m_strValues` (kích thước `FIELD_COUNT`) tự khởi tạo rỗng. `labelOf` dùng `switch` có nhánh `default`."
+        "cpp": "**Thực tế 102 dòng**: `UserProfile.h` 51 (gồm cả `enum class ProfileField`), `UserProfile.cpp` 51. Không cần hàm dựng: mảng `m_strValues` (kích thước `FIELD_COUNT`) tự khởi tạo rỗng. `labelOf` dùng `switch` có nhánh `default`."
       },
       "notes": [],
-      "read": 7,
-      "stage": 2,
+      "read": 9,
+      "stage": 3,
       "readWhy": "Hồ sơ 4 thông tin; khép lại phần dữ liệu.",
       "pos": [
         1575,

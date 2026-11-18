@@ -30,30 +30,36 @@ Nếu sau khi các file được sửa mà trang vẫn hiện bản cũ, nhấn 
 
 | File | Dòng |
 | --- | ---: |
+| `Node.h` | 67 |
+| `LinkedList.h` | 361 |
 | `Util.h` + `Util.cpp` | 72 + 83 |
-| `Account.h` (gồm `Role`) + `Account.cpp` | 75 + 28 |
+| `Account.h` (gồm `Role`) + `Account.cpp` | 91 + 36 |
 | `Admin.h` + `Admin.cpp` | 36 + 35 |
 | `Employee.h` + `Employee.cpp` | 75 + 62 |
-| `UserProfile.h` (gồm `ProfileField`) + `UserProfile.cpp` | 51 + 49 |
-| `AccountList.h` | 139 |
-| `Validator.h` + `Validator.cpp` | 128 + 159 |
+| `UserProfile.h` (gồm `ProfileField`) + `UserProfile.cpp` | 51 + 51 |
+| `AccountList.h` | 154 |
+| `Validator.h` + `Validator.cpp` | 132 + 158 |
 | `HrSystem.h` + `HrSystem.cpp` | 172 + 255 |
-| `Console.h` + `Console.cpp` | 146 + 202 |
+| `Console.h` + `Console.cpp` | 146 + 203 |
 | `Menu.h` + `Menu.cpp` | 56 + 36 |
-| `AdminMenu.h` + `AdminMenu.cpp` | 76 + 165 |
+| `AdminMenu.h` + `AdminMenu.cpp` | 76 + 168 |
 | `EmployeeMenu.h` + `EmployeeMenu.cpp` | 69 + 99 |
 | `Application.h` + `Application.cpp` | 31 + 82 |
 | `main.cpp` | 6 |
-| **Tổng** | **2387** |
+| **Tổng** | **2863** |
 
-Số trên là số dòng của mã đã viết xong. Mã theo C++ Coding Standard V2 nên dài hơn bản ước tính ban đầu (khoảng 923 dòng): mỗi hàm có khối chú thích `@Description`/`@return`/`@attention`, mọi lớp (trừ lớp mẫu `AccountList`) tách thành `.h` và `.cpp`, các số và chuỗi lặp lại được đặt thành hằng.
+Số trên là số dòng của mã đã viết xong. Mã theo C++ Coding Standard V2 nên dài hơn bản ước tính ban đầu (khoảng 923 dòng): mỗi hàm có khối chú thích `@Description`/`@return`/`@attention`, mọi lớp (trừ các lớp mẫu `Node`, `LinkedList`, `AccountList`) tách thành `.h` và `.cpp`, các số và chuỗi lặp lại được đặt thành hằng.
+
+## Cấu trúc dữ liệu (theo giáo trình)
+
+Chương trình không dùng `std::vector`. Mọi dãy phần tử (dòng của file, mục menu, thông báo, username, tài khoản) nằm trong `LinkedList<T>`, danh sách liên kết đơn cài đặt theo chương 3 của giáo trình «Cấu trúc dữ liệu» (có `pHead`, `pTail`, `iSize` và các thao tác `addHead`, `addTail`, `addAfter`, `search`, `searchPre`, `removeHead`, `removeTail`, `removeAfter`, `remove`, `clear`, `selectionSort`, `getSize`). `Node<T>` là một phần tử của danh sách. `AccountList<T>` giữ các tài khoản trong một `LinkedList<T>`; tìm tài khoản trả con trỏ `Node`, không còn chỉ số. Danh sách tên Windows cấm trong `Validator` là một mảng hằng.
 
 ## Quy ước viết mã (theo C++ Coding Standard V2)
 
 - Tên lớp `PascalCase`, tên hàm `camelCase` bắt đầu bằng động từ, tên hằng và giá trị enum `UPPERCASE`.
 - Biến cục bộ dùng Hungarian Notation: `bool` là `b` (`bReady`), số nguyên là `i` (`iIndex`), `char` là `c`, `string` là `str` (`strError`), enum là `e` (`eRole`). Biến thuộc tính có tiền tố `m_` rồi tiền tố kiểu (`m_strUsername`, `m_bNeedsPasswordChange`). Tham số hàm không thêm tiền tố nhưng phải đặt tên đầy đủ, không viết tắt.
 - File `.h` không có `using namespace std;` nên viết `std::string`; file `.cpp` đặt `using namespace std;` sau các `#include` và viết `string`.
-- Mỗi lớp có `.h` và `.cpp` cùng tên, thứ tự hàm trong hai file giống nhau; lớp mẫu `AccountList` được viết hết trong `.h`.
+- Mỗi lớp có `.h` và `.cpp` cùng tên, thứ tự hàm trong hai file giống nhau; các lớp mẫu `Node`, `LinkedList`, `AccountList` được viết hết trong `.h`.
 - Mọi `switch` có nhánh `default`, mỗi câu lệnh một dòng, dùng `this->` khi gọi thành viên của chính lớp và `TenLop::` khi gọi hàm tĩnh.
 - Không dùng số hay chuỗi cứng lặp lại: đặt thành hằng `static const` của lớp; không dùng biến toàn cục.
 - Chú thích hàm viết trong file `.h` theo khung `/**** @Description ... @return ... @attention ... ****/`.
@@ -65,7 +71,8 @@ Số trên là số dòng của mã đã viết xong. Mã theo C++ Coding Standa
 | `index.html`, `style.css` | Khung trang và giao diện |
 | `common.js`, `diagram.js`, `main.js` | Mã trang (không dùng thư viện ngoài) |
 | `data/meta.json` | Tên, phiên bản, các gói (màu), các chặng đọc và kích thước chuẩn để co giãn bố cục |
-| `data/classes_types.json` | Thẻ «Kiểu cơ bản» (`BasicTypes`): `string`, `vector<T>`, `int`, `bool`, `char`, `void` |
+| `data/classes_types.json` | Thẻ «Kiểu cơ bản» (`BasicTypes`): `string`, `int`, `bool`, `char`, `void` |
+| `data/classes_ds.json` | `Node<DataType>`, `LinkedList<DataType>` |
 | `data/classes_util.json` | `Util` |
 | `data/classes_model.json` | `Role`, `Account`, `Admin`, `Employee`, `ProfileField`, `UserProfile` |
 | `data/classes_storage.json` | `AccountList<T>` |
